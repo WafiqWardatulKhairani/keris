@@ -1,0 +1,299 @@
+/* ==========================================================================
+   SUMMARY GRID & CARDS
+   ========================================================================== */
+.pk-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-top: 20px; /* Jarak pas antara Tabs Global dengan Summary Card */
+    margin-bottom: 24px;
+}
+
+.pk-summary-card {
+    background: #ffffff;
+    border: 1px solid #f3f4f6;
+    border-radius: 12px;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.pk-summary-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.pk-summary-icon i {
+    font-size: 24px !important;
+}
+
+/* Penyesuaian Warna Icon Berdasarkan Jenis (Subtle) */
+.bg-primary-subtle { background-color: #eff6ff !important; color: #1d4ed8 !important; }
+.bg-success-subtle { background-color: #f0fdf4 !important; color: #15803d !important; }
+.bg-warning-subtle { background-color: #fffbeb !important; color: #b45309 !important; }
+
+.pk-summary-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.pk-summary-label {
+    font-size: 12px;
+    color: #6b7280;
+    margin-bottom: 2px;
+}
+
+.pk-summary-value {
+    font-size: 24px;
+    font-weight: 700;
+    color: #111827;
+    line-height: 1.2;
+}
+
+.pk-summary-subtext {
+    font-size: 11px;
+    color: #9ca3af;
+    margin-top: 2px;
+}
+
+
+/* ==========================================================================
+   TABLE DESIGN
+   ========================================================================== */
+.pk-table-wrapper {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.pk-konteks-table {
+    margin-bottom: 0;
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.pk-konteks-table thead th {
+    background-color: #f9fafb;
+    font-size: 13px;
+    font-weight: 600;
+    color: #4b5563;
+    padding: 14px 16px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.pk-konteks-table tbody td {
+    padding: 14px 16px;
+    font-size: 13px;
+    color: #374151;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.table-row-click {
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+}
+
+.table-row-click:hover {
+    background-color: #f9fafb !important;
+}
+
+
+/* ==========================================================================
+   BADGES STATUS (Dikurangi round-nya agar tampak semi-kotak)
+   ========================================================================== */
+.pk-status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 2px 8px;       /* Lebih tipis */
+    border-radius: 4px;     /* Mengurangi kelengkungan dari 20px menjadi 4px agar agak kotak */
+    font-size: 11px;
+    font-weight: 500;
+}
+
+.pk-badge-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+/* Warna Status */
+.pk-badge-lengkap { background-color: #ecfdf5; color: #065f46; border: 1px solid #a7f3d0; }
+.pk-badge-lengkap .pk-badge-dot { background-color: #10b981; }
+
+.pk-badge-draft { background-color: #fff7ed; color: #9a3412; border: 1px solid #ffedd5; }
+.pk-badge-draft .pk-badge-dot { background-color: #f97316; }
+
+.pk-badge-draft-konteks { background-color: #fef9c3; color: #713f12; border: 1px solid #fef08a; }
+.pk-badge-draft-konteks .pk-badge-dot { background-color: #eab308; }
+
+
+/* ==========================================================================
+   PAGINATION & TABLE BOTTOM (Disamakan total dengan Analisis Risiko)
+   ========================================================================== */
+.pk-table-bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px;         /* Sama dengan ar-table-bottom */
+    border-top: 1px solid #e9ecef;
+    background: #fafbfc;        /* Efek background kelabu bersih */
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.pk-table-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.pk-perpage-select {
+    height: 30px;               /* Tinggi rigid 30px */
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 12px;
+    padding: 0 6px;
+    background: #fff;
+    cursor: pointer;
+    outline: none;
+}
+
+.pk-info-text {
+    font-size: 12px;
+    color: #6b7280;
+}
+
+/* Style Pagination Generator Core */
+.pk-pagination-wrapper .pagination {
+    margin: 0;
+    gap: 4px;
+    display: flex;
+    flex-wrap: wrap;
+    list-style: none;
+    padding-left: 0;
+}
+
+.pk-pagination-wrapper .page-item .page-link {
+    height: 30px;               /* Mengecil jadi 30px */
+    min-width: 30px;
+    padding: 0 8px;
+    font-size: 12px;
+    border-radius: 6px !important;
+    border: 1px solid #e5e7eb;
+    color: #374151;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    text-decoration: none;
+    background: #fff;
+}
+
+.pk-pagination-wrapper .page-item.active .page-link {
+    background-color: #2f80ed !important; /* Biru khas Analisis Risiko */
+    border-color: #2f80ed !important;
+    color: #fff !important;
+}
+
+.pk-pagination-wrapper .page-item.disabled .page-link {
+    color: #9ca3af;
+    background: #f9fafb;
+    border-color: #e5e7eb;
+}
+
+.pk-pagination-wrapper .page-item .page-link:hover:not(.disabled) {
+    background: #f3f4f6;
+    border-color: #d1d5db;
+    color: #374151;
+}
+/* Year picker */
+.flatpickr-months .flatpickr-prev-month,
+.flatpickr-months .flatpickr-next-month,
+.flatpickr-weekdays,
+.flatpickr-days {
+    display: none !important;
+}
+
+.flatpickr-current-month {
+    padding-top: 12px;
+}
+
+.numInputWrapper {
+    pointer-events: auto;
+}
+
+/* ================= OFFCANVAS RUANG LINGKUP ================= */
+#offcanvasRuangLingkup {
+    width: 420px !important;
+    max-width: 95vw;
+    top: 60px !important;
+    height: calc(100% - 60px) !important;
+    box-shadow: -2px 0 12px rgba(0,0,0,0.08) !important;
+}
+#offcanvasRuangLingkup .offcanvas-header {
+    padding: 14px 20px;
+}
+#offcanvasRuangLingkup .offcanvas-title {
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.2;
+}
+#offcanvasRuangLingkup .offcanvas-header small {
+    font-size: 11px;
+}
+#offcanvasRuangLingkup .offcanvas-body {
+    padding: 12px 20px 18px 20px;
+}
+#offcanvasRuangLingkup .btn {
+    height: 36px;
+    padding: 0 16px;
+    font-size: 13px;
+    border-radius: 6px;
+}
+#offcanvasRuangLingkup .btn-primary {
+    background: #2f80ed;
+    border: none;
+}
+#offcanvasRuangLingkup .btn-primary:hover {
+    background: #1a6fd4;
+}
+#offcanvasRuangLingkup .btn-warning {
+    background: #f59e0b;
+    border: none;
+    color: #fff;
+}
+#offcanvasRuangLingkup .btn-light {
+    background: #f2f4f7;
+    border: none;
+    color: #374151;
+}
+#offcanvasRuangLingkup .form-control,
+#offcanvasRuangLingkup .form-select {
+    height: 40px;
+    border-radius: 6px;
+    font-size: 13px;
+    border: 1px solid #dcdfe4;
+    padding: 6px 10px;
+}
+#offcanvasRuangLingkup .form-control:focus,
+#offcanvasRuangLingkup .form-select:focus {
+    border-color: #2f80ed;
+    box-shadow: 0 0 0 3px rgba(47,128,237,0.1);
+}
+#offcanvasRuangLingkup .form-control:disabled,
+#offcanvasRuangLingkup .form-select:disabled {
+    background-color: #f9fafb;
+    color: #6b7280;
+    cursor: default;
+}

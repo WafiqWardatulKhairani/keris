@@ -36,22 +36,22 @@
 
                         <ul class="pc-submenu">
 
-                            <li class="pc-item pc-hasmenu">
-                                <a href="javascript:void(0)" class="pc-link pc-parent">
-                                    <span class="pc-mtext">MR Instansi</span>
-                                    <span class="pc-arrow"><i data-feather="chevron-right"></i></span>
-                                </a>
+                            <!--<li class="pc-item pc-hasmenu">-->
+                            <!--    <a href="javascript:void(0)" class="pc-link pc-parent">-->
+                            <!--        <span class="pc-mtext">MR Instansi</span>-->
+                            <!--        <span class="pc-arrow"><i data-feather="chevron-right"></i></span>-->
+                            <!--    </a>-->
 
-                                <ul class="pc-submenu">
-                                    <li class="pc-item"><a href="<?= base_url('mr-instansi/penetapan-konteks') ?>" class="pc-link"><span class="pc-mtext">Penetapan Konteks</span></a></li>
-                                    <li class="pc-item"><a href="<?= base_url('mr-instansi/identifikasi-risiko') ?>" class="pc-link"><span class="pc-mtext">Identifikasi Risiko</span></a></li>
-                                    <li class="pc-item"><a href="<?= base_url('mr-instansi/analisis-risiko') ?>" class="pc-link"><span class="pc-mtext">Analisis Risiko</span></a></li>
-                                    <li class="pc-item"><a href="<?= base_url('mr-instansi/evaluasi-risiko') ?>" class="pc-link"><span class="pc-mtext">Evaluasi Risiko</span></a></li>
-                                    <li class="pc-item"><a href="<?= base_url('mr-instansi/rencana-penanganan') ?>" class="pc-link"><span class="pc-mtext">RTP</span></a></li>
-                                    <li class="pc-item"><a href="<?= base_url('mr-instansi/pemantauan-risiko') ?>" class="pc-link"><span class="pc-mtext">Pemantauan Risiko</span></a></li>
-                                    <li class="pc-item"><a href="<?= base_url('mr-instansi/pelaporan-risiko') ?>" class="pc-link"><span class="pc-mtext">Pelaporan Risiko</span></a></li>
-                                </ul>
-                            </li>
+                            <!--    <ul class="pc-submenu">-->
+                            <!--        <li class="pc-item"><a href="<?= base_url('mr-instansi/penetapan-konteks') ?>" class="pc-link"><span class="pc-mtext">Penetapan Konteks</span></a></li>-->
+                            <!--        <li class="pc-item"><a href="<?= base_url('mr-instansi/identifikasi-risiko') ?>" class="pc-link"><span class="pc-mtext">Identifikasi Risiko</span></a></li>-->
+                            <!--        <li class="pc-item"><a href="<?= base_url('mr-instansi/analisis-risiko') ?>" class="pc-link"><span class="pc-mtext">Analisis Risiko</span></a></li>-->
+                            <!--        <li class="pc-item"><a href="<?= base_url('mr-instansi/evaluasi-risiko') ?>" class="pc-link"><span class="pc-mtext">Evaluasi Risiko</span></a></li>-->
+                            <!--        <li class="pc-item"><a href="<?= base_url('mr-instansi/rencana-penanganan') ?>" class="pc-link"><span class="pc-mtext">RTP</span></a></li>-->
+                            <!--        <li class="pc-item"><a href="<?= base_url('mr-instansi/pemantauan-risiko') ?>" class="pc-link"><span class="pc-mtext">Pemantauan Risiko</span></a></li>-->
+                            <!--        <li class="pc-item"><a href="<?= base_url('mr-instansi/pelaporan-risiko') ?>" class="pc-link"><span class="pc-mtext">Pelaporan Risiko</span></a></li>-->
+                            <!--    </ul>-->
+                            <!--</li>-->
 
                             <li class="pc-item pc-hasmenu">
                                 <a href="javascript:void(0)" class="pc-link pc-parent">

@@ -1,9 +1,16 @@
-<div class="offcanvas br-offcanvas" id="brForm">
+<div
+    class="offcanvas offcanvas-end br-offcanvas"
+    tabindex="-1"
+    id="brForm">
     <div class="br-container">
 
         <div class="offcanvas-header border-bottom">
             <div>
-                <h5 class="offcanvas-title mb-0 fw-semibold">Detail Bank Risiko</h5>
+                <h5
+                    id="brTitle"
+                    class="offcanvas-title mb-0 fw-semibold">
+                    Detail Bank Risiko
+                </h5>
                 <small>Master Data</small>
             </div>
         </div>

@@ -1,0 +1,90 @@
+/* ============================= */
+/* SIDEBAR MINI – HOVER SUBMENU */
+/* ============================= */
+
+/* Disable default animations */
+.pc-sidebar .pc-submenu,
+.pc-sidebar .pc-item.pc-hasmenu > .pc-link {
+  transition: none !important;
+}
+
+.pc-sidebar .pc-submenu {
+  height: auto !important;
+}
+
+/* Hide default submenu when collapsed */
+.pc-sidebar.pc-sidebar-mini .pc-item.pc-hasmenu > .pc-submenu {
+  display: none !important;
+}
+
+/* Parent positioning */
+.pc-sidebar.pc-sidebar-mini .pc-item.pc-hasmenu {
+  position: relative;
+}
+
+/* Hover submenu (NO GAP, STABLE) */
+.pc-sidebar.pc-sidebar-mini .pc-item.pc-hasmenu:hover > .pc-submenu,
+.pc-sidebar.pc-sidebar-mini .pc-item.pc-hasmenu > .pc-submenu:hover {
+  display: flex !important;
+  flex-direction: column;
+  align-items: center;
+
+  position: absolute;
+  top: 0;
+  left: 100%;              /* nempel sidebar */
+
+  width: 64px;             /* icon-only panel */
+  padding: 6px 0;
+
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 8px 20px rgba(0,0,0,.12);
+
+  z-index: 1050;
+}
+
+/* Submenu item */
+.pc-sidebar.pc-sidebar-mini .pc-submenu .pc-link {
+  justify-content: center;
+  padding: 10px 0;
+}
+
+/* Icon center */
+.pc-sidebar.pc-sidebar-mini .pc-submenu .pc-micon {
+  margin: 0;
+}
+
+/* === SWEETALERT MANTIS FIX === */
+.swal2-popup.swal-mantis {
+    width: 420px !important;
+    max-width: 90%;
+    padding: 1.75rem !important;
+    border-radius: 12px;
+    font-family: 'Public Sans', sans-serif;
+}
+
+.swal2-title {
+    font-size: 1.25rem !important;
+}
+
+.swal2-html-container {
+    font-size: 0.95rem !important;
+}
+
+.swal-mantis {
+    border-radius: 12px;
+    font-family: 'Public Sans', sans-serif;
+}
+
+.swal-mantis .swal2-title {
+    font-size: 1.1rem;
+}
+
+.swal-mantis .swal2-html-container {
+    font-size: 0.95rem;
+}
+
+.swal-mantis .swal2-actions button {
+    padding: 6px 18px;
+    font-size: 0.9rem;
+}

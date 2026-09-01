@@ -1,0 +1,75 @@
+/* =============================== */
+/* MINI SIDEBAR – FLATTEN SUBMENU */
+/* =============================== */
+
+/* Sembunyikan parent menu */
+.pc-sidebar.pc-sidebar-mini .pc-item.pc-hasmenu > .pc-link {
+  display: none !important;
+}
+
+/* Jadikan submenu sebagai menu utama */
+.pc-sidebar.pc-sidebar-mini .pc-item.pc-hasmenu > .pc-submenu {
+  position: static !important;
+  display: block !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+/* Submenu item tampil seperti menu utama */
+.pc-sidebar.pc-sidebar-mini .pc-submenu .pc-link {
+  display: flex;
+  justify-content: center;
+  padding: 12px 0;
+}
+
+.pc-sidebar.pc-sidebar-mini .pc-submenu .pc-link {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+/* Sembunyikan teks */
+.pc-sidebar.pc-sidebar-mini .pc-submenu .pc-mtext {
+  display: none !important;
+}
+
+/* Center icon */
+.pc-sidebar.pc-sidebar-mini .pc-submenu .pc-micon {
+  margin: 0 !important;
+}
+
+/* === SWEETALERT MANTIS FIX === */
+.swal2-popup.swal-mantis {
+    width: 420px !important;
+    max-width: 90%;
+    padding: 1.75rem !important;
+    border-radius: 12px;
+    font-family: 'Public Sans', sans-serif;
+}
+
+.swal2-title {
+    font-size: 1.25rem !important;
+}
+
+.swal2-html-container {
+    font-size: 0.95rem !important;
+}
+
+.swal-mantis {
+    border-radius: 12px;
+    font-family: 'Public Sans', sans-serif;
+}
+
+.swal-mantis .swal2-title {
+    font-size: 1.1rem;
+}
+
+.swal-mantis .swal2-html-container {
+    font-size: 0.95rem;
+}
+
+.swal-mantis .swal2-actions button {
+    padding: 6px 18px;
+    font-size: 0.9rem;
+}

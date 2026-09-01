@@ -1,0 +1,53 @@
+.kg-offcanvas{
+position:fixed!important;
+top:0;
+left:0;
+width:100vw!important;
+height:100vh!important;
+display:flex!important;
+align-items:center!important;
+justify-content:center!important;
+background:rgba(0,0,0,.25);
+z-index:1055;
+opacity:0;
+pointer-events:none;
+transition:opacity .2s ease;
+transform:none!important;
+right:auto!important;
+bottom:auto!important;
+}
+
+.kg-offcanvas.show{
+opacity:1;
+pointer-events:auto;
+}
+
+.kg-container{
+width:420px;
+max-width:95vw;
+background:#fff;
+border-radius:12px;
+box-shadow:0 10px 30px rgba(0,0,0,.15);
+transform:translateY(-60px);
+opacity:0;
+transition:all .25s ease;
+}
+
+.kg-offcanvas.show .kg-container{
+transform:translateY(0);
+opacity:1;
+}
+
+.kg-container .offcanvas-header{padding:12px 18px;}
+.kg-container .offcanvas-body{padding:16px 18px 14px 18px;}
+
+.kg-container .form-control{height:36px;font-size:13px;}
+.kg-container .btn{height:32px;font-size:13px;padding:0 12px;}
+
+#kgBtnDelete{
+width:34px;
+display:flex;
+align-items:center;
+justify-content:center;
+padding:0;
+}

@@ -1,0 +1,25 @@
+.keris-footer {
+    margin-top: 24px;
+    margin-left: -24px;
+    margin-right: -24px;
+
+    background: #fff;
+    border-top: 1px solid #e9ecef;
+}
+
+.footer-content {
+    text-align: center;
+    padding: 14px 20px;
+
+    font-size: 12px;
+    font-weight: 600;
+    color: #6c757d;
+}
+
+.footer-content strong {
+    font-weight: 600;
+}
+
+.pc-content {
+    min-height: calc(100vh - 140px);
+}

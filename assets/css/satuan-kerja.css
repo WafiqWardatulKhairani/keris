@@ -1,0 +1,131 @@
+.sk-offcanvas{
+position:fixed!important;
+top:0;
+left:0;
+width:100vw!important;
+height:100vh!important;
+display:flex!important;
+align-items:center!important;
+justify-content:center!important;
+background:rgba(0,0,0,.25);
+z-index:1055;
+opacity:0;
+pointer-events:none;
+transition:opacity .2s ease;
+
+/* matikan semua behavior bootstrap */
+transform:none!important;
+right:auto!important;
+bottom:auto!important;
+}
+
+/* show */
+.sk-offcanvas.show{
+opacity:1;
+pointer-events:auto;
+}
+
+/* container (card) */
+.sk-container{
+width:420px;
+max-width:95vw;
+background:#fff;
+border-radius:12px;
+box-shadow:0 10px 30px rgba(0,0,0,.15);
+
+/* animasi dari atas */
+transform:translateY(-60px);
+opacity:0;
+transition:all .25s ease;
+}
+
+/* animasi masuk */
+.sk-offcanvas.show .sk-container{
+transform:translateY(0);
+opacity:1;
+}
+
+/* spacing */
+.sk-container .offcanvas-header{
+padding:12px 18px;
+}
+
+.sk-container .offcanvas-body{
+padding:16px 18px 14px 18px;
+}
+
+/* form */
+.sk-container .form-control{
+height:36px;
+font-size:13px;
+}
+
+/* button */
+.sk-container .btn{
+height:32px;
+font-size:13px;
+padding:0 12px;
+}
+
+/* delete icon */
+#skBtnDelete{
+width:34px;
+display:flex;
+align-items:center;
+justify-content:center;
+padding:0;
+}
+
+/* bottom table */
+.ar-table-bottom{
+display:flex;
+align-items:center;
+justify-content:space-between;
+padding:10px 16px;
+border-top:1px solid #e9ecef;
+background:#fafbfc;
+flex-wrap:wrap;
+gap:8px;
+}
+
+.ar-table-info{
+display:flex;
+align-items:center;
+gap:12px;
+}
+
+.ar-perpage{
+height:30px;
+border:1px solid #d1d5db;
+border-radius:6px;
+font-size:12px;
+padding:0 6px;
+background:#fff;
+}
+
+.ar-info-text{
+font-size:12px;
+color:#6b7280;
+}
+
+.ar-pagination .pagination{
+gap:4px;
+display:flex;
+flex-wrap:wrap;
+}
+
+.ar-pagination .page-link{
+height:30px;
+min-width:30px;
+font-size:12px;
+border-radius:6px!important;
+border:1px solid #e5e7eb;
+display:flex;
+align-items:center;
+justify-content:center;
+}
+
+.ar-pagination .active .page-link{
+background:#2f80ed;
+color:#fff;
+}

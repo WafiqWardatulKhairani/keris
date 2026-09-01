@@ -97,38 +97,101 @@ class TimKerjaController extends BaseController
     public function update($id)
     {
         $data = $this->request->getJSON(true);
-
+    
         $this->db->transStart();
-
-        // update tim
+    
+        // ==========================
+        // Update nama tim
+        // ==========================
         $this->db->table('tim_kerja')
             ->where('id_tim', $id)
             ->update([
                 'nama_tim'   => $data['nama'],
                 'updated_at' => date('Y-m-d H:i:s')
             ]);
-
-        // hapus seluruh kegiatan lama
-        $this->db->table('kegiatan')
-            ->where('id_tim', $id)
-            ->delete();
-
-        // insert ulang kegiatan terbaru
-        foreach ($data['kegiatan'] as $kegiatan) {
-
-            if (trim($kegiatan) === '') {
+    
+        // Menyimpan id kegiatan yang masih ada
+        $existingIds = [];
+    
+        // ==========================
+        // Update / Insert kegiatan
+        // ==========================
+        foreach ($data['kegiatan'] as $item) {
+    
+            if (trim($item['nama']) == '') {
                 continue;
             }
-
-            $this->db->table('kegiatan')->insert([
-                'id_tim'        => $id,
-                'nama_kegiatan' => $kegiatan,
-                'created_at'    => date('Y-m-d H:i:s')
-            ]);
+    
+            // =====================
+            // UPDATE
+            // =====================
+            if (!empty($item['id'])) {
+    
+                $existingIds[] = $item['id'];
+    
+                $this->db->table('kegiatan')
+                    ->where('id_kegiatan', $item['id'])
+                    ->update([
+                        'nama_kegiatan' => $item['nama'],
+                        'updated_at'    => date('Y-m-d H:i:s')
+                    ]);
+    
+            }
+            // =====================
+            // INSERT
+            // =====================
+            else {
+    
+                $this->db->table('kegiatan')
+                    ->insert([
+                        'id_tim'         => $id,
+                        'nama_kegiatan'  => $item['nama'],
+                        'created_at'     => date('Y-m-d H:i:s')
+                    ]);
+    
+            }
         }
-
+    
+        // ==========================
+        // Cari kegiatan yang dihapus dari UI
+        // ==========================
+        $builder = $this->db->table('kegiatan')
+            ->where('id_tim', $id);
+    
+        if (!empty($existingIds)) {
+            $builder->whereNotIn('id_kegiatan', $existingIds);
+        }
+    
+        $deleted = $builder->get()->getResultArray();
+    
+        foreach ($deleted as $row) {
+    
+            // cek apakah kegiatan sudah dipakai pada konteks
+            $dipakai = $this->db->table('konteks')
+                ->where('id_kegiatan', $row['id_kegiatan'])
+                ->countAllResults();
+    
+            if ($dipakai == 0) {
+    
+                // aman dihapus
+                $this->db->table('kegiatan')
+                    ->where('id_kegiatan', $row['id_kegiatan'])
+                    ->delete();
+    
+            } else {
+    
+                // batalkan transaksi
+                $this->db->transRollback();
+    
+                return $this->response->setJSON([
+                    'status' => false,
+                    'message' => 'Kegiatan "' . $row['nama_kegiatan'] . '" tidak dapat dihapus karena sudah digunakan pada Penetapan Konteks.'
+                ]);
+            }
+        }
+    
         $this->db->transComplete();
-
+    
         return $this->response->setJSON([
             'status' => true
         ]);

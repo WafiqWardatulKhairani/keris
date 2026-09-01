@@ -1,0 +1,44 @@
+.pc-header {
+    background-color: #ffffff;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+    z-index: 1025;
+}
+
+.keris-raja-logo-wrapper {
+    display: flex;
+    align-items: center;
+}
+.keris-raja-logo {
+    height: 32px;
+    font-size: 13px;
+    width: auto;
+    max-width: 200px;
+}
+
+.navbar-bps-logo {
+    display: flex;
+    align-items: center;
+    margin-left: 12px;
+}
+.navbar-bps-logo img {
+    height: 36px;
+    width: auto;
+    margin-right: 10px;
+}
+.navbar-bps-text {
+    line-height: 1.1;
+}
+.navbar-bps-main {
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+}
+.navbar-bps-sub {
+    font-size: 12px;
+    color: #777;
+}
+
+.me-auto.pc-mob-drp {
+    display: flex;
+    align-items: center;
+}

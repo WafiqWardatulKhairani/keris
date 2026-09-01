@@ -1,0 +1,6 @@
+@media (max-width: 768px) {
+    .pk-header .text-end {
+        text-align: left !important;
+        margin-top: 8px;
+    }
+}

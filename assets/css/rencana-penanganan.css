@@ -1,0 +1,641 @@
+/* ================= OFFCANVAS ================= */
+#rtpOffcanvas {
+    width: 880px !important;
+    max-width: 95vw;
+}
+
+#rtpOffcanvas .offcanvas-header {
+    padding: 14px 20px;
+}
+
+#rtpOffcanvas .offcanvas-title {
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 2px;
+    line-height: 1.2;
+}
+
+#rtpOffcanvas .offcanvas-header small {
+    font-size: 11px;
+}
+
+#rtpOffcanvas .offcanvas-body {
+    padding: 8px 20px 18px 20px;
+}
+
+/* ================= SECTION TITLE ================= */
+.rtp-section-title {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #6b7280;
+    margin-bottom: 12px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+/* ================= INFO PANELS ================= */
+.rtp-info-panel {
+    border-radius: 8px;
+    margin-bottom: 14px;
+}
+
+.rtp-info-row {
+    display: flex;
+    align-items: flex-start;
+    font-size: 12px;
+    padding: 4px 0;
+    gap: 8px;
+}
+
+.rtp-info-row:not(:last-child) {
+    border-bottom: 1px solid #f2f4f7;
+}
+
+.rtp-info-label {
+    font-weight: 500;
+    color: #6b7280;
+    flex-shrink: 0;
+    width: 140px;
+}
+
+.rtp-info-value {
+    font-weight: 500;
+    color: #111827;
+    flex: 1;
+}
+
+/* ================= GRID 2 KOLOM ================= */
+.rtp-grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+/* ================= TARGET GRID ================= */
+.rtp-target-grid{
+display:grid;
+grid-template-columns: 2fr 1fr;
+gap:16px;
+}
+
+.rtp-sub-label{
+font-size:12px;
+color:#6b7280;
+margin-bottom:4px;
+}
+
+/* ================= FORM LABEL ================= */
+.rtp-form-label {
+    font-size: 13px;
+    font-weight: 500;
+    color: #374151;
+    margin-bottom: 4px;
+}
+
+/* ================= INPUT & SELECT ================= */
+#rtpOffcanvas .form-control,
+#rtpOffcanvas .form-select {
+    height: 40px;
+    border-radius: 6px;
+    font-size: 13px;
+    border: 1px solid #dcdfe4;
+    padding: 6px 10px;
+}
+
+#rtpOffcanvas textarea.form-control {
+    height: auto;
+    resize: vertical;
+}
+
+#rtpOffcanvas .form-control::placeholder {
+    color: #9ca3af;
+    font-size: 12px;
+}
+
+#rtpOffcanvas .form-control:disabled,
+#rtpOffcanvas .form-select:disabled {
+    background-color: #f9fafb;
+    color: #6b7280;
+    cursor: default;
+}
+
+#rtpTargetWaktu{
+max-width:180px;
+}
+
+/* ================= PREVIEW SKOR RISIKO AKTUAL ================= */
+.rtp-preview-card {
+    border: 1px solid #e6eaf0;
+    border-radius: 8px;
+    padding: 14px 18px;
+    background: #f9fafb;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-top: 12px;
+}
+
+.rtp-preview-nilai {
+    font-size: 2.5rem;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.rtp-preview-label {
+    font-size: 11px;
+    color: #6b7280;
+    margin-bottom: 4px;
+}
+
+.rtp-preview-badge {
+    font-size: 13px;
+    font-weight: 600;
+    padding: 6px 14px;
+    border-radius: 20px;
+    color: #fff;
+    display: inline-block;
+    margin-bottom: 4px;
+}
+
+/* ================= PREVIEW SKOR RISIKO RESIDU ================= */
+.rtp-residu-card {
+    border: 1px solid #e6eaf0;
+    border-radius: 8px;
+    padding: 14px 18px;
+    background: #fff8f0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-top: 8px;
+}
+
+.rtp-residu-nilai {
+    font-size: 2.5rem;
+    font-weight: 700;
+    line-height: 1;
+    color: #374151;
+}
+
+.rtp-residu-badge {
+    font-size: 13px;
+    font-weight: 600;
+    padding: 6px 14px;
+    border-radius: 20px;
+    color: #fff;
+    display: inline-block;
+    margin-bottom: 4px;
+    background-color: #6c757d;
+}
+
+/* ================= ACTION BUTTONS ================= */
+#rtpOffcanvas .btn {
+    height: 36px;
+    padding: 0 16px;
+    font-size: 13px;
+    border-radius: 6px;
+}
+
+#rtpOffcanvas .btn-primary {
+    background: #2f80ed;
+    border: none;
+}
+
+#rtpOffcanvas .btn-primary:hover {
+    background: #1a6fd4;
+}
+
+#rtpOffcanvas .btn-warning {
+    background: #f59e0b;
+    border: none;
+    color: #fff;
+}
+
+#rtpOffcanvas .btn-secondary,
+#rtpOffcanvas .btn-light {
+    background: #f2f4f7;
+    border: none;
+    color: #374151;
+}
+
+#rtpOffcanvas .btn-danger {
+    background: #dc3545;
+    border: none;
+}
+
+/* ================= DIVIDER ================= */
+.rtp-divider {
+    border: none;
+    border-top: 1px solid #f3f4f6;
+    margin: 14px 0;
+}
+
+/* ================= RTP CARD ================= */
+.rtp-card{
+border:1px solid #e6eaf0;
+border-radius:8px;
+padding:14px;
+margin-bottom:12px;
+background:#fff;
+animation:rtpFade .15s ease;
+}
+
+.rtp-card-header{
+display:flex;
+align-items:center;
+justify-content:space-between;
+margin-bottom:8px;
+}
+
+.rtp-card-title{
+font-size:12px;
+font-weight:600;
+color:#374151;
+}
+
+.rtp-card-remove{
+border:none;
+background:transparent;
+color:#9ca3af;
+cursor:pointer;
+padding:4px;
+border-radius:4px;
+display:flex;
+align-items:center;
+justify-content:center;
+}
+
+.rtp-card-remove:hover{
+background:#f3f4f6;
+color:#ef4444;
+}
+
+/* ================= RTP TIMELINE ================= */
+.rtp-timeline{
+position:relative;
+padding-left:22px;
+}
+
+.rtp-timeline::before{
+content:"";
+position:absolute;
+left:8px;
+top:0;
+bottom:0;
+width:2px;
+background:#e5e7eb;
+}
+
+.rtp-timeline-item{
+position:relative;
+margin-bottom:14px;
+padding-left:8px;
+}
+
+.rtp-timeline-item::before{
+content:"";
+position:absolute;
+left:-14px;
+top:4px;
+width:10px;
+height:10px;
+background:#2f80ed;
+border-radius:50%;
+}
+
+.rtp-timeline-content{
+font-size:12px;
+color:#374151;
+line-height:1.5;
+}
+
+.rtp-timeline-row{
+display:flex;
+align-items:flex-start;
+justify-content:space-between;
+gap:10px;
+}
+
+.rtp-timeline-delete{
+border:none;
+background:transparent;
+color:#9ca3af;
+cursor:pointer;
+padding:2px 6px;
+border-radius:4px;
+}
+
+.rtp-timeline-delete:hover{
+background:#f3f4f6;
+color:#ef4444;
+}
+
+.rtp-timeline-label{
+font-weight:500;
+color:#6b7280;
+margin-right:4px;
+}
+
+.rtp-timeline-value{
+color:#111827;
+}
+
+#rtpAddBtn{
+font-size:12px;
+padding:4px 10px;
+}
+
+@keyframes rtpFade{
+from{opacity:0;transform:translateY(4px)}
+to{opacity:1;transform:translateY(0)}
+}
+
+.rtp-timeline-item:last-child{
+margin-bottom:0;
+}
+
+.rtp-timeline-item::before{
+transform:translateY(2px);
+}
+
+#rtpAddBtn:hover{
+background:#e5e7eb;
+}
+
+/* ================================================
+   TABLE SECTION
+   ================================================ */
+
+/* Hapus border vertikal antar kolom */
+.rtp-table > :not(caption) > * > * {
+    border-right: none !important;
+    border-left: none !important;
+}
+
+/* Keep border bawah baris */
+.rtp-table > :not(caption) > * > * {
+    border-bottom: 1px solid var(--bs-border-color);
+}
+
+/* Garis bawah thead main (pemisah main → sub kolom) */
+.rtp-thead-main {
+    border-bottom: 2px solid var(--bs-border-color) !important;
+}
+
+/* Keep border bawah di semua th */
+.rtp-thead-main th,
+.rtp-thead-sub th {
+    border-bottom: 1px solid var(--bs-border-color) !important;
+}
+
+/* ===== WIDTH KOLOM ===== */
+.rtp-th-no     { width: 42px;  min-width: 42px; }
+.rtp-th-kode   { width: 75px;  min-width: 70px; }
+.rtp-th-risiko { width: 210px; }
+.rtp-th-rtp    { width: 210px; }
+.rtp-th-output { width: 150px; }
+.rtp-th-waktu  { width: 65px;  min-width: 60px; }
+.rtp-th-pj     { width: 120px; min-width: 105px; }
+.rtp-th-pdr    { width: 38px;  min-width: 34px; }
+.rtp-th-sr     { width: 70px;  min-width: 62px; }
+
+/* ===== KLIK BARIS ===== */
+.rtp-row {
+    cursor: pointer;
+    transition: background-color 0.15s;
+}
+
+.rtp-row:hover {
+    background-color: rgba(var(--bs-primary-rgb), 0.05) !important;
+}
+
+.rtp-row-empty:hover {
+    background-color: rgba(var(--bs-warning-rgb), 0.05) !important;
+}
+
+/* ===== BORDER PEMISAH KOLOM GROUP ===== */
+/* Kolom yang di-rowspan (Kode Proses, Risiko, PJ, P, D, SR)
+   diberi border-left tipis agar grup terlihat */
+.rtp-td-group {
+    border-left: 1px solid var(--bs-border-color) !important;
+    vertical-align: middle !important;
+}
+
+/* ===== PRIORITAS BADGE ===== */
+.rtp-prioritas-1 { background-color: #dc3545 !important; color: #fff !important; }
+.rtp-prioritas-2 { background-color: #fd7e14 !important; color: #fff !important; }
+.rtp-prioritas-3 { background-color: #ffc107 !important; color: #212529 !important; }
+.rtp-prioritas-4 { background-color: #0d6efd !important; color: #fff !important; }
+.rtp-prioritas-5 { background-color: #6f42c1 !important; color: #fff !important; }
+.rtp-prioritas-n { background-color: #6c757d !important; color: #fff !important; }
+
+/* ===== TRUNCATE FLEKSIBEL ===== */
+.rtp-truncate {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    word-break: break-word;
+    max-width: 100%;
+}
+
+/* ===== META INFO (uraian proses di bawah pernyataan risiko) ===== */
+.rtp-meta {
+    font-size: 0.72rem;
+    margin-top: 2px;
+}
+
+/* ===== WAKTU 2 BARIS ===== */
+.rtp-waktu-bulan {
+    font-size: 0.8rem;
+    font-weight: 600;
+    line-height: 1.2;
+}
+
+.rtp-waktu-tahun {
+    font-size: 0.75rem;
+    color: #6c757d;
+    line-height: 1.2;
+}
+
+/* ===== FOOTER TABEL (info + pagination) ===== */
+.rtp-table-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem 0.5rem 0;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.rtp-pagination-info {
+    font-size: 0.85rem;
+    color: #6c757d;
+}
+
+.rtp-perpage {
+    height: 30px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 12px;
+    padding: 0 6px;
+    background: #fff;
+    cursor: pointer;
+}
+
+/* ================= SUMMARY STAT CARDS ================= */
+.er-summary-row {
+    align-items: stretch;
+}
+
+.er-stat-card {
+    border:1px solid #e9ecef;
+    border-radius:10px;
+    padding:10px 14px;
+    background:#fff;
+    min-width:120px;
+    transition:box-shadow .15s ease, transform .15s ease;
+}
+
+.er-stat-card:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    transform: translateY(-2px);
+}
+
+.er-stat-label {
+    font-size: 11px;
+    font-weight: 500;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: 4px;
+}
+
+.er-stat-value {
+    font-size: 1.75rem;
+    font-weight: 700;
+    line-height: 1.1;
+    color: #111827;
+}
+
+.er-stat-active {
+    border-color: #0d6efd !important;
+    background: rgba(13, 110, 253, 0.04);
+}
+
+.er-stat-active-sudah {
+    border-color: #198754 !important;
+    background: rgba(25, 135, 84, 0.04);
+}
+
+.er-stat-active-belum {
+    border-color: #ffc107 !important;
+    background: rgba(255, 193, 7, 0.04);
+}
+
+.er-stat-dist {
+    min-width:190px;
+    max-width:210px;
+    padding:10px 12px;
+}
+
+.er-stat-dist:hover {
+    transform: none;
+    box-shadow: none;
+}
+
+.er-dist-row {
+    font-size: 12px;
+    padding: 2px 0;
+}
+
+.er-dist-label {
+    color: #374151;
+    font-weight: 400;
+}
+
+.er-dist-badge {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 20px;
+    min-width: 24px;
+    text-align: center;
+}
+.er-stat-link{
+    display:block;
+    text-decoration:none;
+    color:inherit;
+}
+.er-stat-link:hover .er-stat-card{
+    box-shadow:0 4px 16px rgba(0,0,0,.08);
+    transform:translateY(-2px);
+}
+
+/* ================= DISTRIBUSI BAR ================= */
+.er-dist-bar-row{
+display:flex;
+align-items:center;
+gap:6px;
+margin:2px 0;
+font-size:11px;
+}
+
+.er-dist-label{
+width:80px;
+font-size:11px;
+color:#374151;
+}
+
+.er-dist-bar{
+flex:1;
+height:6px;
+background:#eef2f7;
+border-radius:4px;
+overflow:hidden;
+}
+
+.er-dist-fill{
+height:100%;
+border-radius:4px;
+transition:width .25s ease;
+}
+
+.er-dist-value{
+width:16px;
+text-align:right;
+font-weight:600;
+font-size:10px;
+}
+
+/* ================= INPUT ZONE (user-fill area) ================= */
+.rtp-input-zone {
+    background: #eef4ff;
+    border: 1.5px solid #93c5fd;
+    border-radius: 10px;
+    padding: 16px 16px 8px 16px;
+    margin-bottom: 14px;
+    box-shadow: 0 1px 4px rgba(59,130,246,0.08);
+}
+.rtp-input-zone .rtp-section-title {
+    color: #1d4ed8;
+    border-bottom-color: #bfdbfe;
+}
+.rtp-input-zone .rtp-residu-card {
+    background: #fff8f0;
+    border-color: #fed7aa;
+}
+.rtp-input-zone .rtp-divider {
+    border-top-color: #bfdbfe;
+}
+
+.rtp-preview-tindakan{
+    font-size:11px;
+    color:#6b7280;
+    max-width:240px;
+    text-align:right;
+    margin-top:4px;
+}

@@ -1,0 +1,73 @@
+.global-context-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: nowrap;
+    flex: 1;
+    padding: 0 12px;
+}
+.context-group {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+.context-group select {
+    height: 32px;
+    padding: 0 8px;
+    border: 1px solid #dbe2ea;
+    border-radius: 6px;
+    background: #f8fafc;
+    min-width: 140px;
+    max-width: 200px;
+    font-size: 12px;
+    color: #1e293b;
+    cursor: pointer;
+} 
+    /* ← Tahun lebih kecil */
+    .context-group select.select-tahun {
+        min-width: 75px;
+        max-width: 85px;
+    }
+
+    .context-group select:focus {
+        outline: none;
+        border-color: #3b82f6;
+        background: #fff;
+    }
+
+    .btn-context-reset {
+        height: 32px;
+        width: 32px;
+        padding: 0;
+        border: 1px solid #dbe2ea;
+        border-radius: 6px;
+        background: #fff;
+        color: #64748b;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        font-size: 16px;
+        transition: all .15s;
+    }
+
+    .btn-context-reset:hover {
+        background: #fee2e2;
+        border-color: #fca5a5;
+        color: #ef4444;
+    }
+
+    .btn-context-reset i {
+    transition: transform .15s;
+}
+
+.btn-context-reset:hover i {
+    transform: rotate(180deg);
+}
+
+    #ctx_kegiatan {
+    width: 270px;
+    min-width: 270px;
+    max-width: 270px;
+}

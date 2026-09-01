@@ -1,0 +1,26 @@
+.pc-content{padding:24px}
+.card{border:1px solid #e5e7eb;border-radius:14px;background:#fff}
+.card-header{padding:16px;font-weight:600}
+.card-body{padding:16px}
+
+.kpi{display:flex;gap:12px;align-items:center;padding:16px;border-radius:12px;background:#fff;border:1px solid #e5e7eb}
+.kpi i{font-size:22px;background:#eef2ff;padding:10px;border-radius:10px}
+.kpi span{font-size:13px;color:#64748b}
+.kpi b{display:block;font-size:20px}
+.kpi.danger i{background:#fee2e2;color:#dc2626}
+
+.heatmap{width:100%;border-collapse:collapse;text-align:center}
+.heatmap td{width:40px;height:40px;font-weight:600;border:1px solid #e5e7eb}
+
+.low{background:#dcfce7}
+.medium{background:#fde68a}
+.high{background:#fecaca}
+
+.legend{margin-top:10px;display:flex;gap:10px}
+.legend span{padding:4px 10px;border-radius:6px;font-size:12px}
+.legend .low{background:#dcfce7}
+.legend .medium{background:#fde68a}
+.legend .high{background:#fecaca}
+
+h4{font-weight:600}
+small{color:#64748b}

@@ -1,0 +1,188 @@
+@page {
+    size: A4 landscape;
+    margin: 16mm;
+}
+
+body {
+    font-family: "Times New Roman", serif;
+    font-size: 12px;
+    color: #000;
+}
+
+.report-wrapper {
+    width: 100%;
+}
+
+/* =========================
+   HEADER
+========================= */
+
+.report-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    margin-bottom: 12px;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.header-left img {
+    width: 72px;
+}
+
+.header-instansi {
+    line-height: 1.3;
+}
+
+.bps-title {
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.bps-subtitle {
+    font-size: 14px;
+}
+
+.header-center {
+    flex: 1;
+    text-align: center;
+
+    font-size: 24px;
+    font-weight: bold;
+
+    margin-right: 90px;
+}
+
+.header-line {
+    border: 1px solid #000;
+    margin-bottom: 18px;
+}
+
+/* =========================
+   META INFO
+========================= */
+
+.report-meta {
+    margin-bottom: 18px;
+}
+
+.meta-row {
+    display: flex;
+    margin-bottom: 5px;
+}
+
+.meta-label {
+    width: 180px;
+    font-weight: bold;
+}
+
+.meta-separator {
+    width: 20px;
+    text-align: center;
+}
+
+.meta-value {
+    flex: 1;
+}
+
+/* =========================
+   TABLE
+========================= */
+
+.report-table {
+    width: 100%;
+    border-collapse: collapse;
+
+    margin-top: 10px;
+}
+
+.report-table th,
+.report-table td {
+    border: 1px solid #000;
+    padding: 8px;
+
+    vertical-align: top;
+}
+
+.report-table th {
+    background: #cfe8ff;
+
+    text-align: center;
+    vertical-align: middle;
+
+    font-weight: bold;
+}
+
+.number-row td {
+    text-align: center;
+    font-style: italic;
+
+    padding: 4px;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.report-table td {
+    line-height: 1.5;
+}
+
+/* =========================
+   SIGNATURE
+========================= */
+.signature-wrapper {
+    margin-top: 70px;
+
+    display: flex;
+    justify-content: space-between;
+    gap: 80px;
+}
+
+.signature-box {
+    flex: 1;
+    text-align: center;
+}
+
+.signature-date {
+    margin-bottom: 10px;
+}
+
+.invisible-date {
+    visibility: hidden;
+}
+
+.signature-role {
+    line-height: 1.5;
+}
+
+.signature-space {
+    height: 90px;
+}
+
+.signature-name {
+    font-weight: normal;
+    text-decoration: underline;
+
+    margin-bottom: 4px;
+}
+
+.signature-nip {
+    font-size: 11px;
+}
+
+/* =========================
+   PRINT FIX
+========================= */
+thead {
+    display: table-header-group;
+}
+
+tr {
+    page-break-inside: avoid;
+}

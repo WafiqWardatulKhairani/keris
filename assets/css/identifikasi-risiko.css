@@ -1,0 +1,254 @@
+/* ================= OFFCANVAS SIZE ================= */
+#offcanvasRisiko {
+    width: 640px !important;
+    max-width: 95vw;
+}
+
+#offcanvasRisiko .offcanvas-header {
+    padding: 14px 20px;
+}
+
+#offcanvasRisiko .offcanvas-title {
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 2px;
+    line-height: 1.2;
+}
+
+#offcanvasRisiko .offcanvas-header small {
+    font-size: 11px;
+}
+
+#offcanvasRisiko .offcanvas-body {
+    padding: 8px 20px 18px 20px;
+}
+
+/* ================= CONTEXT INFO CARD ================= */
+#offcanvasRisiko .card.bg-light {
+    border-radius: 8px;
+}
+
+#offcanvasRisiko .card.bg-light .card-body {
+    padding: 10px 14px;
+}
+
+#offcanvasRisiko .card.bg-light .small {
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+/* ================= FORM LABELS ================= */
+.ir-form-label {
+    font-size: 13px;
+    font-weight: 500;
+    color: #374151;
+    margin-bottom: 4px;
+}
+
+/* ================= INPUT & SELECT ================= */
+#offcanvasRisiko .form-control,
+#offcanvasRisiko .form-select {
+    height: 40px;
+    border-radius: 6px;
+    font-size: 13px;
+    border: 1px solid #dcdfe4;
+    padding: 6px 10px;
+}
+
+#offcanvasRisiko textarea.form-control {
+    height: auto;
+}
+
+#offcanvasRisiko .form-control::placeholder {
+    color: #9ca3af;
+    font-size: 12px;
+}
+
+/* ================= CHECKBOX AREA DAMPAK ================= */
+.ir-check-label {
+    font-size: 12px;
+    color: #374151;
+}
+
+#offcanvasRisiko .form-check {
+    padding-top: 3px;
+    padding-bottom: 3px;
+}
+
+/* ================= RADIO SUMBER RISIKO ================= */
+#offcanvasRisiko .form-check-label {
+    font-size: 13px;
+}
+
+/* ================= SMALL HELPER TEXT ================= */
+#offcanvasRisiko small.text-muted {
+    font-size: 11px;
+}
+
+/* ================= ACTION BUTTONS ================= */
+#offcanvasRisiko .btn {
+    height: 36px;
+    padding: 0 16px;
+    font-size: 13px;
+    border-radius: 6px;
+}
+
+#offcanvasRisiko .btn.btn-primary {
+    background: #2f80ed;
+    border: none;
+}
+
+#offcanvasRisiko .btn.btn-light {
+    background: #f2f4f7;
+    border: none;
+}
+
+/* ================= AUTOCOMPLETE DROPDOWN ================= */
+.ir-autocomplete-wrapper {
+    position: relative;
+}
+
+.ir-suggest-dropdown {
+    position: absolute;
+    top: calc(100% + 2px);
+    left: 0;
+    right: 0;
+    background: #fff;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.10);
+    z-index: 1055;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.ir-suggest-item {
+    padding: 9px 14px;
+    cursor: pointer;
+    font-size: 12px;
+    border-bottom: 1px solid #f1f3f5;
+    line-height: 1.4;
+}
+
+.ir-suggest-item:last-child {
+    border-bottom: none;
+}
+
+.ir-suggest-item:hover,
+.ir-suggest-item.ir-suggest-active {
+    background: #e7f1ff;
+    color: #0d6efd;
+}
+
+.ir-suggest-item mark {
+    background: #fff3cd;
+    padding: 0 2px;
+    border-radius: 3px;
+    font-weight: 600;
+    color: inherit;
+}
+
+.ir-suggest-empty {
+    padding: 10px 14px;
+    font-size: 12px;
+    color: #adb5bd;
+    font-style: italic;
+}
+
+/* ================= TABLE ROW ================= */
+.ir-row {
+    cursor: pointer;
+}
+
+.ir-row:hover {
+    background-color: #f8f9fa;
+}
+
+.ir-action-wrapper {
+    background: #fff;
+    padding: 12px 16px;
+    border-top: 1px solid #eee;
+}
+/* ================= BOTTOM SECTION ================= */
+.ir-table-bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px;
+    border-top: 1px solid #e9ecef;
+    background: #fafbfc;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.ir-table-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.ir-perpage-form {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.ir-perpage {
+    height: 30px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 12px;
+    padding: 0 6px;
+    background: #fff;
+    cursor: pointer;
+}
+
+.ir-info-text {
+    font-size: 12px;
+    color: #6b7280;
+}
+
+/* ================= PAGINATION ================= */
+.ir-pagination .pagination {
+    margin: 0;
+    gap: 4px;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.ir-pagination .page-item .page-link {
+    height: 30px;
+    min-width: 30px;
+    padding: 0 8px;
+    font-size: 12px;
+    border-radius: 6px !important;
+    border: 1px solid #e5e7eb;
+    color: #374151;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+}
+
+.ir-pagination .page-item.active .page-link {
+    background-color: #2f80ed;
+    border-color: #2f80ed;
+    color: #fff;
+}
+
+.ir-pagination .page-item.disabled .page-link {
+    color: #9ca3af;
+    background: #f9fafb;
+}
+
+.ir-pagination .page-item .page-link:hover {
+    background: #f3f4f6;
+    border-color: #d1d5db;
+    color: #374151;
+}
+
+.ir-pagination .page-item.active .page-link:hover {
+    background-color: #2f80ed;
+    border-color: #2f80ed;
+    color: #fff;
+}

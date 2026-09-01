@@ -1,0 +1,93 @@
+.mr-filter-row{
+display:flex;
+gap:10px;
+flex-wrap:wrap;
+margin-bottom:16px;
+}
+
+.mr-filter-row .form-control{
+height:36px;
+font-size:13px;
+border-radius:6px;
+border:1px solid #dcdfe4;
+}
+
+.mr-btn{
+height:36px;
+font-size:13px;
+border-radius:6px;
+padding:0 14px;
+}
+
+.mr-btn-primary{
+background:#2f80ed;
+color:#fff;
+border:none;
+}
+
+.mr-btn-primary:hover{
+background:#1a6fd4;
+}
+
+.mr-btn-secondary{
+background:#f2f4f7;
+border:none;
+color:#374151;
+}
+
+.mr-table{
+font-size:13px;
+border:1px solid #e9ecef;
+}
+
+.mr-table thead{
+background:#f9fafb;
+}
+
+.mr-table th{
+font-weight:600;
+color:#374151;
+padding:10px;
+vertical-align:middle;
+}
+
+.mr-table td{
+padding:10px;
+vertical-align:top;
+color:#111827;
+}
+
+.mr-table tbody tr:hover{
+background:#f8f9fa;
+}
+
+.mr-text{
+max-width:260px;
+white-space:nowrap;
+overflow:hidden;
+text-overflow:ellipsis;
+cursor:pointer;
+}
+
+.mr-badge{
+font-size:11px;
+padding:3px 8px;
+border-radius:20px;
+background:#e6f0ff;
+color:#2f80ed;
+font-weight:500;
+}
+
+.mr-card-header{
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:12px 16px;
+border-bottom:1px solid #e9ecef;
+}
+
+.mr-title{
+font-size:16px;
+font-weight:600;
+margin:0;
+}

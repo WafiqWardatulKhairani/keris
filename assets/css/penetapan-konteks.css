@@ -1,0 +1,123 @@
+/* ================= GRID SECTION ================= */
+.pk-section{
+    margin-top:10px;
+}
+
+.pk-section:first-child{
+    margin-top:0;
+}
+
+.pk-grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+}
+/* ================= FIELD ROW ================= */
+.pk-field-row {
+    display: grid;
+    grid-template-columns: 120px 1fr;
+    align-items:center;
+    gap: 5px;
+}
+
+.pk-field-label {
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.pk-field-input {
+    flex: 1;
+}
+/* ================= INPUT & SELECT ================= */
+.pk-offcanvas .form-control,
+.pk-offcanvas .form-select {
+    height: 40px;
+    border-radius: 6px;
+    font-size: 13px;
+    border: 1px solid #dcdfe4;
+}
+/* ================= SELECT2 ================= */
+
+.select2-container--default .select2-selection--single,
+.select2-container--default .select2-selection--multiple {
+    height: 40px;
+    border-radius: 6px;
+    font-size: 13px;
+    border: 1px solid #dcdfe4;
+}
+
+.select2-container--default .select2-selection--multiple {
+    min-height: 40px;
+}
+/* ===============================
+   INFORMASI KONTEKS PANEL
+=============================== */
+.pk-context-panel{
+    border:1px solid #e6eaf0;
+    border-radius:12px;
+    padding:18px;
+    margin-top:10px;
+    background:linear-gradient(
+        to bottom,
+        #ffffff,
+        #fafbfc
+    );
+    box-shadow:0 2px 8px rgba(0,0,0,0.03);
+}
+/* ============================
+   FIELD SPACING
+============================ */
+.pk-context-panel .pk-field-row{
+    margin-top:12px;
+}
+
+.pk-context-panel .pk-field-row:first-child{
+    margin-top:0;
+}
+.pk-field-row + .pk-field-row{
+    margin-top:14px;
+}
+/* ============================
+   MULTI INPUT GROUP
+============================ */
+.pk-multi-input{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+}
+
+/* TITLE */
+.pk-section-title{
+    font-weight:600;
+    font-size:13px;
+    margin-bottom:10px;
+}
+.pk-truncate {
+  max-width: 200px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pk-info-card {
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 16px;
+  background: #fff;
+}
+
+.pk-info-card-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #6b7280;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.pk-info-card-value {
+  font-size: 15px;
+  font-weight: 600;
+  color: #111827;
+  line-height: 1.5;
+}

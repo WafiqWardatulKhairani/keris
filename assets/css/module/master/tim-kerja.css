@@ -1,0 +1,333 @@
+/* ================= OFFCANVAS ================= */
+
+#tkForm{
+    width: 760px !important;
+    max-width: 95vw;
+}
+
+#tkForm .offcanvas-header{
+    padding:14px 20px;
+}
+
+#tkForm .offcanvas-title{
+    font-size:13px;
+    font-weight:600;
+    margin-bottom:2px;
+    line-height:1.2;
+}
+
+#tkForm .offcanvas-header small{
+    font-size:11px;
+}
+
+#tkForm .offcanvas-body{
+    padding:8px 20px 18px 20px;
+}
+
+/* ================= SECTION TITLE ================= */
+
+.tk-section-title{
+    font-size:11px;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:.05em;
+    color:#6b7280;
+
+    margin-bottom:12px;
+    padding-bottom:6px;
+
+    border-bottom:1px solid #f3f4f6;
+}
+
+/* ================= PANEL ================= */
+
+.tk-info-panel{
+    margin-bottom:14px;
+}
+
+/* ================= LABEL ================= */
+
+#tkForm .form-label{
+    font-size:13px;
+    font-weight:500;
+    color:#374151;
+    margin-bottom:4px;
+}
+
+/* ================= INPUT ================= */
+
+#tkForm .form-control{
+    height:40px;
+    border-radius:6px;
+    font-size:13px;
+    border:1px solid #dcdfe4;
+    padding:6px 10px;
+}
+
+#tkForm .form-control:disabled{
+    background:#f9fafb;
+    color:#6b7280;
+}
+
+/* ================= KEGIATAN CARD ================= */
+
+.tk-kegiatan-card{
+    border:1px solid #e6eaf0;
+    border-radius:8px;
+    background:#f9fafb;
+    padding:14px 18px;
+    max-height:260px;
+    overflow-y:auto;
+}
+
+/* ================= LIST ================= */
+
+.tk-kegiatan-list{
+    margin:0;
+    padding-left:18px;
+}
+
+.tk-kegiatan-list li{
+    font-size:13px;
+    color:#374151;
+    line-height:1.7;
+    margin-bottom:4px;
+}
+
+/* ================= EMPTY ================= */
+
+.tk-empty{
+    font-size:13px;
+    color:#6b7280;
+    font-style:italic;
+}
+
+/* VIEW MODE */
+
+.tk-kegiatan-view-list{
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+}
+
+.tk-kegiatan-view-item{
+    display:flex;
+    align-items:center;
+    gap:10px;
+
+    font-size:14px;
+    color:#374151;
+}
+
+.tk-kegiatan-view-dot{
+    width:8px;
+    height:8px;
+
+    border-radius:50%;
+
+    background:#2f80ed;
+
+    flex-shrink:0;
+}
+
+/* ===== KEGIATAN ITEM ===== */
+
+.tk-kegiatan-item{
+    border:1px solid #e6eaf0;
+    border-radius:8px;
+    padding:12px;
+    margin-bottom:12px;
+    background:#fff;
+}
+
+.tk-kegiatan-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:8px;
+
+    font-size:12px;
+    font-weight:600;
+    color:#374151;
+}
+
+.tk-kegiatan-remove{
+    border:none;
+    background:transparent;
+    color:#9ca3af;
+    padding:4px;
+    border-radius:4px;
+}
+
+.tk-kegiatan-remove:hover{
+    background:#f3f4f6;
+    color:#ef4444;
+}
+
+.tk-kegiatan-input{
+    width:100%;
+}
+
+#tkAddKegiatan{
+    font-size:12px;
+}
+
+/* ================= BUTTON ================= */
+
+#tkForm .btn{
+    height:36px;
+    padding:0 16px;
+    font-size:13px;
+    border-radius:6px;
+}
+
+#tkForm .btn-primary{
+    background:#2f80ed;
+    border:none;
+}
+
+#tkForm .btn-primary:hover{
+    background:#1a6fd4;
+}
+
+#tkForm .btn-warning{
+    background:#f59e0b;
+    border:none;
+    color:#fff;
+}
+
+#tkForm .btn-light{
+    background:#f2f4f7;
+    border:none;
+    color:#374151;
+}
+
+#tkForm .btn-danger{
+    background:#dc3545;
+    border:none;
+}
+
+/* ================= FOOTER ================= */
+
+#tkForm .border-top{
+    border-top:1px solid #f3f4f6 !important;
+    margin-top:14px;
+}
+
+/* ========================================
+   TABLE
+======================================== */
+
+#tkTableCard table{
+    table-layout: fixed;
+}
+
+.tk-col-no{
+    width:60px;
+}
+
+.tk-col-tim{
+    width:38%;
+}
+
+.tk-col-kegiatan{
+    width:auto;
+}
+
+#tkTableBody td{
+    vertical-align:middle;
+}
+
+.tk-tim-name{
+    font-weight:500;
+    color:#374151;
+    line-height:1.4;
+}
+
+.tk-kegiatan-preview{
+    display:flex;
+    align-items:center;
+    gap:8px;
+}
+
+.tk-kegiatan-text{
+    color:#6b7280;
+    font-size:13px;
+    font-weight:400;
+
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+}
+.tk-kegiatan-more{
+    background:#f3f4f6;
+    color:#6b7280;
+
+    border-radius:999px;
+
+    padding:4px 10px;
+
+    font-size:12px;
+    font-weight:600;
+}
+
+/* ========================================
+   SEARCH
+======================================== */
+
+.tk-toolbar{
+    display:flex;
+    justify-content:flex-start; /* dari flex-end */
+    align-items:center;
+
+    padding-bottom:12px;
+    margin-bottom:12px;
+
+    border-bottom:1px solid #edf2f7;
+}
+
+.tk-search{
+    position:relative;
+    width:340px; /* dari 420px */
+}
+
+.tk-search input{
+    width:100%;
+    height:28px; /* dari 40px */
+
+    border:1px solid #dbe3ec;
+    border-radius:8px;
+
+    padding:0 38px 0 36px;
+
+    font-size:13px;
+
+    background:#fff;
+}
+
+.tk-search .ti-search{
+    position:absolute;
+    left:12px;
+    top:50%;
+    transform:translateY(-50%);
+    color:#9ca3af;
+    font-size:14px;
+}
+
+#tkSearchClear{
+    position:absolute;
+    right:10px;
+    top:50%;
+    transform:translateY(-50%);
+
+    border:none;
+    background:none;
+
+    color:#9ca3af;
+    padding:0;
+    line-height:1;
+}
+
+#tkTableCard .card-body{
+    padding:18px 22px;
+}

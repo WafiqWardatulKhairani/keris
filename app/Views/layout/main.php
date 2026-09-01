@@ -142,6 +142,48 @@
             });
         </script>
     <?php endif; ?>
+    
+    <script>
+    document.addEventListener("DOMContentLoaded", function () {
+    
+        const currentUrl = window.location.pathname.replace(/\/$/, "");
+    
+        // Active link
+        document.querySelectorAll(".pc-navbar .pc-link[href]").forEach(link => {
+    
+            const href = new URL(link.href).pathname.replace(/\/$/, "");
+    
+            if (href === currentUrl) {
+    
+                // aktifkan item
+                const item = link.closest(".pc-item");
+                if (item) item.classList.add("active");
+    
+                // expand semua parent menu
+                let parent = item?.parentElement;
+    
+                while (parent) {
+    
+                    if (parent.classList.contains("pc-submenu")) {
+    
+                        parent.style.display = "block";
+    
+                        const hasMenu = parent.closest(".pc-hasmenu");
+    
+                        if (hasMenu) {
+                            hasMenu.classList.add("pc-trigger");
+                            hasMenu.classList.add("active");
+                        }
+                    }
+    
+                    parent = parent.parentElement;
+                }
+            }
+    
+        });
+    
+    });
+    </script>
 </body>
 
 </html>

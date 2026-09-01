@@ -1,0 +1,209 @@
+/* ================================================
+   PEMANTAUAN RISIKO — CSS
+   ================================================ */
+
+/* ================= OFFCANVAS ================= */
+#prOffcanvas {
+    width: 880px !important;
+    max-width: 95vw;
+}
+
+#prOffcanvas .offcanvas-header {
+    padding: 14px 20px;
+}
+
+#prOffcanvas .offcanvas-title {
+    font-size: 13px;
+    font-weight: 600;
+}
+
+#prOffcanvas .offcanvas-body {
+    padding: 8px 20px 18px;
+}
+
+/* ================= INFO PANEL ================= */
+.rtp-info-panel {
+    border-radius: 8px;
+    margin-bottom: 14px;
+}
+
+/* ================= SECTION TITLE ================= */
+.rtp-section-title {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #6b7280;
+    margin-bottom: 8px;
+    padding-bottom: 5px;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+/* ================= INFO ROW ================= */
+.rtp-info-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 4px;
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.rtp-info-label {
+    flex-shrink: 0;
+    min-width: 120px;
+    color: #6b7280;
+    font-weight: 500;
+}
+
+.rtp-info-value {
+    color: #111827;
+}
+
+/* ================= GRID ================= */
+.rtp-grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+.pr-grid-realisasi {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 16px;
+}
+
+/* ================= DIVIDER ================= */
+.rtp-divider {
+    margin: 10px 0;
+    border-color: #f3f4f6;
+}
+
+/* ================= FORM LABEL ================= */
+.rtp-form-label {
+    font-size: 12px;
+    font-weight: 500;
+    margin-bottom: 4px;
+    color: #374151;
+}
+
+/* ================= FORM CONTROLS ================= */
+#prOffcanvas .form-control,
+#prOffcanvas .form-select {
+    height: 36px;
+    font-size: 13px;
+    border-radius: 6px;
+}
+
+#prOffcanvas textarea.form-control {
+    height: auto;
+}
+
+/* ================= BUTTONS ================= */
+#prOffcanvas .btn {
+    height: 34px;
+    font-size: 13px;
+    border-radius: 6px;
+}
+
+/* Tombol kecil untuk aksi bukti (Lihat / Unduh) */
+.btn-xs {
+    padding: 1px 6px !important;
+    font-size: 11px !important;
+    line-height: 1.4;
+    border-radius: 4px;
+    height: auto !important;
+}
+
+/* ================= TABLE ================= */
+.rtp-table > :not(caption) > * > * {
+    border-left: none !important;
+    border-right: none !important;
+}
+
+.rtp-thead-main {
+    border-bottom: 2px solid var(--bs-border-color);
+}
+
+/* ================= ROW ================= */
+.rtp-row {
+    cursor: pointer;
+    transition: background-color 0.15s;
+    animation: prFade 0.15s ease;
+}
+
+.rtp-row:hover {
+    background-color: rgba(var(--bs-primary-rgb), 0.05);
+}
+
+/* ================= KOLOM LEBAR ================= */
+.rtp-th-no     { width: 40px; }
+.rtp-th-kode   { width: 80px; }
+.rtp-th-risiko { width: 220px; }
+.rtp-th-rtp    { width: 220px; }
+.rtp-th-output { width: 160px; }
+.rtp-th-waktu  { width: 70px; }
+
+/* ================= TEXT HELPER ================= */
+.rtp-truncate {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.rtp-meta {
+    font-size: 0.72rem;
+    color: #6c757d;
+}
+
+/* ================= WAKTU ================= */
+.pr-waktu-bulan {
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.pr-waktu-tahun {
+    font-size: 0.75rem;
+    color: #6c757d;
+}
+
+/* ================= STATUS BADGE ================= */
+.pr-status {
+    font-size: 11px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-weight: 500;
+    display: inline-block;
+}
+
+.pr-status-belum {
+    background: #f3f4f6;
+    color: #6b7280;
+}
+
+.pr-status-proses {
+    background: rgba(255, 193, 7, 0.15);
+    color: #d97706;
+}
+
+.pr-status-selesai {
+    background: rgba(25, 135, 84, 0.15);
+    color: #198754;
+}
+
+.pr-status-terlambat {
+    background: rgba(220, 53, 69, 0.15);
+    color: #dc3545;
+}
+
+/* ================= EMPTY STATE ================= */
+.pr-empty {
+    text-align: center;
+    padding: 40px 0;
+    color: #6b7280;
+}
+
+/* ================= ANIMATION ================= */
+@keyframes prFade {
+    from { opacity: 0; transform: translateY(4px); }
+    to   { opacity: 1; transform: translateY(0); }
+}

@@ -728,9 +728,9 @@ class KonteksController extends BaseContextController
     /* GET KEGIATAN BY TIM KERJA (AJAX) */
     public function getKegiatanByTim($id)
     {
-        if (!$this->request->isAJAX()) {
-            return redirect()->back();
-        }
+        // if (!$this->request->isAJAX()) {
+        //     return redirect()->back();
+        // }
 
         $tahun = $this->request->getGet('tahun');
 

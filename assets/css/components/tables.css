@@ -1,0 +1,30 @@
+.table th,
+.table td {
+    padding: 0.6rem 0.75rem;
+}
+.table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+
+  background-color: #f8f9fa; /* samakan dengan table-light */
+  box-shadow: inset 0 -1px 0 #dee2e6;
+  border-bottom: 2px solid #e6ebf1;
+}
+.table-responsive {
+  position: relative; /* WAJIB untuk sticky */
+}
+.table th, .table td {
+    border-top: 1px solid #eef1f4;
+}
+.table td:nth-child(2),
+.table th:nth-child(2) {
+    width: 80px;
+    white-space: nowrap;
+}
+.truncate {
+    max-width: 250px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}

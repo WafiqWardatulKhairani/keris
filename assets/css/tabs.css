@@ -1,0 +1,125 @@
+/* ================= TABS (GLOBAL) ================= */
+.pk-tabs-container {
+  background: #fff;
+  border-radius: 14px;
+  padding: 10px 14px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  margin-bottom: 0;
+}
+
+.pk-tabs-container + * {
+  margin-top: 14px;
+}
+
+.pk-tabs-row {
+  display: flex;
+  gap: 8px; /* 🔥 lebih rapat */
+}
+
+.pk-tabs-row + .pk-tabs-row {
+  margin-top: 8px; /* 🔥 lebih compact */
+}
+
+.pk-tab {
+  flex: 1;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  text-align: center;
+  white-space: normal; /* biar bisa turun baris */
+
+  padding: 6px 10px; /*DIPERKECIL */
+  border-radius: 10px;
+
+  text-decoration: none;
+  font-size: 13px; /* sedikit lebih kecil */
+  font-weight: 500;
+
+  color: #111827; /* HITAM (default) */
+  background: #f9fafb;
+  border: 1px solid transparent;
+
+  line-height: 1.2; /* biar multi-line rapi */
+
+  transition: all 0.2s ease;
+}
+
+.pk-tab i {
+  font-size: 16px;
+}
+
+.pk-tab:hover {
+  background: #eef4ff;
+  color: #2563eb;
+  border-color: #dbeafe;
+}
+
+.pk-tab.active {
+  background: #eef4ff;
+  color: #2563eb;
+  font-weight: 600;
+  border-color: #dbeafe;
+  position: relative;
+}
+
+.pk-tab.active::after {
+  content: "";
+  position: absolute;
+  bottom: -4px; /* 🔥 lebih dekat */
+  left: 25%;
+  width: 50%;
+  height: 2px; /* 🔥 lebih tipis */
+  background: #2563eb;
+  border-radius: 2px;
+}
+
+/* ================= SUB TABS ================= */
+
+.pk-subtabs-container {
+  margin-top: 14px;
+}
+
+.pk-subtabs-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.pk-subtab {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+
+  padding: 6px 14px;
+  border-radius: 10px;
+
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 500;
+
+  color: #111827;
+  background: #f9fafb;
+  border: 1px solid transparent;
+
+  transition: all 0.2s ease;
+}
+
+.pk-subtab i {
+  font-size: 15px;
+}
+
+.pk-subtab:hover {
+  background: #eef4ff;
+  color: #2563eb;
+  border-color: #dbeafe;
+}
+
+.pk-subtab.active {
+  background: #eef4ff;
+  color: #2563eb;
+  font-weight: 600;
+  border-color: #dbeafe;
+}

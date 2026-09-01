@@ -1,0 +1,484 @@
+/* ================= OFFCANVAS SIZE ================= */
+#erOffcanvas {
+    width: 880px !important;
+    max-width: 95vw;
+}
+
+#erOffcanvas .offcanvas-header {
+    padding: 14px 20px;
+}
+
+#erOffcanvas .offcanvas-title {
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 2px;
+    line-height: 1.2;
+}
+
+#erOffcanvas .offcanvas-header small {
+    font-size: 11px;
+}
+
+#erOffcanvas .offcanvas-body {
+    padding: 8px 20px 18px 20px;
+}
+
+/* ================= SECTION TITLE ================= */
+.er-section-title {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #6b7280;
+    margin-bottom: 12px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+/* ================= INFO PANELS ================= */
+.er-info-panel {
+    border-radius: 8px;
+    margin-bottom: 14px;
+}
+
+#erOffcanvas .card.bg-light .card-body {
+    padding: 10px 14px;
+}
+
+#erOffcanvas .card.bg-light .small {
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+.er-info-row {
+    display: flex;
+    align-items: flex-start;
+    font-size: 12px;
+    padding: 4px 0;
+    gap: 8px;
+}
+
+.er-info-row:not(:last-child) {
+    border-bottom: 1px solid #f2f4f7;
+}
+
+.er-info-label {
+    font-weight: 500;
+    color: #6b7280;
+    flex-shrink: 0;
+    width: 140px;
+}
+
+.er-info-value {
+    font-weight: 500;
+    color: #111827;
+    flex: 1;
+}
+
+/* ================= GRID 2 KOLOM ================= */
+.er-grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+/* ================= FORM LABEL ================= */
+.er-form-label {
+    font-size: 13px;
+    font-weight: 500;
+    color: #374151;
+    margin-bottom: 4px;
+}
+
+/* ================= INPUT & SELECT ================= */
+#erOffcanvas .form-control,
+#erOffcanvas .form-select {
+    height: 40px;
+    border-radius: 6px;
+    font-size: 13px;
+    border: 1px solid #dcdfe4;
+    padding: 6px 10px;
+}
+
+#erOffcanvas textarea.form-control {
+    height: auto;
+    resize: vertical;
+}
+
+#erOffcanvas .form-control::placeholder {
+    color: #9ca3af;
+    font-size: 12px;
+}
+
+#erOffcanvas .form-control:disabled,
+#erOffcanvas .form-select:disabled {
+    background-color: #f9fafb;
+    color: #6b7280;
+    cursor: default;
+}
+
+/* ================= PREVIEW SKOR RISIKO ================= */
+.er-preview-card {
+    border: 1px solid #e6eaf0;
+    border-radius: 8px;
+    padding: 14px 18px;
+    background: #f9fafb;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-top: 12px;
+}
+
+.er-preview-nilai {
+    font-size: 2.5rem;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.er-preview-label {
+    font-size: 11px;
+    color: #6b7280;
+    margin-bottom: 4px;
+}
+
+.er-preview-badge {
+    font-size: 13px;
+    font-weight: 600;
+    padding: 6px 14px;
+    border-radius: 20px;
+    color: #fff;
+    display: inline-block;
+    margin-bottom: 4px;
+}
+
+.er-preview-tindakan {
+    font-size: 11px;
+    color: #6b7280;
+    max-width: 240px;
+    text-align: right;
+}
+
+/* ================= ACTION BUTTONS ================= */
+#erOffcanvas .btn {
+    height: 36px;
+    padding: 0 16px;
+    font-size: 13px;
+    border-radius: 6px;
+}
+
+#erOffcanvas .btn-primary {
+    background: #2f80ed;
+    border: none;
+}
+
+#erOffcanvas .btn-primary:hover {
+    background: #1a6fd4;
+}
+
+#erOffcanvas .btn-warning {
+    background: #f59e0b;
+    border: none;
+    color: #fff;
+}
+
+#erOffcanvas .btn-secondary,
+#erOffcanvas .btn-light {
+    background: #f2f4f7;
+    border: none;
+    color: #374151;
+}
+
+/* ================= DIVIDER ================= */
+.er-divider {
+    border: none;
+    border-top: 1px solid #f3f4f6;
+    margin: 14px 0;
+}
+
+/* ================= TABLE ROW ================= */
+.er-row {
+    cursor: pointer;
+}
+
+.er-row:hover {
+    background-color: #f8f9fa;
+}
+
+/* ================= KOLOM RISIKO — truncate fleksibel ================= */
+.ar-risiko-cell {
+    width: 420px;
+    max-width: 420px;
+}
+
+.ar-risiko-text {
+    display:block;
+    width:100%;
+    overflow:hidden;
+    white-space:nowrap;
+    text-overflow:ellipsis;
+}
+#erTable {
+    table-layout: fixed;
+}
+
+/* ================= SUMMARY STAT CARDS ================= */
+.er-summary-row {
+    align-items: stretch;
+}
+
+.er-stat-card {
+    border:1px solid #e9ecef;
+    border-radius:10px;
+    padding:10px 14px;
+    background:#fff;
+    min-width:120px;
+    transition:box-shadow .15s ease, transform .15s ease;
+}
+
+.er-stat-card:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    transform: translateY(-2px);
+}
+
+.er-stat-label {
+    font-size: 11px;
+    font-weight: 500;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: 4px;
+}
+
+.er-stat-value {
+    font-size: 1.75rem;
+    font-weight: 700;
+    line-height: 1.1;
+    color: #111827;
+}
+
+.er-stat-active {
+    border-color: #0d6efd !important;
+    background: rgba(13, 110, 253, 0.04);
+}
+
+.er-stat-active-sudah {
+    border-color: #198754 !important;
+    background: rgba(25, 135, 84, 0.04);
+}
+
+.er-stat-active-belum {
+    border-color: #ffc107 !important;
+    background: rgba(255, 193, 7, 0.04);
+}
+
+.er-stat-dist {
+    min-width:190px;
+    max-width:210px;
+    padding:10px 12px;
+}
+
+.er-stat-dist:hover {
+    transform: none;
+    box-shadow: none;
+}
+
+.er-dist-row {
+    font-size: 12px;
+    padding: 2px 0;
+}
+
+.er-dist-label {
+    color: #374151;
+    font-weight: 400;
+}
+
+.er-dist-badge {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 20px;
+    min-width: 24px;
+    text-align: center;
+}
+.er-stat-link{
+    display:block;
+    text-decoration:none;
+    color:inherit;
+}
+.er-stat-link:hover .er-stat-card{
+    box-shadow:0 4px 16px rgba(0,0,0,.08);
+    transform:translateY(-2px);
+}
+
+/* ================= DISTRIBUSI BAR ================= */
+.er-dist-bar-row{
+display:flex;
+align-items:center;
+gap:6px;
+margin:2px 0;
+font-size:11px;
+}
+
+.er-dist-label{
+width:80px;
+font-size:11px;
+color:#374151;
+}
+
+.er-dist-bar{
+flex:1;
+height:6px;
+background:#eef2f7;
+border-radius:4px;
+overflow:hidden;
+}
+
+.er-dist-fill{
+height:100%;
+border-radius:4px;
+transition:width .25s ease;
+}
+
+.er-dist-value{
+width:16px;
+text-align:right;
+font-weight:600;
+font-size:10px;
+}
+
+/* ================= BOTTOM SECTION ================= */
+.ar-table-bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px;
+    border-top: 1px solid #e9ecef;
+    background: #fafbfc;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.ar-table-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.ar-perpage-form {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.ar-perpage {
+    height: 30px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 12px;
+    padding: 0 6px;
+    background: #fff;
+    cursor: pointer;
+}
+
+.ar-info-text {
+    font-size: 12px;
+    color: #6b7280;
+}
+
+/* ================= PAGINATION ================= */
+.ar-pagination .pagination {
+    margin: 0;
+    gap: 4px;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.ar-pagination .page-item .page-link {
+    height: 30px;
+    min-width: 30px;
+    padding: 0 8px;
+    font-size: 12px;
+    border-radius: 6px !important;
+    border: 1px solid #e5e7eb;
+    color: #374151;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+}
+
+.ar-pagination .page-item.active .page-link {
+    background-color: #2f80ed;
+    border-color: #2f80ed;
+    color: #fff;
+}
+
+.ar-pagination .page-item.disabled .page-link {
+    color: #9ca3af;
+    background: #f9fafb;
+}
+
+.ar-pagination .page-item .page-link:hover {
+    background: #f3f4f6;
+    border-color: #d1d5db;
+    color: #374151;
+}
+
+.ar-pagination .page-item.active .page-link:hover {
+    background-color: #2f80ed;
+    border-color: #2f80ed;
+    color: #fff;
+}
+
+/* ================= PRIORITAS BADGE — warna per nomor ================= */
+.er-prioritas-1 {
+    background-color: #dc3545 !important; /* merah — paling kritis */
+    color: #fff !important;
+    border-color: #dc3545 !important;
+}
+
+.er-prioritas-2 {
+    background-color: #fd7e14 !important; /* oranye */
+    color: #fff !important;
+    border-color: #fd7e14 !important;
+}
+
+.er-prioritas-3 {
+    background-color: #ffc107 !important; /* kuning */
+    color: #212529 !important;
+    border-color: #ffc107 !important;
+}
+
+.er-prioritas-4 {
+    background-color: #0d6efd !important; /* biru */
+    color: #fff !important;
+    border-color: #0d6efd !important;
+}
+
+.er-prioritas-5 {
+    background-color: #6f42c1 !important; /* ungu */
+    color: #fff !important;
+    border-color: #6f42c1 !important;
+}
+
+/* Prioritas 6 ke atas — abu netral */
+.er-prioritas-n {
+    background-color: #6c757d !important;
+    color: #fff !important;
+    border-color: #6c757d !important;
+}
+
+/* ================= INPUT ZONE (user-fill area) ================= */
+.er-input-zone {
+    background: #eef4ff;
+    border: 1.5px solid #93c5fd;
+    border-radius: 10px;
+    padding: 16px 16px 8px 16px;
+    margin-bottom: 14px;
+    box-shadow: 0 1px 4px rgba(59,130,246,0.08);
+}
+.er-input-zone .ar-section-title {
+    color: #1d4ed8;
+    border-bottom-color: #bfdbfe;
+}

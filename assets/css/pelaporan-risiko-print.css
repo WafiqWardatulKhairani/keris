@@ -1,0 +1,215 @@
+@page {
+    size: A4 landscape;
+    margin: 16mm;
+}
+
+body {
+    font-family: DejaVu Sans, sans-serif;
+    font-size: 11px;
+    color: #000;
+    margin: 0;
+    padding: 0;
+}
+
+.report-wrapper {
+    width: 100%;
+}
+
+.report-section {
+    margin-bottom: 40px;
+}
+
+/* =========================
+   HEADER
+========================= */
+
+.report-header {
+    width: 100%;
+    margin-bottom: 14px;
+}
+
+.header-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.header-table td {
+    border: none;
+    vertical-align: middle;
+}
+
+.logo-cell {
+    width: 90px;
+}
+
+.logo-cell img {
+    width: 70px;
+}
+
+.instansi-cell {
+    width: 150px;
+    line-height: 1.2;
+}
+
+.bps-title {
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.bps-subtitle {
+    font-size: 14px;
+}
+
+.title-cell {
+    text-align: center;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.header-line {
+    border-top: 1px solid #000;
+    margin-top: 10px;
+    margin-bottom: 18px;
+}
+
+/* =========================
+   META INFO
+========================= */
+
+.report-meta {
+    margin-bottom: 18px;
+}
+
+.meta-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.meta-table td {
+    border: none;
+    padding: 3px 0;
+    vertical-align: top;
+}
+
+.meta-label {
+    width: 180px;
+    font-weight: bold;
+}
+
+.meta-separator {
+    width: 20px;
+    text-align: center;
+}
+
+/* =========================
+   TABLE
+========================= */
+
+.report-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    font-size: 10px;
+}
+
+.report-table th,
+.report-table td {
+    border: 1px solid #000;
+    padding: 5px;
+    vertical-align: top;
+    line-height: 1.4;
+    word-wrap: break-word;
+}
+
+.report-table th {
+    background: #cfe8ff;
+
+    text-align: center;
+    vertical-align: middle;
+
+    font-weight: bold;
+}
+
+.number-row td {
+    text-align: center;
+    font-style: italic;
+
+    padding: 4px;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.report-table td {
+    line-height: 1.5;
+}
+
+/* =========================
+   SIGNATURE
+========================= */
+
+.signature-wrapper {
+    width: 100%;
+    margin-top: 40px;
+}
+
+.signature-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.signature-table td {
+    width: 50%;
+    border: none;
+    vertical-align: top;
+    text-align: center;
+}
+
+.signature-date {
+    margin-bottom: 10px;
+}
+
+.invisible-date {
+    visibility: hidden;
+}
+
+.signature-role {
+    line-height: 1.5;
+}
+
+.signature-space {
+    height: 70px;
+}
+
+.signature-name {
+    text-decoration: underline;
+    margin-bottom: 4px;
+}
+
+.signature-nip {
+    font-size: 11px;
+}
+
+/* =========================
+   PRINT FIX
+========================= */
+thead {
+    display: table-header-group;
+}
+
+tr {
+    page-break-inside: avoid;
+}
+
+table {
+    page-break-inside: auto;
+}
+
+tr {
+    page-break-inside: avoid;
+}
+
+.signature-wrapper {
+    page-break-inside: avoid;
+}

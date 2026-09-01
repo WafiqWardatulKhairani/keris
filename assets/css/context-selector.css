@@ -1,0 +1,82 @@
+.pk-context-filter {
+    border-left: 3px solid #0d6efd;
+    border-radius: 0;
+    box-shadow: none;
+    margin-bottom: 12px;
+    max-width: 959px;
+    width: 959px;
+}
+
+.pk-context-filter.card {
+    border-radius: 0 !important;
+}
+
+.pk-context-filter .card-body {
+    padding: 10px 12px 6px 12px;
+}
+
+.pk-context-filter .pk-filter-row {
+    display: grid;
+    grid-template-columns: 130px 400px;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.pk-context-filter .pk-filter-row label {
+    font-size: 0.88rem;
+    font-weight: 500;
+    margin-bottom: 0;
+}
+
+.pk-context-filter .pk-select {
+    width: 100%;
+    font-size: 0.88rem;
+    border: none;
+    border-bottom: 1px solid #ced4da;
+    padding: 2px 4px;
+    background: transparent;
+}
+
+.pk-context-filter select[name="th"] {
+    max-width: 120px;
+}
+
+.pk-context-filter .pk-select:focus {
+    border-bottom: 2px solid #0d6efd;
+    outline: none;
+    box-shadow: none;
+}
+
+.pk-context-filter .btn-icon {
+    width: 28px;
+    height: 28px;
+    font-size: 13px;
+    padding: 0;
+}
+
+/* ===== ACTION BUTTON AREA ===== */
+.pk-context-filter .pk-action-wrapper {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+    margin-left: 180px; /* sejajarkan dengan awal dropdown */
+}
+
+/* bikin tombol tidak terlalu bulat */
+.pk-context-filter .btn-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px; /* bukan lingkaran lagi */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* hilangkan padding aneh */
+.pk-context-filter .btn-icon i {
+    font-size: 16px;
+}
+
+.pk-context-filter .pk-right-side {
+    margin-top: 38px;
+}
