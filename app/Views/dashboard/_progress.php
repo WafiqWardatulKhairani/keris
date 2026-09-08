@@ -12,7 +12,7 @@
                         <div class="th-form">Form 1</div>
                         <div class="th-sub">Penetapan Konteks</div>
                     </th>
-                    <th>
+                    <th> 
                         <div class="th-form">Form 2</div>
                         <div class="th-sub">Identifikasi · Analisis · Evaluasi</div>
                     </th>

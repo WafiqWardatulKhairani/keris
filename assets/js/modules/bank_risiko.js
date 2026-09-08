@@ -39,38 +39,30 @@
   };
 
   const bindTableEvents = () => {
+    // Klik baris → buka detail Bank Risiko
     document.querySelectorAll(".br-row").forEach((row) => {
       row.addEventListener("click", () => {
         resetForm();
+
         document.getElementById("bankRisikoModalTitle").textContent =
           "Detail Bank Risiko";
+
         document.getElementById("bankRisikoId").value = row.dataset.id;
+
         document.getElementById("bankRisikoPernyataan").value =
           row.dataset.pernyataan;
+
         document
           .getElementById("bankRisikoPernyataan")
           .setAttribute("readonly", true);
+
         showMode("view");
         modal.show();
       });
     });
-
-    document
-      .getElementById("brPerPage")
-      ?.addEventListener("change", () => reloadTable());
-
-    document
-      .getElementById("bankRisikoTableWrapper")
-      .addEventListener("click", (e) => {
-        const link = e.target.closest("a[data-ci-pagination-page]");
-        if (!link) return;
-        e.preventDefault();
-        reloadTable(link.getAttribute("data-ci-pagination-page"));
-      });
   };
 
   bindTableEvents();
-
   document
     .getElementById("btnTambahBankRisiko")
     ?.addEventListener("click", () => {

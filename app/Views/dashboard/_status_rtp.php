@@ -12,7 +12,7 @@
     </div>
 
     <div class="card">
-        <div class="card-head">
+        <div class="card-head"> 
             <span>Status RTP</span>
             <small>Realisasi penanganan risiko</small>
         </div>

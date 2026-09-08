@@ -21,7 +21,12 @@ async function initGlobalContext() {
   if (selectedTim) {
     await loadKegiatan(selectedTim, GC_DEFAULT.id_kegiatan);
   }
+
   gcInitialized = true;
+
+  if (!GC_DEFAULT.has_context) {
+    await saveGlobalContext();
+  }
 }
 
 function bindEvents() {

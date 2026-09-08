@@ -43,7 +43,7 @@
 
     <!-- Content: filter + table -->
     <?= view('identifikasi_risiko/content', [
-        'data'           => $data,
+        'data'           => $data, 
         'pager'          => $pager,
         'activeKonteks'  => $activeKonteks,
         'kategoriList'   => $kategoriList,

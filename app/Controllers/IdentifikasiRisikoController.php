@@ -158,8 +158,13 @@ class IdentifikasiRisikoController extends BaseController
 
         $db = \Config\Database::connect();
         $query = $db->table('konteks_proses_bisnis kpb')
-            ->select('kpb.id_konteks_proses, pb.kode_proses, pb.uraian_proses, pb.jenis_proses')
-            ->join('proses_bisnis pb', 'pb.id_proses = kpb.id_proses')
+            ->select('
+        kpb.id_konteks_proses,
+        kpb.deskripsi_proses,
+        pb.kode_proses,
+        pb.uraian_proses,
+        pb.jenis_proses
+    ')->join('proses_bisnis pb', 'pb.id_proses = kpb.id_proses')
             ->join('konteks k', 'k.id_konteks = kpb.id_konteks');
 
         // PRIORITAS 1 → kalau pakai id_konteks
@@ -185,6 +190,7 @@ class IdentifikasiRisikoController extends BaseController
 
         $listKonteksProses = $query
             ->orderBy('pb.kode_proses', 'ASC')
+            ->orderBy('kpb.id_konteks_proses', 'ASC')
             ->get()
             ->getResultArray();
 
@@ -270,7 +276,7 @@ class IdentifikasiRisikoController extends BaseController
             $this->request->getPost('dampak_risiko'),
             $this->request->getPost('id_kategori_risiko') ?: null,
             $this->request->getPost('sumber_risiko'),
-        ]);        
+        ]);
 
         $idIdentifikasi = $result->getRow()->id_identifikasi ?? null;
 

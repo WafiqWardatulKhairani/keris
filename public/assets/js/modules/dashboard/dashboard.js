@@ -224,7 +224,7 @@ function updateRiskMatrix(grid) {
             if (!el) continue;
 
             const total =
-                grid?.[k]?.[d]?.total ?? 0;
+                grid?.[d]?.[k]?.total ?? 0;
 
             el.textContent = total > 0
                 ? `(${total})`
@@ -237,6 +237,7 @@ let fetchTimer;
 
 function fetchData() {
     clearTimeout(fetchTimer);
+
     fetchTimer = setTimeout(async () => {
         const tahun = document.getElementById('fTahun').value;
         const tim = document.getElementById('fTim').value;
@@ -256,11 +257,13 @@ function fetchData() {
         if (tim) params.set('tim', tim);
         if (kategori) params.set('kategori', kategori);
 
-        try {
-            const res = await fetch(DATA_URL + '?' + params.toString());
-            const data = await res.json();
-            updateRiskMatrix(data.heatmap);
-            const kpi = data.kpi;
+       try {
+    const res = await fetch(DATA_URL + '?' + params.toString());
+    const data = await res.json();
+
+
+    updateRiskMatrix(data.heatmap);
+    const kpi = data.kpi;
 
             // KPI cards
             document.getElementById('kTotalRisiko').textContent = kpi.totalRisiko;
@@ -298,8 +301,8 @@ function fetchData() {
         } catch (e) {
             console.error('Fetch error:', e);
         } finally {
-            overlay.classList.remove('active');
-        }
+    overlay.classList.remove('active');
+}
     }, 300);
 }
 

@@ -86,10 +86,15 @@ $selectedKegiatan = session('global_id_kegiatan') ?? '';
         },
 
         default: {
-            tahun: '<?= session('global_tahun') ?? date('Y') ?>',
-            id_tim: '<?= session('global_id_tim') ?? session('id_tim') ?>',
-            id_kegiatan: '<?= session('global_id_kegiatan') ?? '' ?>',
-        },
+    tahun: '<?= session('global_tahun') ?? date('Y') ?>',
+    id_tim: '<?= session('global_id_tim') ?? session('id_tim') ?>',
+    id_kegiatan: '<?= session('global_id_kegiatan') ?? '' ?>',
+
+    has_context: <?= (
+        session('global_tahun') !== null &&
+        session('global_id_tim') !== null
+    ) ? 'true' : 'false' ?>
+},
 
         user: {
             role: '<?= session('user_role') ?>',

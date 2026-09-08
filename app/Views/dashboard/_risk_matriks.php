@@ -27,14 +27,15 @@ foreach ($matriks as $row) {
         <table class="risk-matrix">
             <thead>
                 <tr>
-                    <th rowspan="2" style="width:220px">Kemungkinan</th>
+                    <th rowspan="2">Kemungkinan</th>
                     <th colspan="5">Dampak</th>
                 </tr>
                 <tr>
                     <?php foreach ($labelDampak as $label): ?>
-                        <th><?= str_replace(' ', '<br>', $label) ?></th>
+                        <th><?= esc($label) ?></th>
                     <?php endforeach; ?>
                 </tr>
+
             </thead>
 
             <tbody>
@@ -42,7 +43,7 @@ foreach ($matriks as $row) {
                     <tr>
                         <th class="text-start">
                             <?= $namaK ?><br>
-                            <small class="text-muted">(Level <?= $levelK ?>)</small>
+                            
                         </th>
 
                         <?php for ($d = 1; $d <= 5; $d++): ?>

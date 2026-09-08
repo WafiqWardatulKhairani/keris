@@ -15,18 +15,40 @@ class BankRisikoController extends Controller
     }
 
     public function index()
-    {
-        $perPage = 10;
-        $data    = $this->model->getForTable($perPage);
-        $pager   = $this->model->getPager();
+{
+    $perPage = (int) ($this->request->getGet('perPage') ?? 10);
+    $page    = (int) ($this->request->getGet('page') ?? 1);
 
-        return view('bank_risiko/index', [
-            'data'    => $data,
-            'pager'   => $pager,
-            'perPage' => $perPage,
-            'hideGlobalContext' => true,
-        ]);
-    }
+    $offset = ($page - 1) * $perPage;
+
+    $total = $this->model->countAllResults();
+
+    $data = $this->model
+        ->orderBy('id_bank_risiko', 'ASC')
+        ->findAll($perPage, $offset);
+
+    $from = $total > 0 ? $offset + 1 : 0;
+    $to   = min($offset + $perPage, $total);
+
+    $totalPages = (int) ceil($total / $perPage);
+
+    $pager = [
+        'currentPage' => $page,
+        'totalPages'  => $totalPages,
+        'perPage'     => $perPage,
+        'total'       => $total,
+    ];
+
+    return view('bank_risiko/index', [
+        'data'              => $data,
+        'pager'             => $pager,
+        'perPage'           => $perPage,
+        'from'              => $from,
+        'to'                => $to,
+        'total'             => $total,
+        'hideGlobalContext' => true,
+    ]);
+}
 
     public function store()
     {
@@ -72,20 +94,43 @@ class BankRisikoController extends Controller
     }
 
     public function ajaxTable()
-    {
-        if (!$this->request->isAJAX())
-            return redirect()->back();
-
-        $perPage = $this->request->getGet('per_page') ?? 10;
-        $data    = $this->model->getForTable((int) $perPage);
-        $pager   = $this->model->getPager();
-
-        return view('bank_risiko/_table_section', [
-            'data'    => $data,
-            'pager'   => $pager,
-            'perPage' => $perPage,
-        ]);
+{
+    if (!$this->request->isAJAX()) {
+        return redirect()->back();
     }
+
+    $perPage = (int) ($this->request->getGet('per_page') ?? 10);
+    $page    = (int) ($this->request->getGet('page') ?? 1);
+
+    $offset = ($page - 1) * $perPage;
+
+    $total = $this->model->countAllResults();
+
+    $data = $this->model
+        ->orderBy('id_bank_risiko', 'ASC')
+        ->findAll($perPage, $offset);
+
+    $from = $total > 0 ? $offset + 1 : 0;
+    $to   = min($offset + $perPage, $total);
+
+    $totalPages = (int) ceil($total / $perPage);
+
+    $pager = [
+        'currentPage' => $page,
+        'totalPages'  => $totalPages,
+        'perPage'     => $perPage,
+        'total'       => $total,
+    ];
+
+    return view('bank_risiko/_table_section', [
+        'data'    => $data,
+        'pager'   => $pager,
+        'perPage' => $perPage,
+        'from'    => $from,
+        'to'      => $to,
+        'total'   => $total,
+    ]);
+}
 
     /**
      * Endpoint untuk dropdown Pernyataan Risiko

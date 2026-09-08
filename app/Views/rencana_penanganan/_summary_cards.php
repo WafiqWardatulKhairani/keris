@@ -10,7 +10,7 @@
             <?php
             $totalLevel = array_sum(array_column($levelRisiko, 'jumlah'));
             ?>
-
+ 
             <?php foreach ($levelRisiko as $level => $info): ?>
 
                 <?php

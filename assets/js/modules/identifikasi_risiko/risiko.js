@@ -52,10 +52,11 @@ document.addEventListener("DOMContentLoaded", function () {
     ).show();
   });
 
-  document.getElementById("offcanvasRisiko")?.addEventListener("hidden.bs.offcanvas", irResetForm);
+  document
+    .getElementById("offcanvasRisiko")
+    ?.addEventListener("hidden.bs.offcanvas", irResetForm);
   enableAutoNumbering("irPenyebab");
   enableAutoNumbering("irDampak");
-  
 });
 
 /* LOAD BANK RISIKO */
@@ -262,10 +263,12 @@ function irLoadDetail(id, row) {
       }
 
       select.value = data.id_konteks_proses ?? "";
-      document.getElementById("irPernyataan").value =data.pernyataan_risiko ?? "";
+      document.getElementById("irPernyataan").value =
+        data.pernyataan_risiko ?? "";
       document.getElementById("irDampak").value = data.dampak_risiko ?? "";
       document.getElementById("irPenyebab").value = data.penyebab_risiko ?? "";
-      document.getElementById("irKategori").value = data.id_kategori_risiko ?? "";
+      document.getElementById("irKategori").value =
+        data.id_kategori_risiko ?? "";
 
       document.querySelectorAll('input[name="sumber_risiko"]').forEach((r) => {
         r.checked = r.value === data.sumber_risiko;
@@ -289,7 +292,9 @@ function irLoadDetail(id, row) {
       // APPLY READONLY MODE (COPY DARI KONTEKS)
       const btnDelete = document.getElementById("irBtnDelete");
       const btnEdit = document.getElementById("irBtnSwitchEdit");
-      const btnClose = document.querySelector("#irBtnView button[data-bs-dismiss='offcanvas']");
+      const btnClose = document.querySelector(
+        "#irBtnView button[data-bs-dismiss='offcanvas']",
+      );
 
       // DEFAULT
       if (btnDelete) btnDelete.style.display = "";

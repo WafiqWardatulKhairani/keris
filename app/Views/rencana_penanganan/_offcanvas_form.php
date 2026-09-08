@@ -5,7 +5,7 @@
             <small>Manajemen Risiko</small>
         </div>
     </div>
-
+ 
     <div class="offcanvas-body">
 
         <form id="rtpForm" novalidate>

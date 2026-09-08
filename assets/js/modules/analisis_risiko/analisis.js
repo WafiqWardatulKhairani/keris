@@ -1,4 +1,3 @@
-
 const USER = window.APP_USER || {};
 const AR_URL = window.AR_CONFIG?.url || {};
 let arCsrfToken = window.AR_CONFIG?.csrf?.token || "";

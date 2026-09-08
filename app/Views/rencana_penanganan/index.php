@@ -40,7 +40,7 @@
                     <h2 class="page-title mb-0">Rencana Tindak Penanganan Risiko</h2>
                 </div>
             </div>
-        </div>
+        </div> 
     </div>
 
     <!-- Summary Cards -->

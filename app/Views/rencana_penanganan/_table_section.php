@@ -36,7 +36,7 @@
                         $jumlahRtp  = count($rtpList);
                         $noPrioritas = $item['no_prioritas'] ?? null;
 
-                        /* === RISIKO RESIDU — ambil dari rtp_list[0] (BALIK KE LOGIKA BENAR) === */
+                        /* === RISIKO RESIDU — ambil dari rtp_list[0] === */
                         $levelP   = null;
                         $levelD   = null;
                         $skorSR   = null;
@@ -65,11 +65,14 @@
                         };
 
                         $rowspanCount = max($jumlahRtp, 1);
+                        // ID unik untuk grup rowspan (gunakan id_identifikasi)
+                        $groupId = 'rtp-group-' . $item['id_identifikasi'];
                     ?>
 
                         <?php if ($jumlahRtp === 0): ?>
                             <!-- ===== BARIS KOSONG (belum ada RTP) ===== -->
-                            <tr class="rtp-row-empty"
+                            <tr class="rtp-row-empty rtp-row-group" 
+                                data-group="<?= $groupId ?>"
                                 data-rtp=""
                                 data-id-evaluasi="<?= esc($item['id_evaluasi']) ?>"
                                 title="Klik untuk tambah RTP"
@@ -133,7 +136,8 @@
                                     $tahun = date('Y', $ts);
                                 }
                             ?>
-                                <tr class="rtp-row rtp-row-filled"
+                                <tr class="rtp-row rtp-row-filled rtp-row-group"
+                                    data-group="<?= $groupId ?>"
                                     data-rtp="<?= esc($rtp['id_rtp']) ?>"
                                     data-id-evaluasi="<?= esc($item['id_evaluasi']) ?>"
                                     title="Klik untuk lihat/edit RTP ini">
@@ -253,66 +257,95 @@
         </table>
     </div>
 
-    <!-- PAGINATION -->
+    <!-- ======== BOTTOM BAR (selalu muncul jika data ada) ======== -->
     <?php if (!empty($total) && $total > 0): ?>
-        <div class="rtp-table-footer">
-            <div class="rtp-pagination-info">
-                Menampilkan <?= $from ?>–<?= $to ?> dari <?= $total ?> risiko
-            </div>
-
-            <?php if (!empty($pager) && $pager['totalPages'] > 1): ?>
-                <div class="d-flex align-items-center gap-2">
-                    <select class="form-select form-select-sm rtp-perpage"
-                        onchange="rtpGoToPage(1, this.value)">
-                        <?php foreach ([10, 25, 50] as $n): ?>
-                            <option value="<?= $n ?>"
-                                <?= $perPage == $n ? 'selected' : '' ?>>
-                                <?= $n ?>
+        <div class="rtp-table-footer pk-table-bottom">
+            <div class="rtp-pagination-info pk-table-info">
+                <form method="get" class="d-flex align-items-center gap-2" id="rtpPerPageForm">
+                    <!-- Bawa semua parameter GET kecuali perPage dan page -->
+                    <?php
+                    $getParams = $_GET;
+                    unset($getParams['perPage'], $getParams['page']);
+                    foreach ($getParams as $key => $value):
+                        if (is_array($value)) {
+                            foreach ($value as $v) {
+                                echo '<input type="hidden" name="' . esc($key) . '[]" value="' . esc($v) . '">';
+                            }
+                        } else {
+                            echo '<input type="hidden" name="' . esc($key) . '" value="' . esc($value) . '">';
+                        }
+                    endforeach;
+                    ?>
+                    <select name="perPage" class="rtp-perpage pk-perpage-select"
+                            onchange="document.getElementById('rtpPerPageForm').submit();">
+                        <?php foreach ([5, 10, 25, 50] as $size): ?>
+                            <option value="<?= $size ?>" <?= ($perPage ?? 10) == $size ? 'selected' : '' ?>>
+                                <?= $size ?>
                             </option>
                         <?php endforeach; ?>
                     </select>
-
-                    <nav>
-                        <ul class="pagination pagination-sm mb-0">
-                            <li class="page-item <?= $pager['currentPage'] <= 1 ? 'disabled' : '' ?>">
-                                <a class="page-link"
-                                    href="javascript:void(0)"
-                                    onclick="rtpGoToPage(<?= $pager['currentPage'] - 1 ?>)">
-                                    ‹
-                                </a>
-                            </li>
-
-                            <?php for ($p = 1; $p <= $pager['totalPages']; $p++): ?>
-                                <li class="page-item <?= $p === $pager['currentPage'] ? 'active' : '' ?>">
-                                    <a class="page-link"
-                                        href="javascript:void(0)"
-                                        onclick="rtpGoToPage(<?= $p ?>)">
-                                        <?= $p ?>
-                                    </a>
-                                </li>
-                            <?php endfor; ?>
-
-                            <li class="page-item <?= $pager['currentPage'] >= $pager['totalPages'] ? 'disabled' : '' ?>">
-                                <a class="page-link"
-                                    href="javascript:void(0)"
-                                    onclick="rtpGoToPage(<?= $pager['currentPage'] + 1 ?>)">
-                                    ›
-                                </a>
-                            </li>
-                        </ul>
-                    </nav>
+                </form>
+                <div class="rtp-info-text pk-info-text">
+                    Menampilkan <?= $from ?? 0 ?> – <?= $to ?? 0 ?> dari <?= $total ?? 0 ?> risiko
                 </div>
-            <?php endif; ?>
+            </div>
+
+            <div class="pk-pagination-wrapper">
+                <ul class="pagination mb-0">
+                    <?php
+                    $currentPage = $pager['currentPage'] ?? 1;
+                    $totalPages  = $pager['totalPages'] ?? 1;
+                    $queryString = $_GET;
+                    unset($queryString['page']);
+                    ?>
+                    <!-- Prev -->
+                    <?php if ($currentPage <= 1): ?>
+                        <li class="page-item disabled"><span class="page-link">&laquo;</span></li>
+                    <?php else:
+                        $queryString['page'] = $currentPage - 1;
+                        ?>
+                        <li class="page-item"><a class="page-link" href="?<?= http_build_query($queryString) ?>">&laquo;</a></li>
+                    <?php endif; ?>
+
+                    <!-- Nomor halaman dengan elipsis -->
+                    <?php for ($i = 1; $i <= $totalPages; $i++): ?>
+                        <?php if ($i == 1 || $i == $totalPages || abs($i - $currentPage) <= 1): ?>
+                            <?php if ($i == $currentPage): ?>
+                                <li class="page-item active"><span class="page-link"><?= $i ?></span></li>
+                            <?php else:
+                                $queryString['page'] = $i;
+                                ?>
+                                <li class="page-item"><a class="page-link" href="?<?= http_build_query($queryString) ?>"><?= $i ?></a></li>
+                            <?php endif; ?>
+                        <?php elseif ($i == 2 || $i == $totalPages - 1): ?>
+                            <li class="page-item disabled"><span class="page-link">…</span></li>
+                        <?php endif; ?>
+                    <?php endfor; ?>
+
+                    <!-- Next -->
+                    <?php if ($currentPage >= $totalPages): ?>
+                        <li class="page-item disabled"><span class="page-link">&raquo;</span></li>
+                    <?php else:
+                        $queryString['page'] = $currentPage + 1;
+                        ?>
+                        <li class="page-item"><a class="page-link" href="?<?= http_build_query($queryString) ?>">&raquo;</a></li>
+                    <?php endif; ?>
+                </ul>
+            </div>
         </div>
     <?php endif; ?>
+    <!-- ======== END BOTTOM BAR ======== -->
 </div>
 
 <script>
-    function rtpGoToPage(page, perPage = <?= $perPage ?? 5 ?>) {
+    function rtpGoToPage(page, perPage) {
         const url = new URL(window.location.href);
         url.searchParams.set('page', page);
-        url.searchParams.set('perPage', perPage);
-        url.searchParams.set('filter', '<?= esc($filter ?? '') ?>');
+        if (perPage) {
+            url.searchParams.set('perPage', perPage);
+        } else {
+            url.searchParams.set('perPage', <?= $perPage ?? 10 ?>);
+        }
 
         const wrapper = document.getElementById('rtpTableCard');
         const scrollY = window.scrollY;
@@ -326,10 +359,32 @@
                 if (newCard && wrapper) {
                     wrapper.outerHTML = newCard.outerHTML;
                     window.history.pushState({}, '', url.toString());
-                    window.scrollTo({
-                        top: scrollY
-                    });
+                    window.scrollTo({ top: scrollY });
                 }
             });
     }
-</script>
+
+    // ============================================================
+    // HOVER EFFECT UNTUK ROWSPAN GRUP
+    // Saat hover di salah satu baris dalam grup, semua baris 
+    // dalam grup yang sama akan terblok.
+    // ============================================================
+    document.addEventListener('DOMContentLoaded', function() {
+        const rows = document.querySelectorAll('.rtp-row-group');
+
+        rows.forEach(row => {
+            const groupId = row.dataset.group;
+
+            row.addEventListener('mouseenter', function() {
+                // Tambahkan class hover ke semua baris dalam grup yang sama
+                document.querySelectorAll(`.rtp-row-group[data-group="${groupId}"]`)
+                    .forEach(r => r.classList.add('rtp-group-hover'));
+            });
+
+            row.addEventListener('mouseleave', function() {
+                document.querySelectorAll(`.rtp-row-group[data-group="${groupId}"]`)
+                    .forEach(r => r.classList.remove('rtp-group-hover'));
+            });
+        });
+    });
+</script>   

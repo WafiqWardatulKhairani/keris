@@ -1,4 +1,3 @@
-<!-- ================= OFFCANVAS ANALISIS RISIKO ================= -->
 <div class="offcanvas offcanvas-end shadow-lg"
     tabindex="-1"
     id="arOffcanvas">

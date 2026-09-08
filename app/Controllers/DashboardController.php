@@ -33,7 +33,7 @@ class DashboardController extends BaseController
             'timKerjaList'      => $timKerjaList,
             'kategoriList'      => $kategoriList,
             'matriks' => $matriks,
-            'heatmap'=> [],
+            'heatmap' => [],
             'hideGlobalContext' => true,
         ]);
     }
@@ -148,7 +148,7 @@ class DashboardController extends BaseController
                 $tahun,
                 $timId,
                 $katId,
-                
+
                 $konteksHasIdTim,
                 $konteksColumns
             ): array {
@@ -161,7 +161,7 @@ class DashboardController extends BaseController
 
                 if ($needKonteks) {
 
-    $join .= "
+                    $join .= "
         LEFT JOIN konteks_proses_bisnis kpb
             ON kpb.id_konteks_proses = {$irAlias}.id_konteks_proses
 
@@ -169,16 +169,16 @@ class DashboardController extends BaseController
             ON k.id_konteks = kpb.id_konteks
     ";
 
-    if ($tahun) {
-        $where[]  = "k.tahun = ?";
-        $params[] = $tahun;
-    }
+                    if ($tahun) {
+                        $where[]  = "k.tahun = ?";
+                        $params[] = $tahun;
+                    }
 
-    if ($timId) {
-        $where[]  = "k.id_tim = ?";
-        $params[] = $timId;
-    }
-}
+                    if ($timId) {
+                        $where[]  = "k.id_tim = ?";
+                        $params[] = $timId;
+                    }
+                }
 
                 if ($needKat) {
                     $where[]  = "{$irAlias}.id_kategori_risiko = ?";
@@ -206,16 +206,15 @@ class DashboardController extends BaseController
             // ── KPI 2: Total RTP ─────────────────────────────────────────────
             if (empty($p)) {
 
-    $totalRtp = (int)$db->query("
+                $totalRtp = (int)$db->query("
         SELECT COUNT(*) AS total
         FROM rencana_penanganan_risiko
     ")->getRowArray()['total'];
+            } else {
 
-} else {
+                [$j2, $w2, $p2] = $buildJoin('ir');
 
-    [$j2, $w2, $p2] = $buildJoin('ir');
-
-    $totalRtp = (int)$db->query("
+                $totalRtp = (int)$db->query("
         SELECT COUNT(DISTINCT rp.id_rtp) AS total
 
         FROM rencana_penanganan_risiko rp
@@ -229,13 +228,14 @@ class DashboardController extends BaseController
         $j2
         $w2
     ", $p2)->getRowArray()['total'];
-}
+            }
 
             // ── KPI 3: Realisasi ─────────────────────────────────────────────
 
             [$j3, $w3, $p3] = $buildJoin('ir');
 
-            $rtpSelesai = (int)$db->query("
+            $rtpSelesai = (int)$db->query(
+                "
                 SELECT COUNT(DISTINCT rp.id_rtp) AS total
 
                 FROM rencana_penanganan_risiko rp
@@ -255,13 +255,13 @@ class DashboardController extends BaseController
                 $j3
 
                 " . ($w3
-                        ? "$w3 AND pm.realisasi_output IS NOT NULL
+                    ? "$w3 AND pm.realisasi_output IS NOT NULL
                     AND pm.realisasi_waktu IS NOT NULL
                     AND bp.id_bukti IS NOT NULL"
-                        : "WHERE pm.realisasi_output IS NOT NULL
+                    : "WHERE pm.realisasi_output IS NOT NULL
                     AND pm.realisasi_waktu IS NOT NULL
                     AND bp.id_bukti IS NOT NULL"),
-                    $p3
+                $p3
             )->getRowArray()['total'];
 
             $realisasi = $totalRtp > 0
@@ -282,11 +282,11 @@ class DashboardController extends BaseController
             }
 
             [$jh, $wh, $ph] = $buildJoin('ir');
-//             dd([
-//     'join'   => $jh,
-//     'where'  => $wh,
-//     'params' => $ph,
-// ]);
+            //             dd([
+            //     'join'   => $jh,
+            //     'where'  => $wh,
+            //     'params' => $ph,
+            // ]);
             $hmRows = $db->query("
                 SELECT mr.level_kemungkinan, mr.level_dampak, COUNT(*) AS total
                 FROM penilaian_risiko pr
@@ -313,35 +313,50 @@ class DashboardController extends BaseController
                     ];
 
             // ── PIE ───────────────────────────────────────────────────────────
-            [$jp, $wp, $pp] = $buildJoin('ir');
-            $wp = $wp ? "$wp AND pr.warna_risiko IS NOT NULL AND pr.warna_risiko != ''"
-                : "WHERE pr.warna_risiko IS NOT NULL AND pr.warna_risiko != ''";
-            $pieRows = $db->query("
-                SELECT pr.warna_risiko AS warna, COUNT(*) AS total
-                FROM penilaian_risiko pr
-                JOIN identifikasi_risiko ir ON ir.id_identifikasi = pr.id_identifikasi
-                $jp $wp
-                GROUP BY pr.warna_risiko
-            ", $pp)->getResultArray();
+            // ── PIE: DIHITUNG DARI PETA RISIKO ───────────────────────────────
 
-            $warnaLabel = ['biru' => 'Sangat Rendah', 'hijau' => 'Rendah', 'kuning' => 'Sedang', 'oranye' => 'Tinggi', 'merah' => 'Sangat Tinggi'];
-            $warnaColor = [
-                'biru'   => '#bfdbfe',
-                'hijau'  => '#bbf7d0',
-                'kuning' => '#fde68a',
-                'oranye' => '#fed7aa',
-                'merah'  => '#fca5a5'
+            $pieMap = [
+                'biru'   => 0,
+                'hijau'  => 0,
+                'kuning' => 0,
+                'oranye' => 0,
+                'merah'  => 0,
             ];
-            $warnaOrder = ['biru', 'hijau', 'kuning', 'oranye', 'merah'];
-            usort($pieRows, fn($a, $b) => array_search($a['warna'], $warnaOrder) - array_search($b['warna'], $warnaOrder));
-            $pieLabels = $pieValues = $pieColors = [];
-            foreach ($pieRows as $row) {
-                $w = strtolower(trim($row['warna'] ?? ''));
-                $pieLabels[] = $warnaLabel[$w] ?? ucfirst($w);
-                $pieValues[] = (int)$row['total'];
-                $pieColors[] = $warnaColor[$w] ?? '#94a3b8';
+
+            foreach ($heatmap as $row) {
+                foreach ($row as $cell) {
+
+                    $warna = strtolower(trim($cell['warna'] ?? ''));
+
+                    if (isset($pieMap[$warna])) {
+                        $pieMap[$warna] += (int) ($cell['total'] ?? 0);
+                    }
+                }
             }
 
+            $pieLabels = [
+                'Sangat Rendah',
+                'Rendah',
+                'Sedang',
+                'Tinggi',
+                'Sangat Tinggi',
+            ];
+
+            $pieValues = [
+                $pieMap['biru'],
+                $pieMap['hijau'],
+                $pieMap['kuning'],
+                $pieMap['oranye'],
+                $pieMap['merah'],
+            ];
+
+            $pieColors = [
+                '#bfdbfe',
+                '#bbf7d0',
+                '#fde68a',
+                '#fed7aa',
+                '#fca5a5',
+            ];
             // ── KATEGORI ──────────────────────────────────────────────────────
             [$jk, $wk, $pk] = $buildJoin('ir');
             $katRows = $db->query("
@@ -462,11 +477,11 @@ class DashboardController extends BaseController
         COUNT(DISTINCT k.id_konteks) AS f1,
 
         COUNT(
-            DISTINCT CASE
-                WHEN ir.id_identifikasi IS NOT NULL
-                THEN k.id_konteks
-            END
-        ) AS f2,
+    DISTINCT CASE
+        WHEN ev.id_evaluasi IS NOT NULL
+        THEN k.id_konteks
+    END
+) AS f2,
 
         COUNT(
             DISTINCT CASE
@@ -509,10 +524,13 @@ class DashboardController extends BaseController
 
             return $this->response->setJSON([
                 '_debug' => [
-                    //'directJoinWorks'  => $directJoinWorks,
-                    'konteksHasIdTim'  => $konteksHasIdTim,
-                    'totalRisiko'      => $totalRisiko,
-                    'totalRtp'         => $totalRtp,
+                    'konteksHasIdTim' => $konteksHasIdTim,
+                    'totalRisiko'     => $totalRisiko,
+                    'totalRtp'        => $totalRtp,
+
+                    'filter_tahun'    => $tahun,
+                    'filter_tim'      => $timId,
+                    'filter_kategori' => $katId,
                 ],
                 'kpi' => [
                     'totalRisiko' => $totalRisiko,
