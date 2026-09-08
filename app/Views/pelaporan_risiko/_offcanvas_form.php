@@ -16,7 +16,7 @@
                 <i class="ti ti-building me-1"></i>Informasi Konteks
             </div>
             <div class="ar-grid-2">
-                <div>
+                <div> 
                     <div class="ar-info-row">
                         <span class="ar-info-label">Tahun</span>
                         <span class="ar-info-value" id="plInfoTahun">-</span>

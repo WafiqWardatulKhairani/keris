@@ -5,7 +5,7 @@ namespace App\Controllers;
 use App\Controllers\BaseController;
 use App\Models\PemantauanRisikoModel;
 use Dompdf\Dompdf;
-use Dompdf\Options;
+use Dompdf\Options; 
 
 class PelaporanRisikoController extends BaseController
 {

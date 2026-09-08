@@ -4,7 +4,7 @@ const USER = window.APP_USER || {};
 const PR_URL = window.PR_CONFIG?.url || {};
 let prCsrfToken = window.PR_CONFIG?.csrf?.token || "";
 const prCsrfName = window.PR_CONFIG?.csrf?.name || "csrf_token";
-
+ 
 /* HELPER — format "YYYY-MM" / "YYYY-MM-DD" → "Bulan Tahun"
    [FIX #1] Gunakan locale id-ID agar nama bulan bahasa Indonesia */
 function prFormatBulanTahun(val) {

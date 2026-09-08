@@ -176,80 +176,101 @@ class PemantauanRisikoModel extends Model
     }
 
     /* DISTRIBUSI STATUS*/
-    public function getDistribusiStatus(?int $idKonteks = null): array
-    {
-        $statusList = ['Belum Dilaksanakan', 'Dalam Proses', 'Selesai', 'Terlambat'];
-        $result     = array_fill_keys($statusList, 0);
+    public function getDistribusiStatus(
+    $tahun = null,
+    $idTim = null,
+    $idKegiatan = null
+): array {
+    $statusList = [
+        'Belum Dilaksanakan',
+        'Dalam Proses',
+        'Selesai',
+        'Terlambat'
+    ];
 
-        $builder = $this->db->table('rencana_penanganan_risiko rtp')
-            ->select("
-                CASE
-                    WHEN pm.realisasi_waktu IS NOT NULL
-                        AND DATE_TRUNC('month', pm.realisasi_waktu)
-                            > DATE_TRUNC('month', rtp.target_waktu)
-                    THEN 'Terlambat'
+    $result = array_fill_keys($statusList, 0);
 
-                    WHEN pm.realisasi_output IS NOT NULL
-                        AND pm.realisasi_waktu IS NOT NULL
-                        AND bp.id_bukti IS NOT NULL
-                    THEN 'Selesai'
+    $statusCase = "
+        CASE
+            WHEN pm.realisasi_waktu IS NOT NULL
+                AND DATE_TRUNC('month', pm.realisasi_waktu)
+                    > DATE_TRUNC('month', rtp.target_waktu)
+            THEN 'Terlambat'
 
-                    WHEN DATE_TRUNC('month', CURRENT_DATE)
-                        > DATE_TRUNC('month', rtp.target_waktu)
-                    THEN 'Terlambat'
+            WHEN pm.realisasi_output IS NOT NULL
+                AND pm.realisasi_waktu IS NOT NULL
+                AND EXISTS (
+                    SELECT 1
+                    FROM bukti_pemantauan bp
+                    WHERE bp.id_pemantauan = pm.id_pemantauan
+                )
+            THEN 'Selesai'
 
-                    WHEN pm.realisasi_output IS NULL
-                        AND pm.realisasi_waktu IS NULL
-                        AND bp.id_bukti IS NULL
-                    THEN 'Belum Dilaksanakan'
+            WHEN DATE_TRUNC('month', CURRENT_DATE)
+                > DATE_TRUNC('month', rtp.target_waktu)
+            THEN 'Terlambat'
 
-                    ELSE 'Dalam Proses'
-                END as status,
-                COUNT(*) as total
-            ")
-            ->join('evaluasi_risiko er', 'er.id_evaluasi = rtp.id_penilaian_awal')
-            ->join('identifikasi_risiko ir', 'ir.id_identifikasi = er.id_identifikasi')
-            ->join('konteks_proses_bisnis kpb', 'kpb.id_konteks_proses = ir.id_konteks_proses')
-            ->join('pemantauan_risiko pm', 'pm.id_rtp = rtp.id_rtp', 'left')
-            ->join('bukti_pemantauan bp', 'bp.id_pemantauan = pm.id_pemantauan', 'left')
-            ->groupBy("
-                CASE
-                    WHEN pm.realisasi_waktu IS NOT NULL
-                        AND DATE_TRUNC('month', pm.realisasi_waktu)
-                            > DATE_TRUNC('month', rtp.target_waktu)
-                    THEN 'Terlambat'
+            WHEN pm.realisasi_output IS NULL
+                AND pm.realisasi_waktu IS NULL
+            THEN 'Belum Dilaksanakan'
 
-                    WHEN pm.realisasi_output IS NOT NULL
-                        AND pm.realisasi_waktu IS NOT NULL
-                        AND bp.id_bukti IS NOT NULL
-                    THEN 'Selesai'
+            ELSE 'Dalam Proses'
+        END
+    ";
 
-                    WHEN DATE_TRUNC('month', CURRENT_DATE)
-                        > DATE_TRUNC('month', rtp.target_waktu)
-                    THEN 'Terlambat'
+    $builder = $this->db
+        ->table('rencana_penanganan_risiko rtp')
+        ->select("
+            {$statusCase} AS status,
+            COUNT(DISTINCT rtp.id_rtp) AS total
+        ")
+        ->join(
+            'evaluasi_risiko er',
+            'er.id_evaluasi = rtp.id_penilaian_awal'
+        )
+        ->join(
+            'identifikasi_risiko ir',
+            'ir.id_identifikasi = er.id_identifikasi'
+        )
+        ->join(
+            'konteks_proses_bisnis kpb',
+            'kpb.id_konteks_proses = ir.id_konteks_proses'
+        )
+        ->join(
+            'konteks k',
+            'k.id_konteks = kpb.id_konteks'
+        )
+        ->join(
+            'pemantauan_risiko pm',
+            'pm.id_rtp = rtp.id_rtp',
+            'left'
+        );
 
-                    WHEN pm.realisasi_output IS NULL
-                        AND pm.realisasi_waktu IS NULL
-                        AND bp.id_bukti IS NULL
-                    THEN 'Belum Dilaksanakan'
-
-                    ELSE 'Dalam Proses'
-                END
-            ");
-
-        if ($idKonteks) {
-            $builder->where('kpb.id_konteks', $idKonteks);
-        }
-
-        foreach ($builder->get()->getResultArray() as $row) {
-            if (array_key_exists($row['status'], $result)) {
-                $result[$row['status']] = (int) $row['total'];
-            }
-        }
-
-        return $result;
+    // GLOBAL FILTER
+    if (!empty($tahun)) {
+        $builder->where('k.tahun', $tahun);
     }
 
+    if (!empty($idTim)) {
+        $builder->where('k.id_tim', $idTim);
+    }
+
+    if (!empty($idKegiatan)) {
+        $builder->where('k.id_kegiatan', $idKegiatan);
+    }
+
+    $builder->groupBy($statusCase, false);
+
+    $rows = $builder->get()->getResultArray();
+
+    foreach ($rows as $row) {
+        if (array_key_exists($row['status'], $result)) {
+            $result[$row['status']] = (int) $row['total'];
+        }
+    }
+
+    return $result;
+}
     public function validasi(int $idPemantauan, string $status, ?string $catatan = null): bool
     {
         return $this->update($idPemantauan, [

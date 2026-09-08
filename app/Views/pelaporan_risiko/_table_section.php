@@ -7,7 +7,7 @@
                     <tr>
                         <th rowspan="2" style="width:50px">#</th>
                         <th rowspan="2" style="width:24%">Risiko</th>
-                        <th rowspan="2" style="width:24%">RTP</th>
+                        <th rowspan="2" style="width:24%">RTP</th> 
                         <th colspan="2" class="text-center" style="width:22%">Target</th>
                         <th colspan="3" class="text-center" style="width:30%">Realisasi</th>
                     </tr>

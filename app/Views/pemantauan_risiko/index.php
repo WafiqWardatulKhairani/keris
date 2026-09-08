@@ -104,7 +104,7 @@
             window.scrollTo(0, parseInt(y));
             sessionStorage.removeItem('prScrollY');
         }
-    });
+    }); 
 </script>
 
 <?= $this->endSection() ?>
