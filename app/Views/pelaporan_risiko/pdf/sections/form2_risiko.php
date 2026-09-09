@@ -1,116 +1,168 @@
-<div class="report-section">
-    <table class="report-table">
+<div class="report-section form2-section">
 
-        <thead>
+    <?php if (empty($form2Data)): ?>
 
-            <tr>
-                <th colspan="7">Identifikasi Risiko</th>
-                <th colspan="4">Analisis Risiko</th>
-                <th colspan="2">Evaluasi Risiko</th>
-            </tr>
+        <div class="empty-message">
+            Data Identifikasi Risiko tidak ditemukan.
+        </div>
 
-            <tr>
-                <th colspan="2">Proses Bisnis</th>
-                <th rowspan="2">Pernyataan Risiko</th>
-                <th rowspan="2">Penyebab Risiko / Dampak Risiko</th>
-                <th rowspan="2">Kategori Risiko</th>
-                <th rowspan="2">Sumber Risiko</th>
-                <th rowspan="2">Risiko Aktual</th>
-                <th colspan="2">Pengendalian Yang Telah Dilaksanakan</th>
-                <th rowspan="2">Efek Pengendalian</th>
-                <th rowspan="2">Respon Risiko</th>
-                <th rowspan="2">Prioritas</th>
-            </tr>
+    <?php else: ?>
 
-            <tr>
-                <th>Kode</th>
-                <th>Uraian Proses</th>
-                <th>Uraian</th>
-                <th>Efektivitas</th>
-            </tr>
+        <table class="report-table form2-table">
 
-            <tr class="number-row">
-                <td>(1)</td>
-                <td>(2)</td>
-                <td>(3)</td>
-                <td>(4)</td>
-                <td>(5)</td>
-                <td>(6)</td>
-                <td>(7)</td>
-                <td>(8)</td>
-                <td>(9)</td>
-                <td>(10)</td>
-                <td>(11)</td>
-                <td>(12)</td>
-            </tr>
-
-        </thead>
-
-        <tbody>
-
-            <?php foreach ($data as $row): ?>
+            <thead>
 
                 <tr>
+                    <th colspan="8">
+                        Identifikasi Risiko
+                    </th>
 
-                    <td class="text-center">
-                        <?= esc($row['kode_proses'] ?? '-') ?>
-                    </td>
-
-                    <td>
-                        <?= esc($row['uraian_proses'] ?? '-') ?>
-                    </td>
-
-                    <td>
-                        <?= esc($row['pernyataan_risiko'] ?? '-') ?>
-                    </td>
-
-                    <td>
-                        <strong>Penyebab:</strong><br>
-                        <?= nl2br(esc($row['penyebab_risiko'] ?? '-')) ?>
-                        <br><br>
-                        <strong>Dampak:</strong><br>
-                        <?= nl2br(esc($row['dampak_risiko'] ?? '-')) ?>
-                    </td>
-
-                    <td class="text-center">
-                        <?= esc($row['nama_kategori'] ?? '-') ?>
-                    </td>
-
-                    <td class="text-center">
-                        <?= esc($row['sumber_risiko'] ?? '-') ?>
-                    </td>
-
-                    <td class="text-center">
-                        P: <?= esc($row['kemungkinan'] ?? '-') ?><br>
-                        D: <?= esc($row['dampak'] ?? '-') ?><br>
-                        SR: <?= esc($row['nilai_risiko'] ?? '-') ?>
-                    </td>
-
-                    <td>
-                        <?= nl2br(esc($row['uraian_pengendalian'] ?? '-')) ?>
-                    </td>
-
-                    <td class="text-center">
-                        <?= esc($row['efektivitas'] ?? '-') ?>
-                    </td>
-
-                    <td class="text-center">
-                        <?= esc($row['efektivitas'] ?? '-') ?>
-                    </td>
-
-                    <td class="text-center">
-                        <?= esc($row['opsi_tindakan'] ?? '-') ?>
-                    </td>
-
-                    <td class="text-center">
-                        <?= esc($row['prioritas'] ?? '-') ?>
-                    </td>
-
+                    <th colspan="4">
+                        Analisis dan Evaluasi Risiko
+                    </th>
                 </tr>
 
-            <?php endforeach; ?>
+                <tr>
+                    <th rowspan="2">No</th>
 
-        </tbody>
+                    <th colspan="2">
+                        Proses Bisnis
+                    </th>
 
-    </table>
+                    <th rowspan="2">
+                        Pernyataan Risiko
+                    </th>
+
+                    <th rowspan="2">
+                        Penyebab Risiko
+                    </th>
+
+                    <th rowspan="2">
+                        Dampak Risiko
+                    </th>
+
+                    <th rowspan="2">
+                        Kategori / Area Dampak
+                    </th>
+
+                    <th rowspan="2">
+                        Sumber Risiko
+                    </th>
+
+                    <th rowspan="2">
+                        Risiko Aktual
+                    </th>
+
+                    <th rowspan="2">
+                        Pengendalian yang Telah Dilaksanakan
+                    </th>
+
+                    <th rowspan="2">
+                        Efektivitas
+                    </th>
+
+                    <th rowspan="2">
+                        Respon / Prioritas
+                    </th>
+                </tr>
+
+                <tr>
+                    <th>Kode</th>
+                    <th>Uraian Proses</th>
+                </tr>
+
+                <tr class="number-row">
+                    <?php for ($i = 1; $i <= 12; $i++): ?>
+                        <td>(<?= $i ?>)</td>
+                    <?php endfor; ?>
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                <?php foreach ($form2Data as $i => $row): ?>
+
+                    <tr>
+
+                        <td class="text-center">
+                            <?= $i + 1 ?>
+                        </td>
+
+                        <td class="text-center">
+                            <?= esc($row['kode_proses'] ?? '-') ?>
+                        </td>
+
+                        <td>
+                            <?= esc($row['uraian_proses'] ?? '-') ?>
+                        </td>
+
+                        <td>
+                            <?= nl2br(esc(
+                                $row['pernyataan_risiko'] ?? '-'
+                            )) ?>
+                        </td>
+
+                        <td>
+                            <?= nl2br(esc(
+                                $row['penyebab_risiko'] ?? '-'
+                            )) ?>
+                        </td>
+
+                        <td>
+                            <?= nl2br(esc(
+                                $row['dampak_risiko'] ?? '-'
+                            )) ?>
+                        </td>
+
+                        <td>
+                            <strong>Kategori:</strong><br>
+                            <?= esc($row['nama_kategori'] ?? '-') ?>
+
+                            <br><br>
+
+                            <strong>Area Dampak:</strong><br>
+                            <?= esc($row['area_dampak_list'] ?? '-') ?>
+                        </td>
+
+                        <td class="text-center">
+                            <?= esc($row['sumber_risiko'] ?? '-') ?>
+                        </td>
+
+                        <td class="text-center">
+                            K: <?= esc($row['kemungkinan'] ?? '-') ?><br>
+                            D: <?= esc($row['dampak'] ?? '-') ?><br>
+                            NR: <?= esc($row['nilai_risiko'] ?? '-') ?>
+                        </td>
+
+                        <td>
+                            <?= nl2br(esc(
+                                $row['uraian_pengendalian'] ?? '-'
+                            )) ?>
+                        </td>
+
+                        <td class="text-center">
+                            <?= esc($row['efektivitas'] ?? '-') ?>
+                        </td>
+
+                        <td>
+                            <strong>Respon:</strong><br>
+                            <?= esc($row['opsi_tindakan'] ?? '-') ?>
+
+                            <br><br>
+
+                            <strong>Prioritas:</strong><br>
+                            <?= esc($row['prioritas'] ?? '-') ?>
+                        </td>
+
+                    </tr>
+
+                <?php endforeach; ?>
+
+            </tbody>
+
+        </table>
+
+    <?php endif; ?>
+
 </div>

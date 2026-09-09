@@ -25,7 +25,7 @@ body {
 
 .report-header {
     width: 100%;
-    margin-bottom: 14px;
+    margin-bottom: 8px;
 }
 
 .header-table {
@@ -38,38 +38,28 @@ body {
     vertical-align: middle;
 }
 
-.logo-cell {
-    width: 90px;
+.brand-cell {
+    width: 35%;
+    text-align: left;
 }
 
-.logo-cell img {
-    width: 70px;
-}
-
-.instansi-cell {
-    width: 150px;
-    line-height: 1.2;
-}
-
-.bps-title {
-    font-size: 16px;
-    font-weight: bold;
-}
-
-.bps-subtitle {
-    font-size: 14px;
+.bps-brand-image {
+    width: 180px;
+    height: auto;
 }
 
 .title-cell {
-    text-align: center;
+    width: 65%;
+    text-align: right;
     font-size: 16px;
     font-weight: bold;
+    vertical-align: middle;
 }
 
 .header-line {
-    border-top: 1px solid #000;
-    margin-top: 10px;
-    margin-bottom: 18px;
+    border-top: 1.5px solid #000;
+    margin-top: 8px;
+    margin-bottom: 14px;
 }
 
 /* =========================
@@ -213,3 +203,85 @@ tr {
 .signature-wrapper {
     page-break-inside: avoid;
 }
+
+/* =========================
+   FORM 1
+========================= */
+
+.section-title {
+    text-align: center;
+    font-size: 15px;
+    font-weight: bold;
+    margin-bottom: 12px;
+}
+
+.subsection-title {
+    font-size: 11px;
+    font-weight: bold;
+    margin-top: 14px;
+    margin-bottom: 5px;
+}
+
+.label-cell {
+    width: 14%;
+    font-weight: bold;
+    background: #f2f2f2;
+}
+
+.context-summary-table td {
+    padding: 6px;
+}
+
+.empty-message {
+    text-align: center;
+    padding: 20px;
+    border: 1px solid #000;
+}
+
+.two-column-section {
+    width: 100%;
+    margin-top: 2px;
+}
+
+.column-block {
+    width: 100%;
+}
+
+/* =========================
+   FORM 2
+========================= */
+
+.form2-section {
+    margin-bottom: 25px;
+}
+
+.form2-table {
+    table-layout: fixed;
+    width: 100%;
+    font-size: 7.5px;
+}
+
+.form2-table th,
+.form2-table td {
+    padding: 3px;
+    line-height: 1.25;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+}
+
+.form2-table th {
+    font-size: 7.5px;
+}
+
+.form2-table th:nth-child(1) {
+    width: 3%;
+}
+
+.form2-table th:nth-child(2) {
+    width: 4%;
+}
+
+.form2-table th:nth-child(3) {
+    width: 8%;
+}
+

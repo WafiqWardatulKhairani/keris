@@ -32,7 +32,7 @@
             </td>
 
             <td class="meta-separator">:</td>
-
+ 
             <td>
                 <?= esc($timkerja ?? '-') ?>
             </td>

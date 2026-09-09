@@ -5,7 +5,7 @@ namespace App\Controllers;
 use App\Controllers\BaseController;
 use App\Models\PemantauanRisikoModel;
 use Dompdf\Dompdf;
-use Dompdf\Options; 
+use Dompdf\Options;
 
 class PelaporanRisikoController extends BaseController
 {
@@ -178,7 +178,7 @@ class PelaporanRisikoController extends BaseController
                 $builder->where('kpb.id_konteks', $idKonteks);
             }
         }
-        
+
         if (!empty($idKegiatan)) {
             $builder->where('k.id_kegiatan', $idKegiatan);
         }
@@ -429,59 +429,59 @@ class PelaporanRisikoController extends BaseController
     }
 
     public function batalAjukan()
-{
-    if (session('user_role') !== 'operator') {
-        return $this->response
-            ->setStatusCode(403)
-            ->setJSON(['error' => 'Akses ditolak']);
-    }
+    {
+        if (session('user_role') !== 'operator') {
+            return $this->response
+                ->setStatusCode(403)
+                ->setJSON(['error' => 'Akses ditolak']);
+        }
 
-    $payload = $this->request->getJSON(true);
+        $payload = $this->request->getJSON(true);
 
-    $idKegiatan = $payload['id_kegiatan'] ?? null;
-    $idTim      = session('id_tim');
+        $idKegiatan = $payload['id_kegiatan'] ?? null;
+        $idTim      = session('id_tim');
 
-    if (!$idKegiatan) {
-        return $this->response
-            ->setStatusCode(400)
-            ->setJSON(['error' => 'ID kegiatan wajib']);
-    }
+        if (!$idKegiatan) {
+            return $this->response
+                ->setStatusCode(400)
+                ->setJSON(['error' => 'ID kegiatan wajib']);
+        }
 
-    $rtpList = $this->db->table('rencana_penanganan_risiko rtp')
-        ->select('pm.id_pemantauan')
-        ->join('evaluasi_risiko er', 'er.id_evaluasi = rtp.id_penilaian_awal')
-        ->join('identifikasi_risiko ir', 'ir.id_identifikasi = er.id_identifikasi')
-        ->join('konteks_proses_bisnis kpb', 'kpb.id_konteks_proses = ir.id_konteks_proses')
-        ->join('konteks k', 'k.id_konteks = kpb.id_konteks')
-        ->join('pemantauan_risiko pm', 'pm.id_rtp = rtp.id_rtp')
-        ->where('k.id_kegiatan', $idKegiatan)
-        ->where('k.id_tim', $idTim)
-        ->where('pm.status_validasi', 'Diajukan')
-        ->get()
-        ->getResultArray();
+        $rtpList = $this->db->table('rencana_penanganan_risiko rtp')
+            ->select('pm.id_pemantauan')
+            ->join('evaluasi_risiko er', 'er.id_evaluasi = rtp.id_penilaian_awal')
+            ->join('identifikasi_risiko ir', 'ir.id_identifikasi = er.id_identifikasi')
+            ->join('konteks_proses_bisnis kpb', 'kpb.id_konteks_proses = ir.id_konteks_proses')
+            ->join('konteks k', 'k.id_konteks = kpb.id_konteks')
+            ->join('pemantauan_risiko pm', 'pm.id_rtp = rtp.id_rtp')
+            ->where('k.id_kegiatan', $idKegiatan)
+            ->where('k.id_tim', $idTim)
+            ->where('pm.status_validasi', 'Diajukan')
+            ->get()
+            ->getResultArray();
 
-    if (empty($rtpList)) {
-        return $this->response
-            ->setStatusCode(404)
-            ->setJSON(['error' => 'Pengajuan tidak ditemukan']);
-    }
+        if (empty($rtpList)) {
+            return $this->response
+                ->setStatusCode(404)
+                ->setJSON(['error' => 'Pengajuan tidak ditemukan']);
+        }
 
-    $ids = array_column($rtpList, 'id_pemantauan');
+        $ids = array_column($rtpList, 'id_pemantauan');
 
-    $this->db->table('pemantauan_risiko')
-        ->whereIn('id_pemantauan', $ids)
-        ->update([
-            'status_validasi'  => 'Draft',
-            'catatan_validasi' => null,
-            'validated_by'     => null,
-            'validated_at'     => null,
-            'updated_at'       => date('Y-m-d H:i:s'),
+        $this->db->table('pemantauan_risiko')
+            ->whereIn('id_pemantauan', $ids)
+            ->update([
+                'status_validasi'  => 'Draft',
+                'catatan_validasi' => null,
+                'validated_by'     => null,
+                'validated_at'     => null,
+                'updated_at'       => date('Y-m-d H:i:s'),
+            ]);
+
+        return $this->response->setJSON([
+            'success' => true
         ]);
-
-    return $this->response->setJSON([
-        'success' => true
-    ]);
-}
+    }
 
     public function approveKegiatan($idKegiatan)
     {
@@ -683,7 +683,7 @@ class PelaporanRisikoController extends BaseController
 
         // FILTER TIM LOGIN
         if (session('user_role') === 'operator') {
-            $builder->where('k.id_tim',session('id_tim'));
+            $builder->where('k.id_tim', session('id_tim'));
         }
 
         // FILTER KETUA
@@ -700,11 +700,317 @@ class PelaporanRisikoController extends BaseController
 
         // FILTER KEGIATAN
         if (!empty($idKegiatan)) {
-            $builder->where('k.id_kegiatan',$idKegiatan);
+            $builder->where('k.id_kegiatan', $idKegiatan);
         }
 
         $builder->orderBy('rtp.id_rtp', 'ASC');
         $data = $builder->get()->getResultArray();
+
+        // =====================================================
+        // DATA KHUSUS FORM 1 - PENETAPAN KONTEKS
+        // =====================================================
+
+        $form1 = null;
+        $form1Proses = [];
+        $form1Pemangku = [];
+        $form1Peraturan = [];
+
+        if ($form === 'form1' || $form === 'all') {
+
+            $form1Builder = $this->db->table('konteks k')
+                ->select('
+            k.id_konteks,
+            k.tahun,
+            k.id_tim,
+            k.id_kegiatan,
+            k.id_sasaran_strategis,
+            sk.nama_tim,
+            keg.nama_kegiatan,
+            ss.uraian_sasaran AS sasaran_strategis
+        ')
+                ->join(
+                    'tim_kerja sk',
+                    'sk.id_tim = k.id_tim',
+                    'left'
+                )
+                ->join(
+                    'kegiatan keg',
+                    'keg.id_kegiatan = k.id_kegiatan',
+                    'left'
+                )
+                ->join(
+                    'sasaran_strategis ss',
+                    'ss.id_sasaran_strategis = k.id_sasaran_strategis',
+                    'left'
+                );
+
+            // Filter tim sesuai user login
+            if (session('user_role') === 'operator') {
+                $form1Builder->where('k.id_tim', session('id_tim'));
+            }
+
+            if (session('user_role') === 'ketua') {
+
+                $pengelolaId = session('pengelola_id');
+
+                $penugasan = $this->db
+                    ->table('penugasan_pengelola')
+                    ->where('pengelola_id', $pengelolaId)
+                    ->get()
+                    ->getRowArray();
+
+                if ($penugasan) {
+                    $form1Builder->where(
+                        'k.id_tim',
+                        $penugasan['tim_kerja_id']
+                    );
+                }
+            }
+
+            // Filter tahun sesuai periode export
+            $form1Builder->where('k.tahun', $tahun);
+
+            // Filter kegiatan yang dipilih
+            if (!empty($idKegiatan)) {
+                $form1Builder->where('k.id_kegiatan', $idKegiatan);
+            }
+
+            $form1 = $form1Builder
+                ->orderBy('k.id_konteks', 'DESC')
+                ->get()
+                ->getRowArray();
+
+            if ($form1) {
+
+                $idKonteksForm1 = $form1['id_konteks'];
+
+                // PROSES BISNIS + SASARAN KINERJA
+                $form1Proses = $this->db
+                    ->table('konteks_proses_bisnis kpb')
+                    ->select('
+                pb.kode_proses,
+                pb.uraian_proses,
+                pb.jenis_proses,
+                kpb.deskripsi_proses,
+                sk.uraian_sasaran AS sasaran_kinerja
+            ')
+                    ->join(
+                        'proses_bisnis pb',
+                        'pb.id_proses = kpb.id_proses',
+                        'left'
+                    )
+                    ->join(
+                        'sasaran_kinerja sk',
+                        'sk.id_konteks_proses = kpb.id_konteks_proses',
+                        'left'
+                    )
+                    ->where('kpb.id_konteks', $idKonteksForm1)
+                    ->orderBy('pb.kode_proses', 'ASC')
+                    ->get()
+                    ->getResultArray();
+
+                // PEMANGKU KEPENTINGAN
+                $form1Pemangku = $this->db
+                    ->table('konteks_pemangku kp')
+                    ->select('
+                pk.nama_instansi,
+                pk.hubungan
+            ')
+                    ->join(
+                        'pemangku_kepentingan pk',
+                        'pk.id_pemangku = kp.id_pemangku',
+                        'left'
+                    )
+                    ->where('kp.id_konteks', $idKonteksForm1)
+                    ->get()
+                    ->getResultArray();
+
+                // PERATURAN TERKAIT
+                $form1Peraturan = $this->db
+                    ->table('konteks_peraturan kp')
+                    ->select('
+                pt.nama_peraturan
+            ')
+                    ->join(
+                        'peraturan_terkait pt',
+                        'pt.id_peraturan = kp.id_peraturan',
+                        'left'
+                    )
+                    ->where('kp.id_konteks', $idKonteksForm1)
+                    ->get()
+                    ->getResultArray();
+            }
+        }
+
+        // =====================================================
+// DATA KHUSUS FORM 2 - IDENTIFIKASI RISIKO
+// =====================================================
+
+$form2Data = [];
+
+if ($form === 'form2' || $form === 'all') {
+
+    $form2Builder = $this->db->table('identifikasi_risiko ir')
+        ->select("
+            ir.id_identifikasi,
+            ir.pernyataan_risiko,
+            ir.penyebab_risiko,
+            ir.dampak_risiko,
+            ir.sumber_risiko,
+
+            pb.kode_proses,
+            pb.uraian_proses,
+
+            kr.nama_kategori,
+
+            STRING_AGG(
+                DISTINCT ad.nama_area_dampak,
+                ', '
+            ) AS area_dampak_list,
+
+            pr.nilai_risiko,
+            pr.uraian_pengendalian,
+            pr.efektivitas,
+
+            kk.level AS kemungkinan,
+            kd.level AS dampak,
+
+            er.opsi_tindakan,
+            er.prioritas,
+
+            k.id_konteks,
+            k.tahun,
+            k.id_tim,
+            k.id_kegiatan,
+
+            tk.nama_tim,
+            keg.nama_kegiatan
+        ")
+        ->join(
+            'konteks_proses_bisnis kpb',
+            'kpb.id_konteks_proses = ir.id_konteks_proses'
+        )
+        ->join(
+            'proses_bisnis pb',
+            'pb.id_proses = kpb.id_proses',
+            'left'
+        )
+        ->join(
+            'konteks k',
+            'k.id_konteks = kpb.id_konteks'
+        )
+        ->join(
+            'tim_kerja tk',
+            'tk.id_tim = k.id_tim',
+            'left'
+        )
+        ->join(
+            'kegiatan keg',
+            'keg.id_kegiatan = k.id_kegiatan',
+            'left'
+        )
+        ->join(
+            'kategori_risiko kr',
+            'kr.id_kategori_risiko = ir.id_kategori_risiko',
+            'left'
+        )
+        ->join(
+            'identifikasi_area_dampak iad',
+            'iad.id_identifikasi = ir.id_identifikasi',
+            'left'
+        )
+        ->join(
+            'area_dampak ad',
+            'ad.id_area_dampak = iad.id_area_dampak',
+            'left'
+        )
+        ->join(
+            'penilaian_risiko pr',
+            'pr.id_identifikasi = ir.id_identifikasi',
+            'left'
+        )
+        ->join(
+            'kriteria_kemungkinan kk',
+            'kk.id_kriteria = pr.id_kemungkinan',
+            'left'
+        )
+        ->join(
+            'kriteria_dampak kd',
+            'kd.id_kriteria = pr.id_dampak',
+            'left'
+        )
+        ->join(
+            'evaluasi_risiko er',
+            'er.id_penilaian = pr.id_penilaian',
+            'left'
+        );
+
+    // FILTER TIM LOGIN
+    if (session('user_role') === 'operator') {
+        $form2Builder->where(
+            'k.id_tim',
+            session('id_tim')
+        );
+    }
+
+    // FILTER KETUA
+    if (session('user_role') === 'ketua') {
+
+        $pengelolaId = session('pengelola_id');
+
+        $penugasanForm2 = $this->db
+            ->table('penugasan_pengelola')
+            ->where('pengelola_id', $pengelolaId)
+            ->get()
+            ->getRowArray();
+
+        if ($penugasanForm2) {
+            $form2Builder->where(
+                'k.id_tim',
+                $penugasanForm2['tim_kerja_id']
+            );
+        }
+    }
+
+    // FILTER TAHUN
+    $form2Builder->where('k.tahun', $tahun);
+
+    // FILTER KEGIATAN
+    if (!empty($idKegiatan)) {
+        $form2Builder->where(
+            'k.id_kegiatan',
+            $idKegiatan
+        );
+    }
+
+    $form2Builder->groupBy('
+        ir.id_identifikasi,
+        pb.kode_proses,
+        pb.uraian_proses,
+        kr.nama_kategori,
+        pr.id_penilaian,
+        pr.nilai_risiko,
+        pr.uraian_pengendalian,
+        pr.efektivitas,
+        kk.level,
+        kd.level,
+        er.id_evaluasi,
+        er.opsi_tindakan,
+        er.prioritas,
+        k.id_konteks,
+        k.tahun,
+        k.id_tim,
+        k.id_kegiatan,
+        tk.nama_tim,
+        keg.nama_kegiatan
+    ');
+
+    $form2Data = $form2Builder
+        ->orderBy('pb.kode_proses', 'ASC')
+        ->orderBy('ir.id_identifikasi', 'ASC')
+        ->get()
+        ->getResultArray();
+}
 
         // TIM
         $timkerja = $data[0]['nama_tim'] ?? '-';
@@ -713,8 +1019,8 @@ class PelaporanRisikoController extends BaseController
         // KETUA TIM
         $ketua = $this->db->table('pengelola_risiko g')
             ->select('g.nama,g.nip,sk.nama_tim')
-            ->join('penugasan_pengelola p','p.pengelola_id = g.id')
-            ->join('tim_kerja sk','sk.id_tim = p.tim_kerja_id')
+            ->join('penugasan_pengelola p', 'p.pengelola_id = g.id')
+            ->join('tim_kerja sk', 'sk.id_tim = p.tim_kerja_id')
             ->where('p.is_ketua_tim', true)
             ->where('sk.nama_tim', $timkerja)
             ->get()
@@ -728,6 +1034,17 @@ class PelaporanRisikoController extends BaseController
 
         $viewData = [
             'data' => $data,
+            //FORM1
+            // Data Penetapan Konteks
+            'form1' => $form1,
+            'form1Proses' => $form1Proses,
+            'form1Pemangku' => $form1Pemangku,
+            'form1Peraturan' => $form1Peraturan,
+
+            //FORM2
+            'form2Data' => $form2Data,
+
+            
             'bulan' => $bulanNama[$bulan] ?? $bulan,
             'tahun' => $tahun,
             'timkerja' => $timkerja,
@@ -762,10 +1079,10 @@ class PelaporanRisikoController extends BaseController
 
         // FILENAME
         $formLabel = match ($form) {
-            'form1' => 'Form-1-Konteks',
-            'form2' => 'Form-2-Risiko',
-            'form3' => 'Form-3-RTP',
-            'form4' => 'Form-4-Pelaporan',
+            'form1' => 'Form-1-Penetapan-Konteks',
+            'form2' => 'Form-2-Identifikasi-Risiko',
+            'form3' => 'Form-3-Rencana-Penanganan',
+            'form4' => 'Form-4-Pelaporan-Risiko',
             default => 'Semua-Form'
         };
 

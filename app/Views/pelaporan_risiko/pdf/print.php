@@ -10,13 +10,23 @@
 
     <style>
         <?= file_get_contents(FCPATH . 'assets/css/pelaporan-risiko-print.css') ?>
-    </style>    
+    </style>
 </head>
 
 <body>
-
+    <?php
+    $formTitle = match ($form) {
+        'form1' => 'FORM 1 - PENETAPAN KONTEKS',
+        'form2' => 'FORM 2 - IDENTIFIKASI RISIKO',
+        'form3' => 'FORM 3 - RENCANA PENANGANAN',
+        'form4' => 'FORM 4 - PELAPORAN RISIKO',
+        default => 'LAPORAN RISIKO',
+    };
+    ?>
     <div class="report-wrapper">
-        <?= view('pelaporan_risiko/pdf/header') ?>
+        <?= view('pelaporan_risiko/pdf/header', [
+            'formTitle' => $formTitle
+        ]) ?>
         <?= view('pelaporan_risiko/pdf/report_info') ?>
         <?php if ($form === 'form1'): ?>
             <?= view('pelaporan_risiko/pdf/sections/form1_konteks') ?>

@@ -1,40 +1,42 @@
+<?php
+$logoPath = ROOTPATH . 'tampilanSimiko/assets/img/BPS_Provinsi_Riau.png';
+
+$logoBase64 = null;
+
+if (is_file($logoPath)) {
+
+    $logoType = pathinfo($logoPath, PATHINFO_EXTENSION);
+    $logoData = file_get_contents($logoPath);
+
+    $logoBase64 =
+        'data:image/' .
+        $logoType .
+        ';base64,' .
+        base64_encode($logoData);
+}
+?>
+
 <div class="report-header">
 
     <table class="header-table">
         <tr>
-            <td class="logo-cell">
-                <?php
-                $logoPath = FCPATH . 'assets/images/logo-bps.png';
-                $logoType = pathinfo($logoPath, PATHINFO_EXTENSION);
-                $logoData = file_get_contents($logoPath);
 
-                $logoBase64 = 'data:image/' . $logoType . ';base64,' . base64_encode($logoData);
-                ?>
+            <td class="brand-cell">
 
-                <img
-                    src="<?= $logoBase64 ?>"
-                    alt="BPS">
-
-            </td>
-
-            <td class="instansi-cell">
-
-                <div class="bps-title">
-                    BADAN PUSAT STATISTIK
-                </div>
-
-                <div class="bps-subtitle">
-                    PROVINSI RIAU
-                </div>
+                <?php if ($logoBase64): ?>
+                    <img
+                        src="<?= $logoBase64 ?>"
+                        alt="BPS Provinsi Riau"
+                        class="bps-brand-image">
+                <?php endif; ?>
 
             </td>
 
             <td class="title-cell">
-                LAPORAN PEMANTAUAN RISIKO
+                <?= esc($formTitle ?? 'LAPORAN RISIKO') ?>
             </td>
 
         </tr>
-
     </table>
 
 </div>
