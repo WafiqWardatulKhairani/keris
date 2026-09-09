@@ -56,10 +56,30 @@
                 <select class="form-select form-select-sm" name="id_konteks_proses" id="irKonteksProses" required>
                     <option value="">-- Pilih Proses Bisnis --</option>
                     <?php foreach ($listKonteksProses as $kp): ?>
+                        <?php
+                        $deskripsi = trim($kp['deskripsi_proses'] ?? '');
+                        $subLabel = '';
+
+                        if ($deskripsi !== '') {
+                            $kataPertama = preg_split('/\s+/', $deskripsi)[0] ?? '';
+
+                            $normalisasi = [
+                                'Memeriksa' => 'Pemeriksaan',
+                                'Membuat' => 'Pembuatan',
+                                'Menerima' => 'Penerimaan',
+                                'Mengirimkan' => 'Pengiriman',
+                            ];
+
+                            $subLabel = $normalisasi[$kataPertama] ?? $kataPertama;
+                        }
+                        ?>
+
                         <option value="<?= $kp['id_konteks_proses'] ?>">
-                            <?= esc($kp['kode_proses']) ?> — <?= esc($kp['uraian_proses']) ?>
-                            <?php if (!empty($kp['jenis_proses'])): ?>
-                                (<?= esc($kp['jenis_proses']) ?>)
+                            <?= esc($kp['kode_proses']) ?>
+                            — <?= esc($kp['uraian_proses']) ?>
+
+                            <?php if ($subLabel !== ''): ?>
+                                — <?= esc($subLabel) ?>
                             <?php endif; ?>
                         </option>
                     <?php endforeach; ?>

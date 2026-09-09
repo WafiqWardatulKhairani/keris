@@ -12,7 +12,7 @@ document.addEventListener("DOMContentLoaded", function () {
       input.type = "month";
     });
     input.addEventListener("blur", function () {
-      if (!input.value) input.type = "text";
+      if (!input.value) input.type = "text"; 
     });
     if (!input.value) {
       input.type = "text";

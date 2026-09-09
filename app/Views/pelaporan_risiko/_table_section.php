@@ -7,7 +7,7 @@
                     <tr>
                         <th rowspan="2" style="width:50px">#</th>
                         <th rowspan="2" style="width:24%">Risiko</th>
-                        <th rowspan="2" style="width:24%">RTP</th> 
+                        <th rowspan="2" style="width:24%">RTP</th>
                         <th colspan="2" class="text-center" style="width:22%">Target</th>
                         <th colspan="3" class="text-center" style="width:30%">Realisasi</th>
                     </tr>
@@ -40,9 +40,11 @@
                         ?>
                                 <tr class="pl-kegiatan-separator">
                                     <td colspan="8">
-                                        <div class="d-flex justify-content-between align-items-center">
 
-                                            <div class="d-flex flex-column align-items-start">
+                                        <div class="d-flex justify-content-between align-items-center gap-3">
+
+                                            <!-- LEFT -->
+                                            <div class="d-flex align-items-center gap-2 flex-wrap">
 
                                                 <div class="pl-kegiatan-title">
                                                     <i class="ti ti-folders me-2"></i>
@@ -53,72 +55,99 @@
                                                 $statusValidasi = $row['status_validasi'] ?? 'Draft';
 
                                                 $badgeClass = match ($statusValidasi) {
-                                                    'Diajukan'  => 'bg-warning text-dark',
-                                                    'Disetujui' => 'bg-success',
-                                                    'Ditolak'   => 'bg-danger',
-                                                    default     => 'bg-secondary',
+                                                    'Diajukan'  => 'bg-warning-subtle text-warning-emphasis border border-warning',
+                                                    'Disetujui' => 'bg-success-subtle text-success border border-success',
+                                                    'Ditolak'   => 'bg-danger-subtle text-danger border border-danger',
+                                                    default     => 'bg-secondary-subtle text-secondary border border-secondary',
                                                 };
                                                 ?>
 
-                                                <div class="d-flex align-items-center gap-2">
+                                                <span class="badge <?= $badgeClass ?>">
+                                                    <?= esc($statusValidasi) ?>
+                                                </span>
 
-                                                    <span class="badge <?= $badgeClass ?>">
-                                                        <?= esc($statusValidasi) ?>
-                                                    </span>
+                                            </div>
 
-                                                </div>
+                                            <!-- RIGHT -->
+                                            <div class="d-flex align-items-center gap-2 flex-shrink-0">
+
                                                 <?php if (
-                                                    ($row['status_validasi'] ?? '') === 'Ditolak'
+                                                    ($statusValidasi ?? '') === 'Ditolak'
                                                     && !empty($row['catatan_validasi'])
                                                 ): ?>
 
                                                     <button
                                                         type="button"
-                                                        class="btn btn-link btn-sm text-danger p-0 mt-1"
+                                                        class="btn btn-sm btn-danger"
                                                         onclick="event.stopPropagation(); plShowCatatan(`<?= esc($row['catatan_validasi']) ?>`)">
 
-                                                        <i class="ti ti-alert-circle me-1"></i>
-                                                        Lihat catatan
-
+                                                        <i class="ti ti-message-circle-exclamation me-1"></i>
+                                                        Catatan
                                                     </button>
 
                                                 <?php endif; ?>
-                                            </div>
 
-                                            <?php if (
-                                                ($userRole ?? '') === 'operator'
-                                                && ($row['status_validasi'] ?? 'Draft') !== 'Diajukan'
-                                            ): ?>
-                                                <button
-                                                    class="btn btn-sm btn-primary"
-                                                    onclick="event.stopPropagation(); plAjukanKegiatan(<?= (int)$row['id_kegiatan'] ?>)">
-                                                    <i class="ti ti-send me-1"></i>
-                                                    Ajukan ke Ketua
-                                                </button>
-                                            <?php endif; ?>
-                                            <?php if (
-                                                ($userRole ?? '') === 'ketua'
-                                                && ($statusValidasi ?? '') === 'Diajukan'
-                                            ): ?>
 
-                                                <div class="d-flex gap-2">
+                                                <?php if (($userRole ?? '') === 'operator'): ?>
+
+                                                    <?php if ($statusValidasi === 'Diajukan'): ?>
+
+                                                        <button
+                                                            class="btn btn-sm btn-outline-danger"
+                                                            onclick="event.stopPropagation(); plBatalAjukanKegiatan(<?= (int)$row['id_kegiatan'] ?>)">
+                                                            <i class="ti ti-arrow-back-up me-1"></i>
+                                                            Batalkan Pengajuan
+                                                        </button>
+
+                                                    <?php elseif ($statusValidasi === 'Disetujui'): ?>
+
+                                                        <button
+                                                            type="button"
+                                                            class="btn btn-sm btn-success"
+                                                            disabled>
+                                                            <i class="ti ti-circle-check me-1"></i>
+                                                            Sudah Disetujui
+                                                        </button>
+
+                                                    <?php else: ?>
+
+                                                        <button
+                                                            class="btn btn-sm btn-primary"
+                                                            onclick="event.stopPropagation(); plAjukanKegiatan(<?= (int)$row['id_kegiatan'] ?>)">
+                                                            <i class="ti ti-send me-1"></i>
+                                                            Ajukan ke Ketua
+                                                        </button>
+
+                                                    <?php endif; ?>
+
+                                                <?php endif; ?>
+
+
+                                                <?php if (
+                                                    ($userRole ?? '') === 'ketua'
+                                                    && $statusValidasi === 'Diajukan'
+                                                ): ?>
 
                                                     <button
                                                         class="btn btn-sm btn-success"
                                                         onclick="event.stopPropagation(); plApproveKegiatan(<?= (int)$row['id_kegiatan'] ?>)">
-                                                        <i class="ti ti-check"></i>
+                                                        <i class="ti ti-check me-1"></i>
+                                                        Setujui
                                                     </button>
 
                                                     <button
                                                         class="btn btn-sm btn-danger"
                                                         onclick="event.stopPropagation(); plRejectKegiatan(<?= (int)$row['id_kegiatan'] ?>)">
-                                                        <i class="ti ti-x"></i>
+                                                        <i class="ti ti-x me-1"></i>
+                                                        Tolak
                                                     </button>
 
-                                                </div>
+                                                <?php endif; ?>
 
-                                            <?php endif; ?>
+                                            </div>
+
                                         </div>
+
                                     </td>
                                 </tr>
                             <?php

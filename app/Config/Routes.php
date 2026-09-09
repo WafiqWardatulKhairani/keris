@@ -301,6 +301,7 @@ $routes->group('pelaporan-risiko', ['filter' => ['auth']], function ($routes) {
         $routes->post('set-active', 'PelaporanRisikoController::setActive');
         $routes->post('set-periode', 'PelaporanRisikoController::setPeriode');
         $routes->post('ajukan', 'PelaporanRisikoController::ajukan');
+        $routes->post('batal-ajukan', 'PelaporanRisikoController::batalAjukan');
     });
 
     // KETUA

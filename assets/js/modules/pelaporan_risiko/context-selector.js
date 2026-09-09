@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", function () {
   function setMonthPlaceholder(input, label) {
     input.addEventListener("focus", function () {
       input.type = "month";
-    });
+    }); 
     input.addEventListener("blur", function () {
       if (!input.value) input.type = "text";
     });

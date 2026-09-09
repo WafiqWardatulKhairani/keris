@@ -428,6 +428,61 @@ class PelaporanRisikoController extends BaseController
         ]);
     }
 
+    public function batalAjukan()
+{
+    if (session('user_role') !== 'operator') {
+        return $this->response
+            ->setStatusCode(403)
+            ->setJSON(['error' => 'Akses ditolak']);
+    }
+
+    $payload = $this->request->getJSON(true);
+
+    $idKegiatan = $payload['id_kegiatan'] ?? null;
+    $idTim      = session('id_tim');
+
+    if (!$idKegiatan) {
+        return $this->response
+            ->setStatusCode(400)
+            ->setJSON(['error' => 'ID kegiatan wajib']);
+    }
+
+    $rtpList = $this->db->table('rencana_penanganan_risiko rtp')
+        ->select('pm.id_pemantauan')
+        ->join('evaluasi_risiko er', 'er.id_evaluasi = rtp.id_penilaian_awal')
+        ->join('identifikasi_risiko ir', 'ir.id_identifikasi = er.id_identifikasi')
+        ->join('konteks_proses_bisnis kpb', 'kpb.id_konteks_proses = ir.id_konteks_proses')
+        ->join('konteks k', 'k.id_konteks = kpb.id_konteks')
+        ->join('pemantauan_risiko pm', 'pm.id_rtp = rtp.id_rtp')
+        ->where('k.id_kegiatan', $idKegiatan)
+        ->where('k.id_tim', $idTim)
+        ->where('pm.status_validasi', 'Diajukan')
+        ->get()
+        ->getResultArray();
+
+    if (empty($rtpList)) {
+        return $this->response
+            ->setStatusCode(404)
+            ->setJSON(['error' => 'Pengajuan tidak ditemukan']);
+    }
+
+    $ids = array_column($rtpList, 'id_pemantauan');
+
+    $this->db->table('pemantauan_risiko')
+        ->whereIn('id_pemantauan', $ids)
+        ->update([
+            'status_validasi'  => 'Draft',
+            'catatan_validasi' => null,
+            'validated_by'     => null,
+            'validated_at'     => null,
+            'updated_at'       => date('Y-m-d H:i:s'),
+        ]);
+
+    return $this->response->setJSON([
+        'success' => true
+    ]);
+}
+
     public function approveKegiatan($idKegiatan)
     {
         if (session('user_role') !== 'ketua') {

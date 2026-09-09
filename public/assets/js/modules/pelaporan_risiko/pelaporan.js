@@ -9,7 +9,7 @@ function setText(id, value) {
 }
 
 function setFormattedText(id, value) {
-  const el = document.getElementById(id);
+  const el = document.getElementById(id); 
 
   if (!el) return;
 
@@ -193,6 +193,52 @@ function plAjukanKegiatan(idKegiatan) {
         Swal.fire(
           "Berhasil",
           "Laporan berhasil diajukan ke ketua",
+          "success",
+        ).then(() => {
+          location.reload();
+        });
+      })
+      .catch(() => {
+        Swal.fire("Error", "Terjadi kesalahan server", "error");
+      });
+  });
+}
+
+function plBatalAjukanKegiatan(idKegiatan) {
+  Swal.fire({
+    title: "Batalkan pengajuan?",
+    text: "Laporan kegiatan ini akan dikembalikan ke status Draft.",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonText: "Ya, Batalkan",
+    cancelButtonText: "Tidak",
+    confirmButtonColor: "#dc3545",
+  }).then((result) => {
+    if (!result.isConfirmed) return;
+
+    fetch(PL_URL.batalAjukan, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        id_kegiatan: idKegiatan,
+      }),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (!data.success) {
+          Swal.fire(
+            "Error",
+            data.error || "Gagal membatalkan pengajuan",
+            "error",
+          );
+          return;
+        }
+
+        Swal.fire(
+          "Berhasil",
+          "Pengajuan berhasil dibatalkan",
           "success",
         ).then(() => {
           location.reload();

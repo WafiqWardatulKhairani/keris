@@ -156,6 +156,7 @@
             rejectKegiatan: (id) => `<?= site_url('pelaporan-risiko/reject-kegiatan') ?>/${id}`,
             print: '<?= site_url('pelaporan-risiko/print') ?>',
             export: '<?= site_url('pelaporan-risiko/export') ?>',
+            batalAjukan: '<?= site_url('pelaporan-risiko/batal-ajukan') ?>',
         }
     };
 
