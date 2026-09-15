@@ -305,18 +305,11 @@ tr {
   border-top: 0 !important;
 }
 
-/*
- * Kalau row masih di tengah group:
- * bagian merge jangan punya garis internal.
- */
 .form2-process-cell.form2-merge-cont.form2-merge-start {
   border-top: 0 !important;
   border-bottom: 0 !important;
 }
 
-/*
- * Row terakhir group harus nutup.
- */
 .form2-table tr.form2-group-last td {
   border-bottom: 1px solid #000 !important;
 }
