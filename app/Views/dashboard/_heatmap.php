@@ -10,7 +10,7 @@
                 'matriks' => $matriks,
                 'heatmap' => $heatmap
             ]) ?>
-        </div>
+        </div> 
     </div>
 
     <div class="card">

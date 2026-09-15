@@ -120,14 +120,15 @@
     ]) ?>
 
     <?= view('pelaporan_risiko/_table_section', [
-        'data'    => $data,
-        'pager'   => $pager   ?? null,
-        'perPage' => $perPage ?? 10,
-        'total'   => $total   ?? count($data),
-        'from'    => $from    ?? 1,
-        'to'      => $to      ?? count($data),
-        'userRole' => $userRole,
-    ]) ?>
+    'data'    => $data,
+    'pager'   => $pager   ?? null,
+    'perPage' => $perPage ?? 10,
+    'total'   => $total   ?? count($data),
+    'from'    => $from    ?? 1,
+    'to'      => $to      ?? count($data),
+    'userRole' => $userRole,
+    'statusKegiatan' => $statusKegiatan ?? [],
+]) ?>
 
     <?= view('pelaporan_risiko/_offcanvas_form') ?>
 

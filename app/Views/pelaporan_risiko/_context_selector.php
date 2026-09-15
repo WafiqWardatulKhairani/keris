@@ -169,6 +169,7 @@ $type = $tipe_periode ?? 'bulanan';
     window.PL_CS_DATA = {
         konteksMap: <?= json_encode($konteksMap) ?>,
         listKegiatan: <?= json_encode($listKegiatan) ?>,
-        activeTimId: <?= json_encode($sel['id_tim'] ?? session('id_tim')) ?>
+        activeTimId: <?= json_encode($sel['id_tim'] ?? session('id_tim')) ?>,
+        selectedKegiatan: <?= json_encode($selectedKegiatan ?? '') ?>
     };
 </script>

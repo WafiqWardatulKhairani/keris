@@ -314,6 +314,8 @@
   width: 100%;
 }
 
+/* ── Risk Matrix ─────────────────────────────────────────────────────────── */
+
 .dashboard-risk-matrix {
   width: 100%;
   padding: 2px 4px 6px;
@@ -330,45 +332,104 @@
   table-layout: fixed;
 }
 
+/* =========================
+   HEADER UMUM
+========================= */
+
 .dashboard-risk-matrix .risk-matrix th {
   font-size: 12px;
   font-weight: 600;
   line-height: 1.25;
+
   text-align: center;
   vertical-align: middle;
+
   white-space: normal;
   word-break: normal;
   overflow-wrap: normal;
+
   padding: 6px 4px;
+
   color: #1e293b;
 }
 
+/* kolom kemungkinan */
 .dashboard-risk-matrix .risk-matrix thead th:first-child {
   width: 30%;
 }
 
+/* lima kolom dampak */
 .dashboard-risk-matrix .risk-matrix thead tr:nth-child(2) th {
   width: 14%;
   font-size: 11px;
   font-weight: 600;
+
+  padding-top: 4px;
+  padding-bottom: 8px;
 }
 
+/* =========================
+   LABEL DAMPAK
+========================= */
+
+.dashboard-risk-matrix .risk-col-label {
+  text-align: center !important;
+  vertical-align: middle !important;
+}
+
+.dashboard-risk-matrix .risk-col-text {
+  text-align: center;
+  line-height: 1.2;
+}
+
+/* =========================
+   LABEL KEMUNGKINAN
+========================= */
+
 .dashboard-risk-matrix .risk-matrix tbody th {
-  text-align: left;
   font-size: 12px;
   font-weight: 500;
   line-height: 1.3;
-  padding: 8px 8px;
+
+  padding: 8px;
+
   white-space: normal;
+
+  text-align: center;
+  vertical-align: middle;
 }
 
-.dashboard-risk-matrix .risk-matrix tbody th small {
-  display: block;
-  margin-top: 3px;
-  font-size: 10px;
-  font-weight: 400;
-  color: #64748b;
+.dashboard-risk-matrix .risk-row-label {
+  text-align: center !important;
+  vertical-align: middle !important;
 }
+
+.dashboard-risk-matrix .risk-row-text {
+  text-align: center;
+  line-height: 1.25;
+}
+
+/* =========================
+   ANGKA LEVEL (1) - (5)
+========================= */
+
+.dashboard-risk-matrix .risk-axis-number {
+  display: block;
+
+  margin-top: 6px;
+
+  text-align: center;
+
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1;
+
+  color: #475569;
+}
+
+/* =========================
+   CELL MATRIX
+========================= */
 
 .dashboard-risk-matrix .risk-matrix td {
   padding: 1px;
@@ -379,33 +440,35 @@
 .dashboard-risk-matrix .risk-cell {
   width: 100%;
   min-height: 48px;
+
   display: flex;
   flex-direction: column;
+
   justify-content: center;
   align-items: center;
+
   gap: 3px;
+
   border-radius: 6px;
 }
 
+/* nilai risiko */
 .dashboard-risk-matrix .risk-score {
   font-size: 19px;
   font-weight: 700;
   line-height: 1;
 }
 
+/* jumlah risiko */
 .dashboard-risk-matrix .risk-count {
   font-size: 11px;
   line-height: 1;
   opacity: 0.7;
 }
 
+/* header Dampak */
 .dashboard-risk-matrix .risk-matrix thead tr:first-child th {
   padding-bottom: 8px;
-}
-
-.dashboard-risk-matrix .risk-matrix thead tr:nth-child(2) th {
-  padding-top: 4px;
-  padding-bottom: 6px;
 }
 
 /* ── Pie Legend ───────────────────────────────────────────────────────────── */
@@ -693,4 +756,3 @@
     grid-template-columns: 1fr;
   }
 }
-[]

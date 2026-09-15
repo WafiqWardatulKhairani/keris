@@ -345,27 +345,18 @@ function plShowCatatan(catatan) {
 function plPrintReport(form = "form4") {
   const url = new URL(PL_URL.print, window.location.origin);
 
-  const periode = document.getElementById("plCsPeriode");
-  const type = document.getElementById("plCsType");
-  const kegiatan = document.getElementById("plCsKegiatan");
-  const status = document.getElementById("plStatusValidasi");
+  const filterForm = document.getElementById("plContextSelectorForm");
 
   url.searchParams.set("form", form);
 
-  if (periode) {
-    url.searchParams.set("periode", periode.value);
-  }
+  if (filterForm) {
+    const formData = new FormData(filterForm);
 
-  if (type) {
-    url.searchParams.set("tipe_periode", type.value);
-  }
-
-  if (kegiatan) {
-    url.searchParams.set("id_kegiatan", kegiatan.value);
-  }
-
-  if (status) {
-    url.searchParams.set("status_validasi", status.value);
+    for (const [key, value] of formData.entries()) {
+      if (value !== "") {
+        url.searchParams.set(key, value);
+      }
+    }
   }
 
   window.open(url.toString(), "_blank");

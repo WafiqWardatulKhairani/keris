@@ -73,9 +73,15 @@ document.addEventListener("DOMContentLoaded", function () {
         : window.PL_CS_DATA.activeTimId;
 
       // simpan selected lama
-      const currentPengelola = pengelolaSelect ? pengelolaSelect.value : "";
-      const currentKegiatan = kegiatanSelect ? kegiatanSelect.value : "";
+      const currentPengelola = pengelolaSelect
+  ? pengelolaSelect.value
+  : "";
 
+const currentKegiatan =
+  kegiatanSelect && kegiatanSelect.value
+    ? kegiatanSelect.value
+    : window.PL_CS_DATA.selectedKegiatan || "";
+    
       // reset pengelola
       if (pengelolaSelect) {
         pengelolaSelect.innerHTML =

@@ -1,138 +1,249 @@
-<div class="report-section">
-    <table class="report-table">
+<div class="report-section form4-section">
 
-        <thead>
+    <?php if (empty($form4Data)): ?>
 
-            <tr>
+        <div class="empty-message">
+            Data Pelaporan Risiko yang telah disetujui tidak ditemukan.
+        </div>
 
-                <th rowspan="2" width="5%">
-                    Prioritas Risiko
-                </th>
+    <?php else: ?>
 
-                <th rowspan="2" width="22%">
-                    Pernyataan Risiko
-                </th>
+        <?php
+        // =============================================
+        // GROUP BERDASARKAN RISIKO / EVALUASI
+        // =============================================
+        $grouped = [];
 
-                <th rowspan="2" width="18%">
-                    Rencana Tindak Penanganan (RTP)
-                </th>
+        foreach ($form4Data as $row) {
+            $grouped[$row['id_evaluasi']][] = $row;
+        }
+        ?>
 
-                <th colspan="2" width="20%">
-                    Target
-                </th>
+        <table class="report-table form4-table">
 
-                <th colspan="2" width="20%">
-                    Realisasi
-                </th>
+            <thead>
 
-                <th rowspan="2" width="15%">
-                    Penanggung Jawab
-                </th>
+                <tr>
+                    <th rowspan="2">
+                        Prioritas Risiko
+                    </th>
 
-            </tr>
+                    <th rowspan="2">
+                        Pernyataan Risiko
+                    </th>
 
-            <tr>
+                    <th rowspan="2">
+                        Rencana Tindak Penanganan (RTP)
+                    </th>
 
-                <th width="10%">
-                    Output
-                </th>
+                    <th colspan="2">
+                        Target
+                    </th>
 
-                <th width="10%">
-                    Waktu
-                </th>
+                    <th colspan="2">
+                        Realisasi
+                    </th>
 
-                <th width="10%">
-                    Output
-                </th>
+                    <th rowspan="2">
+                        Penanggung Jawab
+                    </th>
+                </tr>
 
-                <th width="10%">
-                    Waktu
-                </th>
+                <tr>
+                    <th>Output</th>
+                    <th>Waktu</th>
 
-            </tr>
+                    <th>Output</th>
+                    <th>Waktu</th>
+                </tr>
 
-            <tr class="number-row">
+                <tr class="number-row">
+                    <?php for ($i = 1; $i <= 8; $i++): ?>
+                        <td>(<?= $i ?>)</td>
+                    <?php endfor; ?>
+                </tr>
 
-                <td>(1)</td>
-                <td>(2)</td>
-                <td>(3)</td>
-                <td>(4)</td>
-                <td>(5)</td>
-                <td>(6)</td>
-                <td>(7)</td>
-                <td>(8)</td>
+            </thead>
 
-            </tr>
+            <tbody>
 
-        </thead>
+    <?php foreach ($grouped as $items): ?>
 
-        <tbody>
+        <?php
+        $first = $items[0];
+        $jumlahItem = count($items);
+
+        $prioritas =
+            $first['prioritas_risiko']
+            ?? '-';
+
+        $risiko =
+            $first['pernyataan_risiko']
+            ?? '-';
+        ?>
+
+        <?php foreach ($items as $index => $item): ?>
 
             <?php
-            $grouped = [];
+            $isFirst = ($index === 0);
+            $isLast  = ($index === $jumlahItem - 1);
 
-            foreach ($data as $row) {
-                $grouped[$row['pernyataan_risiko']][] = $row;
+            // =============================================
+            // CLASS FAKE MERGE
+            // =============================================
+            if ($jumlahItem === 1) {
+
+                $mergeClass = 'form4-merge-single';
+
+            } elseif ($isFirst) {
+
+                $mergeClass = 'form4-merge-first';
+
+            } elseif ($isLast) {
+
+                $mergeClass = 'form4-merge-last';
+
+            } else {
+
+                $mergeClass = 'form4-merge-middle';
             }
 
-            $no = 1;
+            $rowClass = $isLast
+                ? 'form4-group-last'
+                : '';
             ?>
 
-            <?php foreach ($grouped as $risiko => $items): ?>
+            <tr class="form4-data-row <?= $rowClass ?>">
 
-                <?php $first = true; ?>
+                <!-- PRIORITAS -->
+                <td class="
+                    text-center
+                    form4-priority
+                    <?= $mergeClass ?>
+                ">
 
-                <?php foreach ($items as $item): ?>
+                    <?php if ($isFirst): ?>
 
-                    <tr>
+                        (<?= esc($prioritas) ?>)
 
-                        <?php if ($first): ?>
+                    <?php endif; ?>
 
-                            <td rowspan="<?= count($items) ?>" class="text-center">
-                                <?= $no++ ?>
-                            </td>
+                </td>
 
-                            <td rowspan="<?= count($items) ?>">
-                                <?= esc($risiko) ?>
-                            </td>
 
-                        <?php endif; ?>
+                <!-- PERNYATAAN RISIKO -->
+                <td class="
+                    form4-risk-statement
+                    <?= $mergeClass ?>
+                ">
 
-                        <td>
-                            <?= esc($item['uraian_rtp'] ?? '-') ?>
-                        </td>
+                    <?php if ($isFirst): ?>
 
-                        <td>
-                            <?= esc($item['target_output'] ?? '-') ?>
-                        </td>
+                        <?= nl2br(esc($risiko)) ?>
 
-                        <td class="text-center">
-                            <?= esc($item['target_waktu'] ?? '-') ?>
-                        </td>
+                    <?php endif; ?>
 
-                        <td>
-                            <?= esc($item['realisasi_output'] ?? '-') ?>
-                        </td>
+                </td>
 
-                        <td class="text-center">
-                            <?= esc($item['realisasi_waktu'] ?? '-') ?>
-                        </td>
 
-                        <?php if ($first): ?>
+                <!-- RTP -->
+                <td>
 
-                            <td rowspan="<?= count($items) ?>" class="text-center">
-                                Ketua Tim
-                            </td>
+                    <?= nl2br(esc(
+                        $item['uraian_rtp'] ?? '-'
+                    )) ?>
 
-                        <?php endif; ?>
+                </td>
 
-                    </tr>
 
-                    <?php $first = false; ?>
+                <!-- TARGET OUTPUT -->
+                <td>
 
-                <?php endforeach; ?>
+                    <?= nl2br(esc(
+                        $item['target_output'] ?? '-'
+                    )) ?>
 
-            <?php endforeach; ?>
-        </tbody>
-    </table>
+                </td>
+
+
+                <!-- TARGET WAKTU -->
+                <td class="text-center form4-waktu">
+
+                    <?php if (!empty($item['target_waktu'])): ?>
+
+                        <?= date(
+                            'd/m/Y',
+                            strtotime($item['target_waktu'])
+                        ) ?>
+
+                    <?php else: ?>
+
+                        -
+
+                    <?php endif; ?>
+
+                </td>
+
+
+                <!-- REALISASI OUTPUT -->
+                <td>
+
+                    <?= nl2br(esc(
+                        $item['realisasi_output'] ?? '-'
+                    )) ?>
+
+                </td>
+
+
+                <!-- REALISASI WAKTU -->
+                <td class="text-center form4-waktu">
+
+                    <?php if (!empty($item['realisasi_waktu'])): ?>
+
+                        <?= date(
+                            'd/m/Y',
+                            strtotime($item['realisasi_waktu'])
+                        ) ?>
+
+                    <?php else: ?>
+
+                        -
+
+                    <?php endif; ?>
+
+                </td>
+
+
+                <!-- PENANGGUNG JAWAB -->
+                <td class="
+                    text-center
+                    form4-pj
+                    <?= $mergeClass ?>
+                ">
+
+                    <?php if ($isFirst): ?>
+
+                        Ketua Tim
+                        <br>
+
+                        <?= esc(
+                            $timkerja ?? '-'
+                        ) ?>
+
+                    <?php endif; ?>
+
+                </td>
+
+            </tr>
+
+        <?php endforeach; ?>
+
+    <?php endforeach; ?>
+
+</tbody>
+
+        </table>
+
+    <?php endif; ?>
+
 </div>

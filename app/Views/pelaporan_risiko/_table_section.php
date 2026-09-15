@@ -52,7 +52,15 @@
                                                 </div>
 
                                                 <?php
-                                                $statusValidasi = $row['status_validasi'] ?? 'Draft';
+                                                $idKegiatanCurrent = $row['id_kegiatan'] ?? null;
+
+$statusInfo = $statusKegiatan[$idKegiatanCurrent] ?? [
+    'status' => 'Draft',
+    'catatan' => null,
+];
+
+$statusValidasi = $statusInfo['status'];
+$catatanValidasi = $statusInfo['catatan'];
 
                                                 $badgeClass = match ($statusValidasi) {
                                                     'Diajukan'  => 'bg-warning-subtle text-warning-emphasis border border-warning',
@@ -71,18 +79,19 @@
                                             <!-- RIGHT -->
                                             <div class="d-flex align-items-center gap-2 flex-shrink-0">
 
-                                                <?php if (
-                                                    ($statusValidasi ?? '') === 'Ditolak'
-                                                    && !empty($row['catatan_validasi'])
-                                                ): ?>
+                                               <?php if (
+    $statusValidasi === 'Ditolak'
+    && !empty($catatanValidasi)
+): ?>
 
                                                     <button
                                                         type="button"
                                                         class="btn btn-sm btn-danger"
-                                                        onclick="event.stopPropagation(); plShowCatatan(`<?= esc($row['catatan_validasi']) ?>`)">
+                                                        onclick="event.stopPropagation(); 
+                                                        plShowCatatan(`<?= esc($catatanValidasi) ?>`)">
 
                                                         <i class="ti ti-message-circle-exclamation me-1"></i>
-                                                        Catatan
+                                                        Catata
                                                     </button>
 
                                                 <?php endif; ?>
