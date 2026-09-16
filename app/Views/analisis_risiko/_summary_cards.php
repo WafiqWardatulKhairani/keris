@@ -1,65 +1,170 @@
-<div class="d-flex flex-wrap gap-2 mb-3 ar-summary-row">
+<?php
+$order = ['Sangat Rendah', 'Rendah', 'Sedang', 'Tinggi', 'Sangat Tinggi'];
 
-    <!-- ✅ SELALU TAMPIL -->
-    <?php if (!empty($levelRisiko)): ?>
+$colorMap = [
+    'Sangat Rendah' => '#0d6efd',
+    'Rendah'        => '#198754',
+    'Sedang'        => '#ffc107',
+    'Tinggi'        => '#fd7e14',
+    'Sangat Tinggi' => '#dc3545'
+];
 
-        <?php
-        $order = ['Sangat Rendah', 'Rendah', 'Sedang', 'Tinggi', 'Sangat Tinggi'];
+$totalLevel = array_sum($levelRisiko ?? []);
+?>
 
-        $colorMap = [
-            'Sangat Rendah' => '#0d6efd',
-            'Rendah' => '#198754',
-            'Sedang' => '#ffc107',
-            'Tinggi' => '#fd7e14',
-            'Sangat Tinggi' => '#dc3545'
-        ];
+<div class="ar-summary-panel mb-3">
 
-        $totalLevel = array_sum($levelRisiko);
-        ?>
+    <!-- HEADER -->
+    <div class="ar-summary-header">
+        <div>
+            <div class="ar-summary-title">Ringkasan Analisis Risiko</div>
+            <div class="ar-summary-subtitle">
+                Pilih status untuk memfilter data risiko
+            </div>
+        </div>
 
-        <div class="ar-stat-card ar-stat-dist">
-            <div class="ar-stat-label mb-2">Distribusi Level</div>
+        <?php if ($filter): ?>
+            <a href="<?= site_url('analisis-risiko') ?>" class="ar-reset-filter">
+                <i class="ti ti-x"></i>
+                Hapus Filter
+            </a>
+        <?php endif; ?>
+    </div>
 
-            <?php foreach ($order as $lvl):
-                $jumlah = $levelRisiko[$lvl] ?? 0;
-                $warna = $colorMap[$lvl];
-                $percent = $totalLevel > 0 ? ($jumlah / $totalLevel) * 100 : 0;
-            ?>
+    <div class="ar-summary-content">
 
-                <div class="ar-dist-bar-row">
-                    <span class="ar-dist-label"><?= esc($lvl) ?></span>
+        <!-- ================= FILTER STATUS ================= -->
+        <div class="ar-filter-section">
 
-                    <div class="ar-dist-bar">
-                        <div class="ar-dist-fill"
-                            style="width:<?= $percent ?>%;background:<?= $warna ?>"></div>
+            <div class="ar-filter-label">Status Analisis</div>
+
+            <div class="ar-filter-grid">
+
+                <!-- TOTAL -->
+                <a href="<?= site_url('analisis-risiko') ?>"
+                   class="ar-filter-card <?= !$filter ? 'active active-total' : '' ?>">
+
+                    <div class="ar-filter-icon ar-filter-icon-total">
+                        <i class="ti ti-list-check"></i>
                     </div>
 
-                    <span class="ar-dist-value"><?= $jumlah ?></span>
+                    <div class="ar-filter-info">
+                        <span class="ar-filter-name">Total Risiko</span>
+                        <strong><?= $totalRisiko ?></strong>
+                        <small>Seluruh data risiko</small>
+                    </div>
+
+                    <div class="ar-filter-action">
+                        <?= !$filter ? 'Ditampilkan' : 'Lihat Data' ?>
+                        <i class="ti ti-chevron-right"></i>
+                    </div>
+
+                </a>
+
+                <!-- SUDAH -->
+                <a href="<?= site_url('analisis-risiko?filter=sudah') ?>"
+                   class="ar-filter-card <?= $filter === 'sudah' ? 'active active-sudah' : '' ?>">
+
+                    <div class="ar-filter-icon ar-filter-icon-sudah">
+                        <i class="ti ti-circle-check"></i>
+                    </div>
+
+                    <div class="ar-filter-info">
+                        <span class="ar-filter-name">Sudah Dianalisis</span>
+                        <strong><?= $totalSudah ?></strong>
+                        <small>Risiko yang telah dinilai</small>
+                    </div>
+
+                    <div class="ar-filter-action">
+                        <?= $filter === 'sudah' ? 'Ditampilkan' : 'Lihat Data' ?>
+                        <i class="ti ti-chevron-right"></i>
+                    </div>
+
+                </a>
+
+                <!-- BELUM -->
+                <a href="<?= site_url('analisis-risiko?filter=belum') ?>"
+                   class="ar-filter-card <?= $filter === 'belum' ? 'active active-belum' : '' ?>">
+
+                    <div class="ar-filter-icon ar-filter-icon-belum">
+                        <i class="ti ti-clock"></i>
+                    </div>
+
+                    <div class="ar-filter-info">
+                        <span class="ar-filter-name">Belum Dianalisis</span>
+                        <strong><?= $totalBelum ?></strong>
+                        <small>Risiko yang belum dinilai</small>
+                    </div>
+
+                    <div class="ar-filter-action">
+                        <?= $filter === 'belum' ? 'Ditampilkan' : 'Lihat Data' ?>
+                        <i class="ti ti-chevron-right"></i>
+                    </div>
+
+                </a>
+
+            </div>
+        </div>
+
+        <!-- ================= DISTRIBUSI ================= -->
+        <?php if (!empty($levelRisiko)): ?>
+
+            <div class="ar-distribution-section">
+
+                <div class="ar-distribution-head">
+                    <div>
+                        <div class="ar-filter-label">Distribusi Level Risiko</div>
+                        <div class="ar-distribution-subtitle">
+                            Berdasarkan tingkat risiko
+                        </div>
+                    </div>
+
+                    <span class="ar-distribution-total">
+                        <?= $totalLevel ?> dianalisis
+                    </span>
                 </div>
 
-            <?php endforeach; ?>
-        </div>
-    <?php endif; ?>
+                <div class="ar-distribution-list">
 
-    <a href="<?= site_url('analisis-risiko') ?>" class="ar-stat-link">
-        <div class="ar-stat-card <?= !$filter ? 'ar-stat-active' : '' ?>">
-            <div class="ar-stat-label">Total Risiko</div>
-            <div class="ar-stat-value"><?= $totalRisiko ?></div>
-        </div>
-    </a>
+                    <?php foreach ($order as $lvl):
+                        $jumlah = $levelRisiko[$lvl] ?? 0;
+                        $warna = $colorMap[$lvl];
+                        $percent = $totalLevel > 0
+                            ? ($jumlah / $totalLevel) * 100
+                            : 0;
+                    ?>
 
-    <a href="<?= site_url('analisis-risiko?filter=sudah') ?>" class="ar-stat-link">
-        <div class="ar-stat-card <?= $filter === 'sudah' ? 'ar-stat-active-sudah' : '' ?>">
-            <div class="ar-stat-label">Sudah Dianalisis</div>
-            <div class="ar-stat-value text-success"><?= $totalSudah ?></div>
-        </div>
-    </a>
+                        <div class="ar-distribution-item">
 
-    <a href="<?= site_url('analisis-risiko?filter=belum') ?>" class="ar-stat-link">
-        <div class="ar-stat-card <?= $filter === 'belum' ? 'ar-stat-active-belum' : '' ?>">
-            <div class="ar-stat-label">Belum Dianalisis</div>
-            <div class="ar-stat-value text-warning"><?= $totalBelum ?></div>
-        </div>
-    </a>
+                            <div class="ar-level-name">
+                                <span class="ar-level-dot"
+                                      style="background: <?= $warna ?>"></span>
 
+                                <span><?= esc($lvl) ?></span>
+                            </div>
+
+                            <div class="ar-level-bar">
+                                <div class="ar-level-fill"
+                                     style="
+                                        width: <?= $percent ?>%;
+                                        background: <?= $warna ?>;
+                                     ">
+                                </div>
+                            </div>
+
+                            <strong class="ar-level-count">
+                                <?= $jumlah ?>
+                            </strong>
+
+                        </div>
+
+                    <?php endforeach; ?>
+
+                </div>
+
+            </div>
+
+        <?php endif; ?>
+
+    </div>
 </div>

@@ -235,130 +235,514 @@
     max-width: 100%; /* ikuti lebar kolom, bukan fixed px */
 }
 
-/* ================= SUMMARY STAT CARDS ================= */
-.ar-summary-row {
-    align-items: stretch;
+/* ======================================================
+   ANALISIS RISIKO — SUMMARY & FILTER
+====================================================== */
+
+.ar-summary-panel {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    overflow: hidden;
 }
 
-.ar-stat-card {
-    border: 1px solid #e9ecef;
-    border-radius: 10px;
-    padding: 10px 14px;
-    background: #fff;
-    min-width: 130px;
-    transition: box-shadow 0.15s ease, transform 0.15s ease;
-    cursor: pointer;
+/* HEADER */
+.ar-summary-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 14px 18px;
+    border-bottom: 1px solid #eef0f3;
+    background: #ffffff;
 }
 
-.ar-stat-card:hover {
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-    transform: translateY(-2px);
+.ar-summary-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 2px;
 }
 
-.ar-stat-label {
-    font-size: 11px;
+.ar-summary-subtitle {
+    font-size: 12px;
+    color: #6b7280;
+}
+
+.ar-reset-filter {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 10px;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    background: #ffffff;
+    color: #6b7280;
+    text-decoration: none;
+    font-size: 12px;
     font-weight: 500;
+    white-space: nowrap;
+}
+
+.ar-reset-filter:hover {
+    background: #f9fafb;
+    color: #dc3545;
+    border-color: #fecaca;
+}
+
+/* CONTENT */
+.ar-summary-content {
+    padding: 16px 18px 18px;
+}
+
+.ar-filter-label {
+    font-size: 11px;
+    font-weight: 700;
     color: #6b7280;
     text-transform: uppercase;
-    letter-spacing: 0.04em;
-    margin-bottom: 4px;
+    letter-spacing: 0.05em;
+    margin-bottom: 8px;
 }
 
-.ar-stat-value {
-    font-size: 1.75rem;
+/* ======================================================
+   FILTER CARDS
+====================================================== */
+
+.ar-filter-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+}
+
+.ar-filter-card {
+    position: relative;
+    min-width: 0;
+    min-height: 105px;
+
+    display: grid;
+    grid-template-columns: 38px minmax(0, 1fr);
+    grid-template-rows: 1fr auto;
+    column-gap: 10px;
+
+    padding: 13px;
+    border: 1px solid #e5e7eb;
+    border-radius: 9px;
+    background: #ffffff;
+
+    color: inherit;
+    text-decoration: none;
+
+    transition:
+        border-color 0.15s ease,
+        background 0.15s ease,
+        box-shadow 0.15s ease;
+}
+
+.ar-filter-card:hover {
+    border-color: #cbd5e1;
+    background: #fafbfc;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.05);
+    color: inherit;
+    text-decoration: none;
+}
+
+/* ICON */
+.ar-filter-icon {
+    grid-row: 1;
+    width: 38px;
+    height: 38px;
+    border-radius: 8px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 19px;
+}
+
+.ar-filter-icon-total {
+    background: #eff6ff;
+    color: #2563eb;
+}
+
+.ar-filter-icon-sudah {
+    background: #ecfdf3;
+    color: #16a34a;
+}
+
+.ar-filter-icon-belum {
+    background: #fff7ed;
+    color: #ea580c;
+}
+
+/* INFORMATION */
+.ar-filter-info {
+    min-width: 0;
+}
+
+.ar-filter-name {
+    display: block;
+    margin-bottom: 2px;
+
+    font-size: 12px;
+    font-weight: 600;
+    color: #475569;
+}
+
+.ar-filter-info strong {
+    display: block;
+
+    font-size: 25px;
     font-weight: 700;
     line-height: 1.1;
     color: #111827;
 }
 
-.ar-stat-active {
-    border-color: #0d6efd !important;
-    background: rgba(13, 110, 253, 0.04);
+.ar-filter-info small {
+    display: block;
+    margin-top: 3px;
+
+    font-size: 11px;
+    line-height: 1.3;
+    color: #94a3b8;
 }
 
-.ar-stat-active-sudah {
-    border-color: #198754 !important;
-    background: rgba(25, 135, 84, 0.04);
-}
+/* ACTION */
+.ar-filter-action {
+    grid-column: 1 / -1;
 
-.ar-stat-active-belum {
-    border-color: #ffc107 !important;
-    background: rgba(255, 193, 7, 0.04);
-}
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 
-.ar-stat-dist {
-    min-width: 180px;
-    cursor: default;
-}
+    margin-top: 9px;
+    padding-top: 8px;
+    border-top: 1px solid #f1f3f5;
 
-.ar-stat-dist:hover {
-    transform: none;
-    box-shadow: none;
-}
-
-.ar-dist-row {
-    font-size: 12px;
-    padding: 2px 0;
-}
-
-.ar-dist-label {
-    color: #374151;
-    font-weight: 400;
-}
-
-.ar-dist-badge {
     font-size: 11px;
     font-weight: 600;
-    padding: 2px 8px;
-    border-radius: 20px;
-    min-width: 24px;
-    text-align: center;
+    color: #64748b;
 }
 
-.ar-stat-link{
-display:inline-block;
-text-decoration:none;
+.ar-filter-card:hover .ar-filter-action {
+    color: #2563eb;
 }
 
-.ar-stat-dist{
-min-width:190px;
-max-width:210px;
-padding:10px 12px;
+/* ACTIVE FILTER */
+.ar-filter-card.active {
+    box-shadow: inset 3px 0 0 currentColor;
 }
 
-.ar-dist-bar-row{
-display:flex;
-align-items:center;
-gap:6px;
-margin:2px 0;
-font-size:11px;
+.ar-filter-card.active-total {
+    color: #2563eb;
+    border-color: #bfdbfe;
+    background: #f8fbff;
 }
 
-.ar-dist-label{
-width:80px;
-font-size:11px;
-color:#374151;
+.ar-filter-card.active-sudah {
+    color: #16a34a;
+    border-color: #bbf7d0;
+    background: #f8fdf9;
 }
 
-.ar-dist-bar{
-flex:1;
-height:6px;
-background:#eef2f7;
-border-radius:4px;
-overflow:hidden;
+.ar-filter-card.active-belum {
+    color: #ea580c;
+    border-color: #fed7aa;
+    background: #fffaf5;
 }
 
-.ar-dist-fill{
-height:100%;
-border-radius:4px;
-transition:width .25s ease;
+.ar-filter-card.active .ar-filter-action {
+    color: currentColor;
 }
 
-.ar-dist-value{
-width:16px;
-text-align:right;
-font-weight:600;
-font-size:10px;
+.ar-filter-card.active .ar-filter-info strong {
+    color: #111827;
+}
+
+/* ======================================================
+   DISTRIBUSI LEVEL RISIKO
+====================================================== */
+
+.ar-distribution-section {
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 1px solid #eef0f3;
+}
+
+.ar-distribution-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 10px;
+}
+
+.ar-distribution-head .ar-filter-label {
+    margin-bottom: 1px;
+}
+
+.ar-distribution-subtitle {
+    font-size: 11px;
+    color: #94a3b8;
+}
+
+.ar-distribution-total {
+    padding: 4px 8px;
+    border-radius: 5px;
+    background: #f3f4f6;
+
+    font-size: 11px;
+    font-weight: 600;
+    color: #64748b;
+
+    white-space: nowrap;
+}
+
+/* DISTRIBUTION ROW */
+.ar-distribution-list {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 8px;
+}
+
+.ar-distribution-item {
+    min-width: 0;
+    padding: 9px 10px;
+
+    border: 1px solid #eef0f3;
+    border-radius: 7px;
+    background: #fafbfc;
+}
+
+.ar-level-name {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+
+    margin-bottom: 7px;
+
+    font-size: 11px;
+    font-weight: 500;
+    color: #475569;
+
+    white-space: nowrap;
+}
+
+.ar-level-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.ar-level-bar {
+    width: 100%;
+    height: 5px;
+
+    border-radius: 999px;
+    background: #e9edf2;
+    overflow: hidden;
+}
+
+.ar-level-fill {
+    height: 100%;
+    min-width: 0;
+    border-radius: inherit;
+}
+
+.ar-level-count {
+    display: block;
+    margin-top: 5px;
+
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1;
+    color: #111827;
+}
+
+/* ======================================================
+   RESPONSIVE
+====================================================== */
+
+@media (max-width: 991px) {
+    .ar-filter-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .ar-distribution-list {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 767px) {
+    .ar-summary-header {
+        align-items: flex-start;
+    }
+
+    .ar-filter-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .ar-distribution-list {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 480px) {
+    .ar-summary-header {
+        flex-direction: column;
+    }
+
+    .ar-distribution-list {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ======================================================
+   COMPACT SUMMARY ANALISIS RISIKO
+====================================================== */
+
+/* Panel utama lebih ringkas */
+.ar-summary-header {
+    padding: 10px 16px;
+}
+
+.ar-summary-title {
+    font-size: 13px;
+    margin-bottom: 1px;
+}
+
+.ar-summary-subtitle {
+    font-size: 11px;
+}
+
+.ar-summary-content {
+    padding: 12px 16px 14px;
+}
+
+/* Judul section lebih kecil */
+.ar-filter-label {
+    font-size: 10px;
+    margin-bottom: 6px;
+}
+
+/* ================= FILTER ================= */
+
+.ar-filter-grid {
+    gap: 8px;
+}
+
+/* Card dipendekkan */
+.ar-filter-card {
+    min-height: 78px;
+    grid-template-columns: 32px minmax(0, 1fr) auto;
+    grid-template-rows: auto;
+    align-items: center;
+    column-gap: 9px;
+
+    padding: 10px 12px;
+}
+
+/* Icon lebih kecil */
+.ar-filter-icon {
+    grid-row: auto;
+    width: 32px;
+    height: 32px;
+    border-radius: 7px;
+    font-size: 16px;
+}
+
+/* Angka + label lebih compact */
+.ar-filter-name {
+    font-size: 11px;
+    margin-bottom: 1px;
+}
+
+.ar-filter-info strong {
+    font-size: 21px;
+    line-height: 1;
+}
+
+.ar-filter-info small {
+    font-size: 10px;
+    margin-top: 3px;
+}
+
+/* Lihat Data / Ditampilkan pindah ke kanan,
+   jadi tidak perlu baris bawah */
+.ar-filter-action {
+    grid-column: auto;
+
+    margin: 0;
+    padding: 0;
+    border-top: 0;
+
+    display: flex;
+    align-items: center;
+    gap: 5px;
+
+    font-size: 10px;
+    white-space: nowrap;
+}
+
+/* ================= DISTRIBUSI ================= */
+
+.ar-distribution-section {
+    margin-top: 11px;
+    padding-top: 10px;
+}
+
+.ar-distribution-head {
+    align-items: center;
+    margin-bottom: 7px;
+}
+
+.ar-distribution-subtitle {
+    display: none;
+}
+
+.ar-distribution-total {
+    padding: 3px 7px;
+    font-size: 10px;
+}
+
+/* Distribusi jadi lebih tipis */
+.ar-distribution-list {
+    gap: 6px;
+}
+
+.ar-distribution-item {
+    padding: 7px 9px;
+    border-radius: 6px;
+}
+
+/* Nama level */
+.ar-level-name {
+    gap: 5px;
+    margin-bottom: 5px;
+    font-size: 10px;
+}
+
+.ar-level-dot {
+    width: 6px;
+    height: 6px;
+}
+
+/* Progress bar */
+.ar-level-bar {
+    height: 4px;
+}
+
+/* Angka jumlah */
+.ar-level-count {
+    margin-top: 4px;
+    font-size: 13px;
+}
+
+/* Hapus filter lebih compact */
+.ar-reset-filter {
+    padding: 5px 8px;
+    font-size: 10px;
 }
 
 /* ================= BOTTOM SECTION ================= */

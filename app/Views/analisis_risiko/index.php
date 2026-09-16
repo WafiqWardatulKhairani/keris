@@ -52,21 +52,6 @@
         'filter'        => $filter,
     ]) ?>
 
-    <!-- Filter Active Badge -->
-    <?php if ($filter): ?>
-        <div class="mb-3 d-flex align-items-center gap-2">
-            <span class="text-muted small">Menampilkan:</span>
-            <?php if ($filter === 'sudah'): ?>
-                <span class="badge bg-success-subtle text-success border border-success">Sudah Dianalisis</span>
-            <?php elseif ($filter === 'belum'): ?>
-                <span class="badge bg-warning-subtle text-warning border border-warning">Belum Dianalisis</span>
-            <?php endif; ?>
-            <a href="<?= site_url('analisis-risiko') ?>" class="small text-decoration-none text-danger ms-2">
-                ✕ Clear Filter
-            </a>
-        </div>
-    <?php endif; ?>
-
     <!-- Table tetap muncul -->
     <?= view('analisis_risiko/_table_section', [
         'data'          => $data,
