@@ -498,36 +498,6 @@
     white-space: nowrap;
 }
 
-/* DISTRIBUTION ROW */
-.ar-distribution-list {
-    display: grid;
-    grid-template-columns: repeat(5, minmax(0, 1fr));
-    gap: 8px;
-}
-
-.ar-distribution-item {
-    min-width: 0;
-    padding: 9px 10px;
-
-    border: 1px solid #eef0f3;
-    border-radius: 7px;
-    background: #fafbfc;
-}
-
-.ar-level-name {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-
-    margin-bottom: 7px;
-
-    font-size: 11px;
-    font-weight: 500;
-    color: #475569;
-
-    white-space: nowrap;
-}
-
 .ar-level-dot {
     width: 7px;
     height: 7px;
@@ -535,31 +505,444 @@
     flex-shrink: 0;
 }
 
-.ar-level-bar {
-    width: 100%;
-    height: 5px;
+/* ======================================================
+   RINGKASAN ANALISIS RISIKO
+====================================================== */
 
-    border-radius: 999px;
-    background: #e9edf2;
+.ar-summary-panel {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
     overflow: hidden;
 }
 
-.ar-level-fill {
-    height: 100%;
-    min-width: 0;
-    border-radius: inherit;
+
+/* ================= HEADER ================= */
+
+.ar-summary-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+
+    padding: 11px 16px;
+    border-bottom: 1px solid #eef0f3;
 }
 
-.ar-level-count {
-    display: block;
-    margin-top: 5px;
-
-    font-size: 15px;
+.ar-summary-title {
+    font-size: 13px;
     font-weight: 700;
+    color: #111827;
+    line-height: 1.3;
+}
+
+.ar-summary-subtitle {
+    margin-top: 2px;
+    font-size: 10px;
+    color: #94a3b8;
+}
+
+
+/* ================= RESET FILTER ================= */
+
+.ar-reset-filter {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+
+    padding: 5px 9px;
+
+    border: 1px solid #dfe3e8;
+    border-radius: 6px;
+
+    background: #fff;
+    color: #64748b;
+
+    font-size: 10px;
+    font-weight: 500;
+
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.ar-reset-filter:hover {
+    background: #f8fafc;
+    color: #334155;
+}
+
+
+/* ================= CONTENT ================= */
+
+.ar-summary-content {
+    padding: 12px 16px 14px;
+}
+
+
+/* ======================================================
+   DISTRIBUSI LEVEL RISIKO
+====================================================== */
+
+.ar-distribution-section {
+    padding-bottom: 12px;
+    margin-bottom: 12px;
+
+    border-bottom: 1px solid #eef0f3;
+}
+
+.ar-distribution-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+
+    margin-bottom: 9px;
+}
+
+.ar-filter-label {
+    margin-bottom: 7px;
+
+    font-size: 10px;
+    font-weight: 700;
+
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+
+    color: #64748b;
+}
+
+.ar-distribution-head .ar-filter-label {
+    margin-bottom: 1px;
+}
+
+.ar-distribution-subtitle {
+    font-size: 9px;
+    color: #94a3b8;
+}
+
+.ar-distribution-total {
+    display: inline-flex;
+    align-items: center;
+
+    padding: 3px 7px;
+
+    border-radius: 5px;
+    background: #f3f4f6;
+
+    color: #64748b;
+
+    font-size: 9px;
+    font-weight: 600;
+
+    white-space: nowrap;
+}
+
+
+/* ================= LEVEL GRID ================= */
+
+.ar-level-summary {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 9px;
+}
+
+.ar-level-summary-item {
+    min-width: 0;
+}
+
+
+/* garis warna */
+
+.ar-level-color {
+    width: 100%;
+    height: 4px;
+
+    margin-bottom: 6px;
+
+    border-radius: 999px;
+}
+
+
+/* isi level */
+
+.ar-level-summary-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 6px;
+
+    padding: 0 2px;
+}
+
+.ar-level-summary-name {
+    display: flex;
+    align-items: center;
+
+    min-width: 0;
+    gap: 5px;
+
+    color: #64748b;
+
+    font-size: 10px;
+    font-weight: 500;
+
+    white-space: nowrap;
+}
+
+.ar-level-dot {
+    width: 6px;
+    height: 6px;
+
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.ar-level-summary-value {
+    flex-shrink: 0;
+
+    font-size: 14px;
+    font-weight: 700;
+
     line-height: 1;
+
     color: #111827;
 }
 
+
+/* ======================================================
+   FILTER STATUS ANALISIS
+====================================================== */
+
+.ar-filter-section {
+    margin-top: 0;
+}
+
+.ar-filter-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+
+    gap: 8px;
+}
+
+
+/* ================= FILTER CARD ================= */
+
+.ar-filter-card {
+    position: relative;
+
+    min-width: 0;
+    min-height: 68px;
+
+    display: flex;
+    align-items: center;
+
+    gap: 10px;
+
+    padding: 9px 11px;
+
+    background: #fff;
+
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+
+    color: inherit;
+    text-decoration: none;
+
+    transition:
+        border-color 0.15s ease,
+        background 0.15s ease,
+        box-shadow 0.15s ease;
+}
+
+.ar-filter-card:hover {
+    border-color: #cbd5e1;
+    background: #fafbfc;
+
+    color: inherit;
+    text-decoration: none;
+}
+
+
+/* ================= ICON ================= */
+
+.ar-filter-icon {
+    width: 32px;
+    height: 32px;
+
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 7px;
+
+    font-size: 16px;
+}
+
+.ar-filter-icon-total {
+    background: #eff6ff;
+    color: #2563eb;
+}
+
+.ar-filter-icon-sudah {
+    background: #ecfdf3;
+    color: #16a34a;
+}
+
+.ar-filter-icon-belum {
+    background: #fff7ed;
+    color: #f97316;
+}
+
+
+/* ================= INFO ================= */
+
+.ar-filter-info {
+    display: flex;
+    flex-direction: column;
+
+    min-width: 0;
+    flex: 1;
+}
+
+.ar-filter-name {
+    margin-bottom: 1px;
+
+    font-size: 10px;
+    font-weight: 600;
+
+    color: #475569;
+}
+
+.ar-filter-info strong {
+    font-size: 21px;
+    font-weight: 700;
+
+    line-height: 1.05;
+
+    color: #111827;
+}
+
+.ar-filter-info small {
+    margin-top: 2px;
+
+    font-size: 9px;
+
+    color: #94a3b8;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+
+/* ================= ACTION ================= */
+
+.ar-filter-action {
+    display: flex;
+    align-items: center;
+
+    gap: 3px;
+
+    flex-shrink: 0;
+
+    font-size: 9px;
+    font-weight: 500;
+
+    color: #64748b;
+
+    white-space: nowrap;
+}
+
+.ar-filter-action i {
+    font-size: 11px;
+}
+
+
+/* ======================================================
+   ACTIVE FILTER
+====================================================== */
+
+.ar-filter-card.active {
+    box-shadow: none;
+}
+
+
+/* TOTAL */
+
+.ar-filter-card.active-total {
+    border-color: #3b82f6;
+    background: #f8fbff;
+    box-shadow: inset 3px 0 0 #2563eb;
+}
+
+.ar-filter-card.active-total .ar-filter-action {
+    color: #2563eb;
+}
+
+
+/* SUDAH */
+
+.ar-filter-card.active-sudah {
+    border-color: #4ade80;
+    background: #f7fef9;
+    box-shadow: inset 3px 0 0 #16a34a;
+}
+
+.ar-filter-card.active-sudah .ar-filter-action {
+    color: #16a34a;
+}
+
+
+/* BELUM */
+
+.ar-filter-card.active-belum {
+    border-color: #fb923c;
+    background: #fffaf5;
+    box-shadow: inset 3px 0 0 #f97316;
+}
+
+.ar-filter-card.active-belum .ar-filter-action {
+    color: #f97316;
+}
+
+
+/* ======================================================
+   RESPONSIVE
+====================================================== */
+
+@media (max-width: 900px) {
+
+    .ar-level-summary {
+        grid-template-columns: repeat(3, 1fr);
+        row-gap: 12px;
+    }
+
+    .ar-filter-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+
+@media (max-width: 576px) {
+
+    .ar-summary-header {
+        align-items: flex-start;
+    }
+
+    .ar-summary-content {
+        padding: 12px;
+    }
+
+    .ar-level-summary {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .ar-filter-action {
+        display: none;
+    }
+}
 /* ======================================================
    RESPONSIVE
 ====================================================== */

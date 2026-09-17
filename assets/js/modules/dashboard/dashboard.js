@@ -9,7 +9,7 @@ document.getElementById("dashDate").textContent = new Date().toLocaleDateString(
 
 let chartPie, chartKategori;
 
-function initCharts() {
+function initCharts() { 
   chartPie = new Chart(document.getElementById("chartPie"), {
     type: "pie",
     data: {

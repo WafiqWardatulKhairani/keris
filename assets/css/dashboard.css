@@ -169,8 +169,8 @@
 /* ── Grid layouts ─────────────────────────────────────────────────────────── */
 .grid-heatmap {
   display: grid;
-  grid-template-columns: 1.2fr 0.8fr;
-  gap: 20px;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+  gap: 16px;
 }
 .grid-2 {
   display: grid;
@@ -312,6 +312,8 @@
 .chart-container {
   position: relative;
   width: 100%;
+  max-width: 260px;
+  margin: 0 auto;
 }
 
 .dashboard-risk-matrix .risk-cell {
@@ -334,24 +336,87 @@
   opacity: 0.7;
 }
 
+/* ── Compact Risk Matrix ─────────────────────────────────────────────────── */
+
+.dashboard-risk-matrix {
+  width: 100%;
+}
+
+.dashboard-risk-matrix .table-responsive {
+  overflow: visible;
+}
+
+.dashboard-risk-matrix .risk-matrix {
+  width: 100%;
+  table-layout: fixed;
+}
+
+/* Kolom pertama untuk label kemungkinan */
+.dashboard-risk-matrix .risk-matrix th:first-child {
+  width: 150px;
+}
+
+/* Beri jarak kecil antar kotak */
+.dashboard-risk-matrix .risk-matrix td {
+  padding: 2px;
+}
+
+/* Kotak warna dibuat lebih compact */
+.dashboard-risk-matrix .risk-cell {
+  height: 58px;
+  min-height: 58px;
+  padding: 4px 2px;
+  gap: 3px;
+  border-radius: 6px;
+}
+
+/* Angka utama: 9, 15, 18, dst */
+.dashboard-risk-matrix .risk-score {
+  font-size: 17px;
+}
+
+/* Jumlah risiko: (39), (32), dst */
+.dashboard-risk-matrix .risk-count {
+  font-size: 10px;
+}
+
+/* Label Dampak */
+.dashboard-risk-matrix .risk-col-text {
+  font-size: 10px;
+  line-height: 1.15;
+}
+
+/* Label Kemungkinan */
+.dashboard-risk-matrix .risk-row-text {
+  font-size: 10px;
+  line-height: 1.2;
+}
+
+/* Nomor axis (1), (2), dst */
+.dashboard-risk-matrix .risk-axis-number {
+  font-size: 9px;
+  margin-top: 2px;
+}
+
 /* ── Pie Legend ───────────────────────────────────────────────────────────── */
 .pie-wrap {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 10px;
   align-items: center;
 }
 .pie-legend {
   width: 100%;
+  max-width: 280px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 5px;
 }
 .pie-legend-item {
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 13px;
+  gap: 7px;
+  font-size: 11px;
   color: #334155;
 }
 .pie-legend-item i {
@@ -583,9 +648,6 @@
   .kpi-grid {
     grid-template-columns: 1fr 1fr 1fr;
   }
-  .grid-heatmap {
-    grid-template-columns: 1fr;
-  }
   .grid-2 {
     grid-template-columns: 1fr;
   }
@@ -611,6 +673,22 @@
     height: 36px;
   }
 }
+
+@media (max-width: 850px) {
+  .grid-heatmap {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-risk-matrix .risk-matrix th:first-child {
+    width: 130px;
+  }
+
+  .dashboard-risk-matrix .risk-cell {
+    height: 52px;
+    min-height: 52px;
+  }
+}
+
 @media (max-width: 480px) {
   .kpi-grid {
     grid-template-columns: 1fr;
