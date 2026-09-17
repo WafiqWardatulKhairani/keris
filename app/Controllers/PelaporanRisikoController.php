@@ -272,7 +272,6 @@ class PelaporanRisikoController extends BaseController
             }
         }
 
-
         // Tentukan status final tiap kegiatan
         foreach ($statusKegiatan as $id => &$item) {
 
