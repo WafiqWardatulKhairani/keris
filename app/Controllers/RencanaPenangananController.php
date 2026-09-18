@@ -38,30 +38,75 @@ class RencanaPenangananController extends BaseController
     }
 
     /* SUMMARY STATS */
-    private function getSummary(?int $idKonteks): array
-    {
+    private function getSummary(
+        ?int $idKonteks,
+        $idTim = null,
+        $idKegiatan = null,
+        $tahun = null
+    ): array {
         /* TOTAL risiko ber-opsi Mengurangi */
         $qTotal = $this->db->table('evaluasi_risiko er')
-            ->join('identifikasi_risiko ir',    'ir.id_identifikasi = er.id_identifikasi')
-            ->join('konteks_proses_bisnis kpb', 'kpb.id_konteks_proses = ir.id_konteks_proses')
+            ->join(
+                'identifikasi_risiko ir',
+                'ir.id_identifikasi = er.id_identifikasi'
+            )
+            ->join(
+                'konteks_proses_bisnis kpb',
+                'kpb.id_konteks_proses = ir.id_konteks_proses'
+            )
+            ->join(
+                'konteks k',
+                'k.id_konteks = kpb.id_konteks'
+            )
             ->where('er.opsi_tindakan', 'Mengurangi');
-        if ($idKonteks) $qTotal->where('kpb.id_konteks', $idKonteks);
-        $totalRisiko = $qTotal->countAllResults();
+        if ($idKonteks) {
+            $qTotal->where('kpb.id_konteks', $idKonteks);
+        }
+
+        if ($idTim) {
+            $qTotal->where('k.id_tim', $idTim);
+        }
+
+        if ($idKegiatan) {
+            $qTotal->where('k.id_kegiatan', $idKegiatan);
+        }
+
+        if ($tahun) {
+            $qTotal->where('k.tahun', $tahun);
+        }
+
+        $totalDitangani = $qTotal->countAllResults();
 
         /* SUDAH ada RTP */
-        $totalSudah = (int) $this->db->query("
-            SELECT COUNT(*) as total
-            FROM (
-                SELECT DISTINCT er.id_evaluasi
-                FROM evaluasi_risiko er
-                JOIN identifikasi_risiko ir        ON ir.id_identifikasi = er.id_identifikasi
-                JOIN konteks_proses_bisnis kpb     ON kpb.id_konteks_proses = ir.id_konteks_proses
-                JOIN rencana_penanganan_risiko rtp ON rtp.id_penilaian_awal = er.id_evaluasi
-                WHERE er.opsi_tindakan = 'Mengurangi'
-                " . ($idKonteks ? "AND kpb.id_konteks = $idKonteks" : "") . "
-            ) as sub
-        ")->getRowArray()['total'] ?? 0;
-        $totalBelum = $totalRisiko - $totalSudah;
+        $qSudah = $this->db->table('evaluasi_risiko er')
+            ->select('COUNT(DISTINCT er.id_evaluasi) AS total')
+            ->join('identifikasi_risiko ir', 'ir.id_identifikasi = er.id_identifikasi')
+            ->join('konteks_proses_bisnis kpb', 'kpb.id_konteks_proses = ir.id_konteks_proses')
+            ->join('konteks k', 'k.id_konteks = kpb.id_konteks')
+            ->join('rencana_penanganan_risiko rtp', 'rtp.id_penilaian_awal = er.id_evaluasi')
+            ->where('er.opsi_tindakan', 'Mengurangi');
+
+        if ($idKonteks) {
+            $qSudah->where('kpb.id_konteks', $idKonteks);
+        }
+
+        if ($idTim) {
+            $qSudah->where('k.id_tim', $idTim);
+        }
+
+        if ($idKegiatan) {
+            $qSudah->where('k.id_kegiatan', $idKegiatan);
+        }
+
+        if ($tahun) {
+            $qSudah->where('k.tahun', $tahun);
+        }
+
+        $totalSudah = (int) (
+            $qSudah->get()->getRowArray()['total'] ?? 0
+        );
+
+        $totalBelum = max(0, $totalDitangani - $totalSudah);
 
         /* DISTRIBUSI LEVEL RISIKO */
         $levelRisiko = [
@@ -88,19 +133,32 @@ class RencanaPenangananController extends BaseController
         ];
         $qDistribusi = $this->db->table('evaluasi_risiko er')
             ->select('sr_r.nama_level, sr_r.warna, COUNT(DISTINCT er.id_evaluasi) as total')
-            ->join('identifikasi_risiko ir','ir.id_identifikasi = er.id_identifikasi')
-            ->join('konteks_proses_bisnis kpb','kpb.id_konteks_proses = ir.id_konteks_proses')
-            ->join('rencana_penanganan_risiko rtp','rtp.id_penilaian_awal = er.id_evaluasi')
-            ->join('kriteria_kemungkinan km_r','km_r.id_kriteria = rtp.id_kemungkinan_residu','left')
-            ->join('kriteria_dampak kd_r','kd_r.id_kriteria = rtp.id_dampak_residu','left')
-            ->join('matriks_risiko mr_r','mr_r.level_kemungkinan = km_r.level AND mr_r.level_dampak = kd_r.level','left')
-            ->join('selera_risiko sr_r','mr_r.nilai_risiko BETWEEN sr_r.nilai_min AND sr_r.nilai_max','left')
+            ->join('identifikasi_risiko ir', 'ir.id_identifikasi = er.id_identifikasi')
+            ->join('konteks_proses_bisnis kpb', 'kpb.id_konteks_proses = ir.id_konteks_proses')
+            ->join('rencana_penanganan_risiko rtp', 'rtp.id_penilaian_awal = er.id_evaluasi')
+            ->join('kriteria_kemungkinan km_r', 'km_r.id_kriteria = rtp.id_kemungkinan_residu', 'left')
+            ->join('kriteria_dampak kd_r', 'kd_r.id_kriteria = rtp.id_dampak_residu', 'left')
+            ->join('matriks_risiko mr_r', 'mr_r.level_kemungkinan = km_r.level AND mr_r.level_dampak = kd_r.level', 'left')
+            ->join('selera_risiko sr_r', 'mr_r.nilai_risiko BETWEEN sr_r.nilai_min AND sr_r.nilai_max', 'left')
+            ->join('konteks k', 'k.id_konteks = kpb.id_konteks')
             ->where('er.opsi_tindakan', 'Mengurangi')
             ->where('rtp.id_rtp IS NOT NULL', null, false)
             ->groupBy('sr_r.nama_level, sr_r.warna');
-        if ($idKonteks) $qDistribusi->where('kpb.id_konteks', $idKonteks);
+        if ($idKonteks) {
+            $qDistribusi->where('kpb.id_konteks', $idKonteks);
+        }
 
-        
+        if ($idTim) {
+            $qDistribusi->where('k.id_tim', $idTim);
+        }
+
+        if ($idKegiatan) {
+            $qDistribusi->where('k.id_kegiatan', $idKegiatan);
+        }
+
+        if ($tahun) {
+            $qDistribusi->where('k.tahun', $tahun);
+        }
 
         foreach ($qDistribusi->get()->getResultArray() as $row) {
             if (isset($levelRisiko[$row['nama_level']])) {
@@ -113,7 +171,12 @@ class RencanaPenangananController extends BaseController
             }
         }
 
-        return compact('totalRisiko', 'totalSudah', 'totalBelum', 'levelRisiko');
+        return compact(
+            'totalDitangani',
+            'totalSudah',
+            'totalBelum',
+            'levelRisiko'
+        );
     }
 
     private function validateTimAccessByIdentifikasi($idIdentifikasi): bool
@@ -214,8 +277,8 @@ class RencanaPenangananController extends BaseController
             ->join('rencana_penanganan_risiko rtp', 'rtp.id_penilaian_awal = er.id_evaluasi', 'left')
             ->join('kriteria_kemungkinan km_r', 'km_r.id_kriteria = rtp.id_kemungkinan_residu', 'left')
             ->join('kriteria_dampak kd_r', 'kd_r.id_kriteria = rtp.id_dampak_residu', 'left')
-            ->join('matriks_risiko mr_r','mr_r.level_kemungkinan = km_r.level AND mr_r.level_dampak = kd_r.level','left')
-            ->join('selera_risiko sr_r','mr_r.nilai_risiko BETWEEN sr_r.nilai_min AND sr_r.nilai_max','left')
+            ->join('matriks_risiko mr_r', 'mr_r.level_kemungkinan = km_r.level AND mr_r.level_dampak = kd_r.level', 'left')
+            ->join('selera_risiko sr_r', 'mr_r.nilai_risiko BETWEEN sr_r.nilai_min AND sr_r.nilai_max', 'left')
             ->where('er.opsi_tindakan', 'Mengurangi')
             ->orderBy('pb.kode_proses', 'ASC')
             ->orderBy('rtp.id_rtp', 'ASC');
@@ -265,6 +328,12 @@ class RencanaPenangananController extends BaseController
 
         if ($tahun) {
             $qCount->where('k.tahun', $tahun);
+        }
+
+        if ($filter === 'sudah') {
+            $qCount->where('rtp.id_rtp IS NOT NULL', null, false);
+        } elseif ($filter === 'belum') {
+            $qCount->where('rtp.id_rtp IS NULL', null, false);
         }
 
         $total = (int) ($qCount->get()->getRowArray()['total'] ?? 0);
@@ -327,7 +396,12 @@ class RencanaPenangananController extends BaseController
         }
 
         $kriteria = $this->getKriteriaList();
-        $summary = $this->getSummary($idKonteks);
+        $summary = $this->getSummary(
+            $idKonteks,
+            $idTim,
+            $idKegiatan,
+            $tahun
+        );
 
         return view('rencana_penanganan/index', [
             'grouped'       => $grouped,
@@ -343,9 +417,9 @@ class RencanaPenangananController extends BaseController
             ],
             'kriteriaKemungkinan' => $kriteria['kriteriaKemungkinan'],
             'kriteriaDampak'      => $kriteria['kriteriaDampak'],
-            'totalRisiko' => $summary['totalRisiko'],
-            'totalSudah'  => $summary['totalSudah'],
-            'totalBelum'  => $summary['totalBelum'],
+            'totalDitangani' => $summary['totalDitangani'],
+            'totalSudah'     => $summary['totalSudah'],
+            'totalBelum'     => $summary['totalBelum'],
             'levelRisiko' => $summary['levelRisiko'],
         ]);
     }
@@ -356,11 +430,17 @@ class RencanaPenangananController extends BaseController
 
         $db = $this->db;
 
-        $activeKonteks = $this->getActiveKonteks();
-        $idKonteks     = $activeKonteks ? (int)$activeKonteks['id_konteks'] : null;
-        $idTim = session('global_id_tim');
-        $idKegiatan = session('global_id_kegiatan');
-        $tahun = session('global_tahun');
+        $idKonteks = $this->request->getGet('id_konteks')
+            ?? session('global_id_konteks');
+
+        $idTim = $this->request->getGet('sk')
+            ?? session('global_id_tim');
+
+        $idKegiatan = $this->request->getGet('kg')
+            ?? session('global_id_kegiatan');
+
+        $tahun = $this->request->getGet('th')
+            ?? session('global_tahun');
 
         $filter = $this->request->getGet('filter');
 
@@ -382,6 +462,7 @@ class RencanaPenangananController extends BaseController
             pr.nilai_risiko,
             pr.warna_risiko,
             sl.nama_level as nama_selera,
+            sl.warna as warna_selera,
             rtp.id_rtp,
             rtp.uraian_rtp,
             rtp.target_output,
@@ -398,12 +479,33 @@ class RencanaPenangananController extends BaseController
             ->join('proses_bisnis pb', 'pb.id_proses = kpb.id_proses')
             ->join('tim_kerja tk', 'tk.id_tim = k.id_tim', 'left')
             ->join('penilaian_risiko pr', 'pr.id_penilaian = er.id_penilaian', 'left')
-            ->join('kriteria_kemungkinan km_r','km_r.id_kriteria = rtp.id_kemungkinan_residu','left')
-            ->join('kriteria_dampak kd_r','kd_r.id_kriteria = rtp.id_dampak_residu','left')
-            ->join('matriks_risiko mr_r','mr_r.level_kemungkinan = km_r.level AND mr_r.level_dampak = kd_r.level','left')
             ->join('selera_risiko sl', 'sl.id_selera = pr.id_selera', 'left')
-            ->join('selera_risiko sr_r','mr_r.nilai_risiko BETWEEN sr_r.nilai_min AND sr_r.nilai_max','left')
-            ->join('rencana_penanganan_risiko rtp', 'rtp.id_penilaian_awal = er.id_evaluasi', 'left')
+
+            ->join(
+                'rencana_penanganan_risiko rtp',
+                'rtp.id_penilaian_awal = er.id_evaluasi',
+                'left'
+            )
+            ->join(
+                'kriteria_kemungkinan km_r',
+                'km_r.id_kriteria = rtp.id_kemungkinan_residu',
+                'left'
+            )
+            ->join(
+                'kriteria_dampak kd_r',
+                'kd_r.id_kriteria = rtp.id_dampak_residu',
+                'left'
+            )
+            ->join(
+                'matriks_risiko mr_r',
+                'mr_r.level_kemungkinan = km_r.level AND mr_r.level_dampak = kd_r.level',
+                'left'
+            )
+            ->join(
+                'selera_risiko sr_r',
+                'mr_r.nilai_risiko BETWEEN sr_r.nilai_min AND sr_r.nilai_max',
+                'left'
+            )
             ->where('er.opsi_tindakan', 'Mengurangi');
 
         if ($idKonteks) {
@@ -450,6 +552,12 @@ class RencanaPenangananController extends BaseController
             $qCount->where('k.tahun', $tahun);
         }
 
+        if ($filter === 'sudah') {
+            $qCount->where('rtp.id_rtp IS NOT NULL', null, false);
+        } elseif ($filter === 'belum') {
+            $qCount->where('rtp.id_rtp IS NULL', null, false);
+        }
+
         $total = (int) ($qCount->get()->getRowArray()['total'] ?? 0);
         $rows  = $builder->limit($perPage, $offset)->get()->getResultArray();
 
@@ -461,13 +569,18 @@ class RencanaPenangananController extends BaseController
             if (!isset($grouped[$idEval])) {
                 $grouped[$idEval] = [
                     'id_evaluasi'       => $row['id_evaluasi'],
+                    'id_identifikasi'   => $row['id_identifikasi'],
                     'id_tim'            => $row['id_tim'],
                     'pernyataan_risiko' => $row['pernyataan_risiko'],
+                    'penyebab_risiko'   => $row['penyebab_risiko'],
+                    'dampak_risiko'     => $row['dampak_risiko'],
                     'kode_proses'       => $row['kode_proses'],
                     'uraian_proses'     => $row['uraian_proses'],
                     'nama_tim'          => $row['nama_tim'],
                     'nilai_risiko'      => $row['nilai_risiko'],
+                    'warna_risiko'      => $row['warna_risiko'],
                     'nama_selera'       => $row['nama_selera'],
+                    'warna_selera'      => $row['warna_selera'],
                     'rtp_list'          => [],
                 ];
             }
@@ -560,7 +673,7 @@ class RencanaPenangananController extends BaseController
 
         // ambil list RTP
         $rtpList = $db->table('rencana_penanganan_risiko rtp')
-    ->select('
+            ->select('
         rtp.id_rtp,
         rtp.uraian_rtp,
         rtp.target_output,
@@ -568,9 +681,9 @@ class RencanaPenangananController extends BaseController
         rtp.id_kemungkinan_residu,
         rtp.id_dampak_residu
     ')
-    ->where('rtp.id_penilaian_awal', $data['id_evaluasi'])
-    ->orderBy('rtp.id_rtp', 'ASC')
-    ->get()->getResultArray();
+            ->where('rtp.id_penilaian_awal', $data['id_evaluasi'])
+            ->orderBy('rtp.id_rtp', 'ASC')
+            ->get()->getResultArray();
 
         $data['rtp_list'] = $rtpList;
 
@@ -625,7 +738,7 @@ class RencanaPenangananController extends BaseController
 
         return $this->response->setJSON($data);
     }
-    
+
     public function store()
     {
         log_message('error', 'POST DATA: ' . json_encode($this->request->getPost()));
@@ -766,7 +879,7 @@ class RencanaPenangananController extends BaseController
             ]);
         }
     }
-    
+
     public function delete($id)
     {
         try {

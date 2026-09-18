@@ -2,7 +2,7 @@
     <!-- DISTRIBUSI LEVEL -->
     <?php if (!empty($levelRisiko)): ?>
         <div class="er-stat-card er-stat-dist">
-
+ 
             <div class="er-stat-label mb-2">
                 Distribusi Level
             </div>
@@ -51,7 +51,7 @@
     <a href="<?= site_url('rencana-penanganan') ?>" class="er-stat-link">
         <div class="er-stat-card <?= !$filter ? 'er-stat-active' : '' ?>">
             <div class="er-stat-label">Total Risiko Ditangani</div>
-            <div class="er-stat-value"><?= $totalRisiko ?></div>
+            <div class="er-stat-value"><?= $totalDitangani ?></div>
         </div>
     </a>
 
