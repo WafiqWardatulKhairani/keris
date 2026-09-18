@@ -1,73 +1,146 @@
-<div class="d-flex flex-wrap gap-2 mb-3 er-summary-row">
-    <!-- DISTRIBUSI LEVEL -->
-    <?php if (!empty($levelRisiko)): ?>
-        <div class="er-stat-card er-stat-dist">
- 
-            <div class="er-stat-label mb-2">
-                Distribusi Level
+<?php
+$order = ['Sangat Rendah', 'Rendah', 'Sedang', 'Tinggi', 'Sangat Tinggi'];
+
+$colorMap = [
+    'Sangat Rendah' => '#0d6efd',
+    'Rendah'        => '#198754',
+    'Sedang'        => '#ffc107',
+    'Tinggi'        => '#fd7e14',
+    'Sangat Tinggi' => '#dc3545',
+];
+
+$totalLevel = 0;
+
+foreach ($levelRisiko ?? [] as $info) {
+    $totalLevel += (int) ($info['jumlah'] ?? 0);
+}
+?>
+
+<div class="rtp-summary-panel mb-3">
+
+    <!-- HEADER -->
+    <div class="rtp-summary-header">
+        <div>
+            <div class="rtp-summary-title">
+                Ringkasan Rencana Penanganan
             </div>
 
-            <?php
-            $totalLevel = array_sum(array_column($levelRisiko, 'jumlah'));
-            ?>
- 
-            <?php foreach ($levelRisiko as $level => $info): ?>
+            <div class="rtp-summary-subtitle">
+                Pilih status untuk memfilter data rencana penanganan
+            </div>
+        </div>
 
-                <?php
-                $jumlah = $info['jumlah'] ?? 0;
-                $warna  = hex_warna_selera_risiko($info['warna'] ?? null);
+        <?php if (!empty($filter)): ?>
+            <a href="<?= site_url('rencana-penanganan') ?>"
+                class="rtp-summary-reset">
+                Reset Filter
+            </a>
+        <?php endif; ?>
+    </div>
 
-                $percent = $totalLevel > 0
-                    ? ($jumlah / $totalLevel) * 100
-                    : 0;
-                ?>
+    <!-- DISTRIBUSI LEVEL -->
+    <?php if (!empty($levelRisiko)): ?>
 
-                <div class="er-dist-bar-row">
+        <div class="rtp-summary-distribution">
 
-                    <span class="er-dist-label">
-                        <?= esc($level) ?>
-                    </span>
+            <div class="rtp-summary-dist-title">
+                Distribusi Level Risiko
+            </div>
 
-                    
+            <div class="rtp-summary-dist-grid">
 
-                    <div class="er-dist-bar">
-                        <div class="er-dist-fill"
-                            style="width:<?= $percent ?>%; background:<?= $warna ?>">
+                <?php foreach ($order as $level): ?>
+
+                    <?php
+                    $info = $levelRisiko[$level] ?? [];
+
+                    $jumlah = (int) ($info['jumlah'] ?? 0);
+
+                    $warna = !empty($info['warna'])
+                        ? hex_warna_selera_risiko($info['warna'])
+                        : ($colorMap[$level] ?? '#94a3b8');
+
+                    $percent = $totalLevel > 0
+                        ? ($jumlah / $totalLevel) * 100
+                        : 0;
+                    ?>
+
+                    <div class="rtp-summary-dist-item">
+
+                        <div class="rtp-summary-dist-top">
+                            <span>
+                                <?= esc($level) ?>
+                            </span>
+
+                            <strong>
+                                <?= $jumlah ?>
+                            </strong>
                         </div>
+
+                        <div class="rtp-summary-dist-bar">
+                            <div
+                                class="rtp-summary-dist-fill"
+                                style="
+                                    width: <?= $percent ?>%;
+                                    background: <?= esc($warna) ?>;
+                                ">
+                            </div>
+                        </div>
+
                     </div>
 
-                    <span class="er-dist-value">
-                        <?= $jumlah ?>
-                    </span>
+                <?php endforeach; ?>
 
-                </div>
-
-            <?php endforeach; ?>
+            </div>
 
         </div>
     <?php endif; ?>
 
-    <!-- TOTAL -->
-    <a href="<?= site_url('rencana-penanganan') ?>" class="er-stat-link">
-        <div class="er-stat-card <?= !$filter ? 'er-stat-active' : '' ?>">
-            <div class="er-stat-label">Total Risiko Ditangani</div>
-            <div class="er-stat-value"><?= $totalDitangani ?></div>
-        </div>
-    </a>
+    <!-- FILTER STATUS -->
+    <div class="rtp-summary-filters">
 
-    <!-- SUDAH -->
-    <a href="<?= site_url('rencana-penanganan?filter=sudah') ?>" class="er-stat-link">
-        <div class="er-stat-card <?= $filter === 'sudah' ? 'er-stat-active-sudah' : '' ?>">
-            <div class="er-stat-label">Sudah Ada RTP</div>
-            <div class="er-stat-value text-success"><?= $totalSudah ?></div>
-        </div>
-    </a>
+        <a href="<?= site_url('rencana-penanganan') ?>"
+            class="rtp-summary-filter <?= empty($filter) ? 'is-active is-total' : '' ?>">
 
-    <!-- BELUM -->
-    <a href="<?= site_url('rencana-penanganan?filter=belum') ?>" class="er-stat-link">
-        <div class="er-stat-card <?= $filter === 'belum' ? 'er-stat-active-belum' : '' ?>">
-            <div class="er-stat-label">Belum Ada RTP</div>
-            <div class="er-stat-value text-warning"><?= $totalBelum ?></div>
-        </div>
-    </a>
+            <span class="rtp-summary-filter-label">
+                Total Risiko Ditangani
+            </span>
+
+            <strong>
+                <?= $totalDitangani ?>
+            </strong>
+        </a>
+
+
+        <a href="<?= site_url('rencana-penanganan?filter=sudah') ?>"
+            class="rtp-summary-filter <?= $filter === 'sudah' ? 'is-active is-sudah' : '' ?>">
+
+            <span class="rtp-summary-dot rtp-dot-sudah"></span>
+
+            <span class="rtp-summary-filter-label">
+                Sudah Ada RTP
+            </span>
+
+            <strong class="text-success">
+                <?= $totalSudah ?>
+            </strong>
+        </a>
+
+
+        <a href="<?= site_url('rencana-penanganan?filter=belum') ?>"
+            class="rtp-summary-filter <?= $filter === 'belum' ? 'is-active is-belum' : '' ?>">
+
+            <span class="rtp-summary-dot rtp-dot-belum"></span>
+
+            <span class="rtp-summary-filter-label">
+                Belum Ada RTP
+            </span>
+
+            <strong class="text-warning">
+                <?= $totalBelum ?>
+            </strong>
+        </a>
+
+    </div>
+
 </div>
