@@ -1,61 +1,153 @@
-<div class="d-flex flex-wrap gap-2 mb-3 er-summary-row">
-    <!-- DISTRIBUSI -->
+<?php
+$order = [
+    'Sangat Rendah',
+    'Rendah',
+    'Sedang',
+    'Tinggi',
+    'Sangat Tinggi'
+];
+
+$colorMap = [
+    'Sangat Rendah' => '#0d6efd',
+    'Rendah'        => '#198754',
+    'Sedang'        => '#ffc107',
+    'Tinggi'        => '#fd7e14',
+    'Sangat Tinggi' => '#dc3545',
+];
+
+$totalLevel = 0;
+
+foreach ($levelRisiko ?? [] as $info) {
+    $totalLevel += (int) ($info['jumlah'] ?? 0);
+}
+?>
+
+<div class="er-summary-panel mb-3">
+
+    <!-- HEADER -->
+    <div class="er-summary-header">
+
+        <div>
+            <div class="er-summary-title">
+                Ringkasan Evaluasi Risiko
+            </div>
+
+            <div class="er-summary-subtitle">
+                Pilih status untuk memfilter data evaluasi risiko
+            </div>
+        </div>
+
+        <?php if (!empty($filter)): ?>
+            <a href="<?= site_url('evaluasi-risiko') ?>"
+               class="er-summary-reset">
+                Reset Filter
+            </a>
+        <?php endif; ?>
+
+    </div>
+
+    <!-- DISTRIBUSI LEVEL RISIKO -->
     <?php if (!empty($levelRisiko)): ?>
-        <div class="er-stat-card er-stat-dist">
-            <div class="er-stat-label mb-2">Distribusi Level</div>
 
-            <?php
-            $totalLevel = array_sum(array_column($levelRisiko, 'jumlah'));
-            ?>
+        <div class="er-summary-distribution">
 
-            <?php foreach ($levelRisiko as $level => $info): ?>
+            <div class="er-summary-dist-title">
+                Distribusi Level Risiko
+            </div>
 
-                <?php
-                $jumlah = $info['jumlah'] ?? 0;
-                $warna  = hex_warna_selera_risiko($info['warna'] ?? null);
-                $percent = $totalLevel > 0 ? ($jumlah / $totalLevel) * 100 : 0;
-                ?>
+            <div class="er-summary-dist-grid">
 
-                <div class="er-dist-bar-row">
+                <?php foreach ($order as $level): ?>
 
-                    <span class="er-dist-label"><?= esc($level) ?></span>
+                    <?php
+                    $info = $levelRisiko[$level] ?? [];
 
-                    <div class="er-dist-bar">
-                        <div class="er-dist-fill"
-                            style="width:<?= $percent ?>%; background:<?= $warna ?>">
+                    $jumlah = (int) ($info['jumlah'] ?? 0);
+
+                    $warna = !empty($info['warna'])
+                        ? hex_warna_selera_risiko($info['warna'])
+                        : ($colorMap[$level] ?? '#94a3b8');
+
+                    $percent = $totalLevel > 0
+                        ? ($jumlah / $totalLevel) * 100
+                        : 0;
+                    ?>
+
+                    <div class="er-summary-dist-item">
+
+                        <div class="er-summary-dist-top">
+
+                            <span>
+                                <?= esc($level) ?>
+                            </span>
+
+                            <strong>
+                                <?= $jumlah ?>
+                            </strong>
+
                         </div>
+
+                        <div class="er-summary-dist-bar">
+                            <div
+                                class="er-summary-dist-fill"
+                                style="width: <?= $percent ?>%; background: <?= esc($warna) ?>;">
+                            </div>
+                        </div>
+
                     </div>
 
-                    <span class="er-dist-value"><?= $jumlah ?></span>
+                <?php endforeach; ?>
 
-                </div>
-
-            <?php endforeach; ?>
+            </div>
 
         </div>
+
     <?php endif; ?>
 
-    <!-- TOTAL -->
-    <a href="<?= site_url('evaluasi-risiko') ?>" class="er-stat-link">
-        <div class="er-stat-card <?= !$filter ? 'er-stat-active' : '' ?>">
-            <div class="er-stat-label">Total Risiko</div>
-            <div class="er-stat-value"><?= $totalRisiko ?></div>
-        </div>
-    </a>
+    <!-- FILTER STATUS -->
+    <div class="er-summary-filters">
 
-    <!-- SUDAH -->
-    <a href="<?= site_url('evaluasi-risiko?filter=sudah') ?>" class="er-stat-link">
-        <div class="er-stat-card <?= $filter === 'sudah' ? 'er-stat-active-sudah' : '' ?>">
-            <div class="er-stat-label">Sudah Dievaluasi</div>
-            <div class="er-stat-value text-success"><?= $totalSudah ?></div>
-        </div>
-    </a>
+        <!-- TOTAL -->
+        <a href="<?= site_url('evaluasi-risiko') ?>"
+           class="er-summary-filter <?= empty($filter) ? 'is-active is-total' : '' ?>">
 
-    <!-- BELUM -->
-    <a href="<?= site_url('evaluasi-risiko?filter=belum') ?>" class="er-stat-link">
-        <div class="er-stat-card <?= $filter === 'belum' ? 'er-stat-active-belum' : '' ?>">
-            <div class="er-stat-label">Belum Dievaluasi</div>
-            <div class="er-stat-value text-warning"><?= $totalBelum ?></div>
-        </div>
-    </a>
+            <span class="er-summary-filter-label">
+                Total Risiko
+            </span>
+
+            <strong>
+                <?= $totalRisiko ?>
+            </strong>
+        </a>
+
+        <!-- SUDAH -->
+        <a href="<?= site_url('evaluasi-risiko?filter=sudah') ?>"
+           class="er-summary-filter <?= $filter === 'sudah' ? 'is-active is-sudah' : '' ?>">
+
+            <span class="er-summary-dot er-dot-sudah"></span>
+
+            <span class="er-summary-filter-label">
+                Sudah Dievaluasi
+            </span>
+
+            <strong class="text-success">
+                <?= $totalSudah ?>
+            </strong>
+        </a>
+
+        <!-- BELUM -->
+        <a href="<?= site_url('evaluasi-risiko?filter=belum') ?>"
+           class="er-summary-filter <?= $filter === 'belum' ? 'is-active is-belum' : '' ?>">
+
+            <span class="er-summary-dot er-dot-belum"></span>
+
+            <span class="er-summary-filter-label">
+                Belum Dievaluasi
+            </span>
+
+            <strong class="text-warning">
+                <?= $totalBelum ?>
+            </strong>
+        </a>
+    </div>
 </div>

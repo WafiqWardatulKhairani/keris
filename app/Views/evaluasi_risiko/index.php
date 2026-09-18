@@ -16,6 +16,7 @@
         }
     };
 </script>
+
 <script>
     window.APP_USER = {
         role: '<?= session()->get('user_role') ?>',
@@ -36,64 +37,44 @@
                             <li class="breadcrumb-item active">Evaluasi Risiko</li>
                         </ol>
                     </nav>
-                    <h2 class="page-title mb-0">Evaluasi Risiko</h2>
+
+                    <h2 class="page-title mb-0">
+                        Evaluasi Risiko
+                    </h2>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Summary Cards -->
+    <!-- SUMMARY / FILTER -->
     <?= view('evaluasi_risiko/_summary_cards', [
-        'totalRisiko'   => $totalRisiko ?? 0,
-        'totalSudah'    => $totalSudah ?? 0,
-        'totalBelum'    => $totalBelum ?? 0,
-        'levelRisiko'   => $levelRisiko ?? [],
-        'filter'        => $filter ?? '',
+        'totalRisiko' => $totalRisiko ?? 0,
+        'totalSudah'  => $totalSudah ?? 0,
+        'totalBelum'  => $totalBelum ?? 0,
+        'levelRisiko' => $levelRisiko ?? [],
+        'filter'      => $filter ?? '',
     ]) ?>
 
-    <!-- Filter Badge -->
-    <?php if ($filter): ?>
-        <div class="mb-3 d-flex align-items-center gap-2">
-            <span class="text-muted small">Menampilkan:</span>
-
-            <?php if ($filter === 'sudah'): ?>
-                <span class="badge bg-success-subtle text-success border border-success">
-                    Sudah Dievaluasi
-                </span>
-            <?php elseif ($filter === 'belum'): ?>
-                <span class="badge bg-warning-subtle text-warning border border-warning">
-                    Belum Dievaluasi
-                </span>
-            <?php endif; ?>
-
-            <a href="<?= site_url('evaluasi-risiko') ?>"
-                class="small text-decoration-none text-danger ms-2">
-                ✕ Clear Filter
-            </a>
-        </div>
-    <?php endif; ?>
-
-    <!-- Table -->
+    <!-- TABLE -->
     <?= view('evaluasi_risiko/_table_section', [
-        'data'          => $data,
-        'total'         => $total   ?? 0,
-        'from'          => $from    ?? 1,
-        'to'            => $to      ?? count($data),
-        'perPage'       => $perPage ?? 10,
-        'filter'        => $filter  ?? '',
-        'pager'         => $pager   ?? null,
+        'data'    => $data,
+        'total'   => $total ?? 0,
+        'from'    => $from ?? 1,
+        'to'      => $to ?? count($data),
+        'perPage' => $perPage ?? 10,
+        'filter'  => $filter ?? '',
+        'pager'   => $pager ?? null,
     ]) ?>
 
-    <!-- Offcanvas Form -->
-    <?= view('evaluasi_risiko/_offcanvas_form', [
-    ]) ?>
+    <!-- OFFCANVAS FORM -->
+    <?= view('evaluasi_risiko/_offcanvas_form') ?>
 
 </div>
 
 <!-- CSS -->
 <link rel="stylesheet" href="<?= base_url('assets/css/evaluasi-risiko.css') ?>">
 
-<!-- JS Modules -->
+<!-- JS MODULE -->
 <script src="<?= base_url('assets/js/modules/evaluasi_risiko/evaluasi.js') ?>"></script>
 
 <?= $this->endSection() ?>

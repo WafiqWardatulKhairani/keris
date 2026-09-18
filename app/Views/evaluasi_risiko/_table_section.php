@@ -12,7 +12,7 @@
                         <th class="py-2" style="width:150px">Respon Risiko</th>
                         <th class="py-2" style="width:100px">Prioritas</th>
                         <th class="py-2" style="width:150px">Status</th>
-                    </tr>
+                    </tr> 
                 </thead>
                 <tbody>
                     <?php if (empty($data)): ?>
