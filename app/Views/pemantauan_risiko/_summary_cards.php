@@ -1,79 +1,166 @@
 <?php
-// Warna per status pemantauan
 $statusConfig = [
-    'Belum Dilaksanakan' => ['color' => '#6c757d', 'text' => 'text-secondary'],
-    'Dalam Proses'       => ['color' => '#0d6efd', 'text' => 'text-primary'],
-    'Selesai'            => ['color' => '#198754', 'text' => 'text-success'],
-    'Terlambat'          => ['color' => '#dc3545', 'text' => 'text-danger'],
+    'Belum Dilaksanakan' => '#6c757d',
+    'Dalam Proses'       => '#0d6efd',
+    'Selesai'            => '#198754',
+    'Terlambat'          => '#dc3545',
 ];
 
-$totalDistribusi = array_sum($distribusi);
+$totalDistribusi = array_sum($distribusi ?? []);
 ?>
 
-<div class="d-flex flex-wrap gap-2 mb-3 er-summary-row">
+<div class="er-summary-panel mb-3">
+
+    <!-- HEADER -->
+    <div class="er-summary-header">
+
+        <div>
+            <div class="er-summary-title">
+                Ringkasan Pemantauan Risiko
+            </div>
+
+            <div class="er-summary-subtitle">
+                Pilih status untuk memfilter data pemantauan risiko
+            </div>
+        </div>
+
+        <?php if (!empty($filter)): ?>
+            <a href="<?= site_url('pemantauan-risiko') ?>"
+               class="er-summary-reset">
+                Reset Filter
+            </a>
+        <?php endif; ?>
+
+    </div>
 
     <!-- DISTRIBUSI STATUS -->
     <?php if (!empty($distribusi)): ?>
-        <div class="er-stat-card er-stat-dist">
-            <div class="er-stat-label mb-2">Distribusi Status</div>
 
-            <?php foreach ($distribusi as $status => $jumlah): ?>
-                <?php
-                $warna   = $statusConfig[$status]['color'] ?? '#adb5bd';
-                $percent = $totalDistribusi > 0 ? ($jumlah / $totalDistribusi) * 100 : 0;
-                ?>
-                <div class="er-dist-bar-row">
-                    <span class="er-dist-label"><?= esc($status) ?></span>
-                    <div class="er-dist-bar">
-                        <div class="er-dist-fill"
-                            style="width:<?= number_format($percent, 1) ?>%; background:<?= $warna ?>">
+        <div class="er-summary-distribution">
+
+            <div class="er-summary-dist-title">
+                Distribusi Status Pemantauan
+            </div>
+
+            <div class="er-summary-dist-grid pr-summary-dist-grid">
+
+                <?php foreach ($statusConfig as $status => $warna): ?>
+
+                    <?php
+                    $jumlah = (int) ($distribusi[$status] ?? 0);
+
+                    $percent = $totalDistribusi > 0
+                        ? ($jumlah / $totalDistribusi) * 100
+                        : 0;
+                    ?>
+
+                    <div class="er-summary-dist-item">
+
+                        <div class="er-summary-dist-top">
+
+                            <span>
+                                <?= esc($status) ?>
+                            </span>
+
+                            <strong>
+                                <?= $jumlah ?>
+                            </strong>
+
                         </div>
+
+                        <div class="er-summary-dist-bar">
+                            <div
+                                class="er-summary-dist-fill"
+                                style="width: <?= $percent ?>%; background: <?= esc($warna) ?>;">
+                            </div>
+                        </div>
+
                     </div>
-                    <span class="er-dist-value"><?= $jumlah ?></span>
-                </div>
-            <?php endforeach; ?>
+
+                <?php endforeach; ?>
+
+            </div>
 
         </div>
+
     <?php endif; ?>
 
-    <!-- TOTAL RTP -->
-    <a href="<?= site_url('pemantauan-risiko') ?>" class="er-stat-link">
-        <div class="er-stat-card <?= !$filter ? 'er-stat-active' : '' ?>">
-            <div class="er-stat-label">Total RTP</div>
-            <div class="er-stat-value"><?= $totalRtp ?></div>
-        </div>
-    </a>
+    <!-- FILTER STATUS -->
+    <div class="er-summary-filters">
 
-    <!-- SUDAH DIPANTAU -->
-    <a href="<?= site_url('pemantauan-risiko?filter=Selesai') ?>" class="er-stat-link">
-        <div class="er-stat-card <?= $filter === 'Selesai' ? 'er-stat-active-sudah' : '' ?>">
-            <div class="er-stat-label">Selesai</div>
-            <div class="er-stat-value text-success"><?= $distribusi['Selesai'] ?? 0 ?></div>
-        </div>
-    </a>
+        <!-- TOTAL RTP -->
+        <a href="<?= site_url('pemantauan-risiko') ?>"
+           class="er-summary-filter <?= empty($filter) ? 'is-active is-total' : '' ?>">
 
-    <!-- DALAM PROSES -->
-    <a href="<?= site_url('pemantauan-risiko?filter=Dalam+Proses') ?>" class="er-stat-link">
-        <div class="er-stat-card <?= $filter === 'Dalam Proses' ? 'er-stat-active' : '' ?>">
-            <div class="er-stat-label">Dalam Proses</div>
-            <div class="er-stat-value text-primary"><?= $distribusi['Dalam Proses'] ?? 0 ?></div>
-        </div>
-    </a>
+            <span class="er-summary-filter-label">
+                Total RTP
+            </span>
 
-    <!-- BELUM DILAKSANAKAN -->
-    <a href="<?= site_url('pemantauan-risiko?filter=Belum+Dilaksanakan') ?>" class="er-stat-link">
-        <div class="er-stat-card <?= $filter === 'Belum Dilaksanakan' ? 'er-stat-active-belum' : '' ?>">
-            <div class="er-stat-label">Belum Dilaksanakan</div>
-            <div class="er-stat-value text-secondary"><?= $distribusi['Belum Dilaksanakan'] ?? 0 ?></div>
-        </div>
-    </a>
+            <strong>
+                <?= $totalRtp ?>
+            </strong>
+        </a>
 
-    <!-- TERLAMBAT -->
-    <a href="<?= site_url('pemantauan-risiko?filter=Terlambat') ?>" class="er-stat-link">
-        <div class="er-stat-card <?= $filter === 'Terlambat' ? 'er-stat-active-belum' : '' ?>">
-            <div class="er-stat-label">Terlambat</div>
-            <div class="er-stat-value text-danger"><?= $distribusi['Terlambat'] ?? 0 ?></div>
-        </div>
-    </a>
+        <!-- SELESAI -->
+        <a href="<?= site_url('pemantauan-risiko?filter=Selesai') ?>"
+           class="er-summary-filter <?= $filter === 'Selesai' ? 'is-active pr-active-selesai' : '' ?>">
+
+            <span class="er-summary-dot pr-dot-selesai"></span>
+
+            <span class="er-summary-filter-label">
+                Selesai
+            </span>
+
+            <strong class="text-success">
+                <?= $distribusi['Selesai'] ?? 0 ?>
+            </strong>
+        </a>
+
+        <!-- DALAM PROSES -->
+        <a href="<?= site_url('pemantauan-risiko?filter=Dalam+Proses') ?>"
+           class="er-summary-filter <?= $filter === 'Dalam Proses' ? 'is-active pr-active-proses' : '' ?>">
+
+            <span class="er-summary-dot pr-dot-proses"></span>
+
+            <span class="er-summary-filter-label">
+                Dalam Proses
+            </span>
+
+            <strong class="text-primary">
+                <?= $distribusi['Dalam Proses'] ?? 0 ?>
+            </strong>
+        </a>
+
+        <!-- BELUM DILAKSANAKAN -->
+        <a href="<?= site_url('pemantauan-risiko?filter=Belum+Dilaksanakan') ?>"
+           class="er-summary-filter <?= $filter === 'Belum Dilaksanakan' ? 'is-active pr-active-belum' : '' ?>">
+
+            <span class="er-summary-dot pr-dot-belum"></span>
+
+            <span class="er-summary-filter-label">
+                Belum Dilaksanakan
+            </span>
+
+            <strong class="text-secondary">
+                <?= $distribusi['Belum Dilaksanakan'] ?? 0 ?>
+            </strong>
+        </a>
+
+        <!-- TERLAMBAT -->
+        <a href="<?= site_url('pemantauan-risiko?filter=Terlambat') ?>"
+           class="er-summary-filter <?= $filter === 'Terlambat' ? 'is-active pr-active-terlambat' : '' ?>">
+
+            <span class="er-summary-dot pr-dot-terlambat"></span>
+
+            <span class="er-summary-filter-label">
+                Terlambat
+            </span>
+
+            <strong class="text-danger">
+                <?= $distribusi['Terlambat'] ?? 0 ?>
+            </strong>
+        </a>
+
+    </div>
 
 </div>
