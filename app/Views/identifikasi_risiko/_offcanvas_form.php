@@ -9,7 +9,7 @@
         </div>
     </div>
 
-    <!-- BODY -->
+    <!-- BODY --> 
     <div class="offcanvas-body">
 
         <!-- INFO KONTEKS -->
@@ -55,34 +55,44 @@
                 </label>
                 <select class="form-select form-select-sm" name="id_konteks_proses" id="irKonteksProses" required>
                     <option value="">-- Pilih Proses Bisnis --</option>
-                    <?php foreach ($listKonteksProses as $kp): ?>
-                        <?php
-                        $deskripsi = trim($kp['deskripsi_proses'] ?? '');
-                        $subLabel = '';
+                   <?php foreach ($listKonteksProses as $kp): ?>
+    <?php
+    $deskripsi = trim($kp['deskripsi_proses'] ?? '');
+    $deskripsiSingkat = '';
 
-                        if ($deskripsi !== '') {
-                            $kataPertama = preg_split('/\s+/', $deskripsi)[0] ?? '';
+    if ($deskripsi !== '') {
+        $kata = preg_split('/\s+/', $deskripsi);
+        $potongan = array_slice($kata, 0, 5);
 
-                            $normalisasi = [
-                                'Memeriksa' => 'Pemeriksaan',
-                                'Membuat' => 'Pembuatan',
-                                'Menerima' => 'Penerimaan',
-                                'Mengirimkan' => 'Pengiriman',
-                            ];
+        $deskripsiSingkat = implode(' ', $potongan);
 
-                            $subLabel = $normalisasi[$kataPertama] ?? $kataPertama;
-                        }
-                        ?>
+        if (count($kata) > 5) {
+            $deskripsiSingkat .= '...';
+        }
+    }
 
-                        <option value="<?= $kp['id_konteks_proses'] ?>">
-                            <?= esc($kp['kode_proses']) ?>
-                            — <?= esc($kp['uraian_proses']) ?>
+    $labelLengkap =
+        $kp['kode_proses'] .
+        ' — ' .
+        $kp['uraian_proses'];
 
-                            <?php if ($subLabel !== ''): ?>
-                                — <?= esc($subLabel) ?>
-                            <?php endif; ?>
-                        </option>
-                    <?php endforeach; ?>
+    if ($deskripsi !== '') {
+        $labelLengkap .= ' — ' . $deskripsi;
+    }
+    ?>
+
+    <option
+        value="<?= esc($kp['id_konteks_proses']) ?>"
+        title="<?= esc($labelLengkap) ?>"
+    >
+        <?= esc($kp['kode_proses']) ?>
+        — <?= esc($kp['uraian_proses']) ?>
+
+        <?php if ($deskripsiSingkat !== ''): ?>
+            — <?= esc($deskripsiSingkat) ?>
+        <?php endif; ?>
+    </option>
+<?php endforeach; ?>
                 </select>
                 <div class="invalid-feedback">Proses bisnis wajib dipilih.</div>
             </div>

@@ -150,7 +150,7 @@ class IdentifikasiRisikoController extends BaseController
             'currentPage' => $page,
             'totalPages'  => $totalPages,
             'perPage'     => $perPage,
-            'total'       => $total,
+            'total'       => $total, 
         ];
 
         /* LIST PROSES BISNIS UNTUK KONTEKS AKTIF (untuk dropdown di form tambah risiko) */
