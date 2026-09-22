@@ -25,7 +25,7 @@ $routes->group('global-context', ['filter' => ['auth']], function ($routes) {
 });
 
 // Manajemen User (admin)
-$routes->group('manajemen-user', ['filter' => ['auth', 'ronle:admin']], function ($routes) {
+$routes->group('manajemen-user', ['filter' => ['auth', 'role:admin']], function ($routes) {
     $routes->get('/', 'UserController::index');
     $routes->post('store', 'UserController::store');
     $routes->post('update/(:num)', 'UserController::update/$1');
@@ -309,4 +309,12 @@ $routes->group('pelaporan-risiko', ['filter' => ['auth']], function ($routes) {
         $routes->post('approve-kegiatan/(:num)','PelaporanRisikoController::approveKegiatan/$1');
         $routes->post('reject-kegiatan/(:num)','PelaporanRisikoController::rejectKegiatan/$1');
     });
+});
+
+// ======================================================
+// API
+// ======================================================
+
+$routes->group('api', function ($routes) {
+    $routes->get('bank-risiko', 'Api\BankRisikoApiController::index');
 });
