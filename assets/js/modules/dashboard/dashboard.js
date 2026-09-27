@@ -332,3 +332,4 @@ document.getElementById("btnReset").addEventListener("click", () => {
 
 initCharts();
 fetchData();
+ 

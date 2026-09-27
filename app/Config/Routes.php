@@ -11,17 +11,44 @@ $routes->get('logout', 'AuthController::logout');
 
 // Dashboard
 $routes->group('', ['filter' => ['auth']], function ($routes) {
-    $routes->get('/','DashboardController::index',['filter' => 'role:admin,operator,ketua']);
-    $routes->get('dashboard','DashboardController::index',['filter' => 'role:admin,operator,ketua']);
-    $routes->get('dashboard/data','DashboardController::data',['filter' => 'role:admin,operator,ketua']);
-    $routes->get('dashboard/debug', 'DashboardController::debug', ['filter' => 'role:admin,operator,ketua']);
+
+    $routes->get(
+        '/',
+        'DashboardController::index',
+        ['filter' => 'role:admin,operator,ketua']
+    );
+
+    $routes->get(
+        'dashboard',
+        'DashboardController::index',
+        ['filter' => 'role:admin,operator,ketua']
+    );
+
+    $routes->get(
+        'dashboard/data',
+        'DashboardController::data',
+        ['filter' => 'role:admin,operator,ketua']
+    );
+
+    // Detail risiko berdasarkan cell Peta Risiko
+    $routes->get(
+        'dashboard/risk-detail',
+        'DashboardController::riskDetail',
+        ['filter' => 'role:admin,operator,ketua']
+    );
+
+    $routes->get(
+        'dashboard/debug',
+        'DashboardController::debug',
+        ['filter' => 'role:admin,operator,ketua']
+    );
 });
 
 // Global Context
 $routes->group('global-context', ['filter' => ['auth']], function ($routes) {
-    $routes->post('set','GlobalContextController::set',['filter' => 'role:admin,operator,ketua']);
-    $routes->get('kegiatan','GlobalContextController::getKegiatanByTim',['filter' => 'role:admin,operator,ketua']);
-    $routes->post('reset','GlobalContextController::reset',['filter' => 'role:admin,operator,ketua']);
+    $routes->post('set', 'GlobalContextController::set', ['filter' => 'role:admin,operator,ketua']);
+    $routes->get('kegiatan', 'GlobalContextController::getKegiatanByTim', ['filter' => 'role:admin,operator,ketua']);
+    $routes->post('reset', 'GlobalContextController::reset', ['filter' => 'role:admin,operator,ketua']);
 });
 
 // Manajemen User (admin)
@@ -79,7 +106,7 @@ $routes->group('master', ['filter' => ['auth']], function ($routes) {
     $routes->post('tim-kerja/store', 'Master\TimKerjaController::store');
     $routes->post('tim-kerja/update/(:num)', 'Master\TimKerjaController::update/$1');
     $routes->post('tim-kerja/delete/(:num)', 'Master\TimKerjaController::delete/$1');
-    $routes->get('tim-kerja/detail/(:num)','Master\TimKerjaController::detail/$1');
+    $routes->get('tim-kerja/detail/(:num)', 'Master\TimKerjaController::detail/$1');
 
     // Kegiatan
     $routes->get('kegiatan', 'Master\KegiatanController::index');
@@ -103,14 +130,14 @@ $routes->group('master', ['filter' => ['auth']], function ($routes) {
     $routes->post('pengelola-risiko/delete/(:num)', 'Master\PengelolaRisikoController::delete/$1');
     $routes->get('pengelola-risiko/wilayah', 'Master\PengelolaRisikoController::wilayah');
     $routes->get('wilayah/table', 'Master\PengelolaRisikoController::wilayahTable');
-    $routes->get('pengelola-risiko/active-table','Master\PengelolaRisikoController::activeTable');
+    $routes->get('pengelola-risiko/active-table', 'Master\PengelolaRisikoController::activeTable');
 
     // Penugasan Tim
     $routes->get('penugasan-tim', 'Master\PenugasanTimController::index');
     $routes->get('penugasan-tim/table', 'Master\PenugasanTimController::table');
     $routes->get('pengelola/table', 'Master\PengelolaController::table');
     $routes->post('penugasan-tim/store', 'Master\PenugasanTimController::store');
-    $routes->post('penugasan-tim/update/(:num)','Master\PenugasanTimController::update/$1');
+    $routes->post('penugasan-tim/update/(:num)', 'Master\PenugasanTimController::update/$1');
     $routes->post('penugasan-tim/delete/(:num)', 'Master\PenugasanTimController::delete/$1');
 
     // Bank Risiko
@@ -124,16 +151,18 @@ $routes->group('master', ['filter' => ['auth']], function ($routes) {
 });
 
 // Penetapan Konteks
-$routes->group('penetapan-konteks', ['namespace' => 'App\Controllers\PenetapanKonteks', 'filter' => ['auth']
+$routes->group('penetapan-konteks', [
+    'namespace' => 'App\Controllers\PenetapanKonteks',
+    'filter' => ['auth']
 ], function ($routes) {
     $routes->get('/', 'KonteksController::index');
-    $routes->get('konteks','KonteksController::redirectToActive',['filter' => 'role:admin,operator,ketua']);
-    $routes->get('konteks/(:num)','KonteksController::show/$1',['filter' => 'role:admin,operator,ketua']);
+    $routes->get('konteks', 'KonteksController::redirectToActive', ['filter' => 'role:admin,operator,ketua']);
+    $routes->get('konteks/(:num)', 'KonteksController::show/$1', ['filter' => 'role:admin,operator,ketua']);
     $routes->post('konteks/create-draft', 'KonteksController::createDraft', ['filter' => 'role:admin,operator']);
     //$routes->get('konteks/(:num)', 'KonteksController::index/$1', ['filter' => 'role:admin,operator,ketua']);
 
     //$routes->get('penetapan-konteks/konteks/(:num)/edit','PenetapanKonteks\KonteksController::edit/$1');
-    $routes->get('konteks/(:num)/edit','KonteksController::edit/$1',['filter' => 'role:admin,operator']);
+    $routes->get('konteks/(:num)/edit', 'KonteksController::edit/$1', ['filter' => 'role:admin,operator']);
 
 
     $routes->post('konteks/store', 'KonteksController::store', ['filter' => 'role:admin,operator']);
@@ -148,10 +177,10 @@ $routes->group('penetapan-konteks', ['namespace' => 'App\Controllers\PenetapanKo
 
     // Proses Bisnis
     $routes->get('proses-bisnis', 'ProsesBisnisController::index', ['filter' => 'role:admin,operator,ketua']);
-    $routes->post('proses-bisnis/store','ProsesBisnisController::store',['filter' => 'role:admin,operator']);
-    $routes->post('proses-bisnis/update/(:num)','ProsesBisnisController::update/$1',['filter' => 'role:admin,operator']);
-    $routes->post('proses-bisnis/delete/(:num)','ProsesBisnisController::delete/$1',['filter' => 'role:admin,operator']);
-    $routes->get('proses-bisnis/detail/(:num)','ProsesBisnisController::detail/$1',['filter' => 'role:admin,operator,ketua']);
+    $routes->post('proses-bisnis/store', 'ProsesBisnisController::store', ['filter' => 'role:admin,operator']);
+    $routes->post('proses-bisnis/update/(:num)', 'ProsesBisnisController::update/$1', ['filter' => 'role:admin,operator']);
+    $routes->post('proses-bisnis/delete/(:num)', 'ProsesBisnisController::delete/$1', ['filter' => 'role:admin,operator']);
+    $routes->get('proses-bisnis/detail/(:num)', 'ProsesBisnisController::detail/$1', ['filter' => 'role:admin,operator,ketua']);
     $routes->get('proses-bisnis/ajax-table', 'ProsesBisnisController::ajaxTable');
 
     // Sasaran Kinerja
@@ -182,7 +211,7 @@ $routes->group('penetapan-konteks', ['namespace' => 'App\Controllers\PenetapanKo
 });
 
 // Identifikasi
-$routes->group('identifikasi-risiko', ['namespace' => 'App\Controllers','filter' => ['auth']], function ($routes) {
+$routes->group('identifikasi-risiko', ['namespace' => 'App\Controllers', 'filter' => ['auth']], function ($routes) {
     $routes->get('/', 'IdentifikasiRisikoController::index', ['filter' => 'role:admin,operator,ketua']);
     $routes->get('detail/(:num)', 'IdentifikasiRisikoController::detail/$1', ['filter' => 'role:admin,operator,ketua']);
     $routes->get('detail-area/(:num)', 'IdentifikasiRisikoController::detailArea/$1', ['filter' => 'role:admin,operator,ketua']);
@@ -249,7 +278,7 @@ $routes->group('rencana-penanganan', ['namespace' => 'App\Controllers', 'filter'
 
     // WAJIB biar sama seperti Analisis & Evaluasi
     $routes->get('table', 'RencanaPenangananController::ajaxTable');
-                            
+
     $routes->post('set-active', 'RencanaPenangananController::setActive', ['filter' => 'role:admin,operator,ketua']);
     $routes->post('reset-active', 'RencanaPenangananController::resetActive', ['filter' => 'role:admin,operator,ketua']);
 
@@ -306,8 +335,8 @@ $routes->group('pelaporan-risiko', ['filter' => ['auth']], function ($routes) {
 
     // KETUA
     $routes->group('', ['filter' => 'role:ketua'], function ($routes) {
-        $routes->post('approve-kegiatan/(:num)','PelaporanRisikoController::approveKegiatan/$1');
-        $routes->post('reject-kegiatan/(:num)','PelaporanRisikoController::rejectKegiatan/$1');
+        $routes->post('approve-kegiatan/(:num)', 'PelaporanRisikoController::approveKegiatan/$1');
+        $routes->post('reject-kegiatan/(:num)', 'PelaporanRisikoController::rejectKegiatan/$1');
     });
 });
 

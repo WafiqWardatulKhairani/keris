@@ -563,4 +563,202 @@ class DashboardController extends BaseController
             ]);
         }
     }
+
+    public function riskDetail()
+    {
+        $db = \Config\Database::connect();
+
+        // ==============================
+        // KOORDINAT CELL
+        // ==============================
+
+        $kemungkinan = (int) $this->request->getGet('kemungkinan');
+        $dampak      = (int) $this->request->getGet('dampak');
+
+
+        // ==============================
+        // FILTER DASHBOARD
+        // ==============================
+
+        $tahun    = $this->request->getGet('tahun');
+        $tim      = $this->request->getGet('tim');
+        $kategori = $this->request->getGet('kategori');
+
+
+        // ==============================
+        // VALIDASI
+        // ==============================
+
+        if (
+            $kemungkinan < 1 ||
+            $kemungkinan > 5 ||
+            $dampak < 1 ||
+            $dampak > 5
+        ) {
+
+            return $this->response
+                ->setStatusCode(400)
+                ->setJSON([
+                    'status'  => false,
+                    'message' => 'Koordinat risiko tidak valid.'
+                ]);
+        }
+
+
+        try {
+
+            // ==============================
+            // QUERY DASAR
+            // ==============================
+
+            $builder = $db->table('penilaian_risiko pr');
+
+            $builder->select([
+                'ir.id_identifikasi',
+                'ir.pernyataan_risiko',
+
+                'tk.nama_tim',
+                'pb.jenis_proses',
+                'pb.uraian_proses',
+
+                'mr.nilai_risiko',
+                'mr.level_kemungkinan',
+                'mr.level_dampak',
+                'mr.warna'
+            ]);
+
+
+            // ==============================
+            // JOIN
+            // ==============================
+
+            $builder->join(
+                'matriks_risiko mr',
+                'mr.id_matriks = pr.id_matriks'
+            );
+
+            $builder->join(
+                'identifikasi_risiko ir',
+                'ir.id_identifikasi = pr.id_identifikasi'
+            );
+
+            $builder->join(
+                'konteks_proses_bisnis kpb',
+                'kpb.id_konteks_proses = ir.id_konteks_proses',
+                'left'
+            );
+
+            $builder->join(
+                'proses_bisnis pb',
+                'pb.id_proses = kpb.id_proses',
+                'left'
+            );
+
+            $builder->join(
+                'konteks k',
+                'k.id_konteks = kpb.id_konteks',
+                'left'
+            );
+
+            $builder->join(
+                'tim_kerja tk',
+                'tk.id_tim = k.id_tim',
+                'left'
+            );
+
+            // ==============================
+            // CELL PETA RISIKO
+            // ==============================
+
+            $builder->where(
+                'mr.level_kemungkinan',
+                $kemungkinan
+            );
+
+            $builder->where(
+                'mr.level_dampak',
+                $dampak
+            );
+
+
+            // ==============================
+            // FILTER TAHUN
+            // ==============================
+
+            if ($tahun !== null && $tahun !== '') {
+
+                $builder->where(
+                    'k.tahun',
+                    (int) $tahun
+                );
+            }
+
+
+            // ==============================
+            // FILTER TIM
+            // ==============================
+
+            if ($tim !== null && $tim !== '') {
+
+                $builder->where(
+                    'k.id_tim',
+                    (int) $tim
+                );
+            }
+
+
+            // ==============================
+            // FILTER KATEGORI
+            // ==============================
+
+            if ($kategori !== null && $kategori !== '') {
+
+                $builder->where(
+                    'ir.id_kategori_risiko',
+                    (int) $kategori
+                );
+            }
+
+
+            // ==============================
+            // URUTAN
+            // ==============================
+
+            $builder->orderBy(
+                'ir.id_identifikasi',
+                'ASC'
+            );
+
+
+            // ==============================
+            // AMBIL DATA
+            // ==============================
+
+            $rows = $builder
+                ->get()
+                ->getResultArray();
+
+
+            return $this->response->setJSON([
+                'status' => true,
+                'total'  => count($rows),
+                'data'   => $rows
+            ]);
+        } catch (\Throwable $e) {
+
+            log_message(
+                'error',
+                'Dashboard riskDetail error: ' .
+                    $e->getMessage()
+            );
+
+
+            return $this->response
+                ->setStatusCode(500)
+                ->setJSON([
+                    'status'  => false,
+                    'message' => 'Gagal mengambil detail risiko.'
+                ]);
+        }
+    }
 }

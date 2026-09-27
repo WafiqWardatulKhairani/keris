@@ -3,9 +3,6 @@
         <div class="keris-brand">
             <!-- ICON -->
             <img src="<?= base_url('assets/images/logo-keris-v2.png') ?>" class="keris-icon" alt="KERIS">
-
-            <!-- TEXT KERIS -->
-            <img src="<?= base_url('assets/images/logo-keris-text-v2.png') ?>" class="keris-text-logo" alt="KERIS TEXT">
         </div>
         <div class="navbar-content">
             <ul class="pc-navbar">

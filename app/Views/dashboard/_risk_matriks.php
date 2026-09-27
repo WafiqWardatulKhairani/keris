@@ -90,9 +90,15 @@ foreach ($matriks as $row) {
 
                             <td>
 
-                                <div class="risk-cell <?= warna_risiko_class(
-                                    $cell['warna'] ?? null
-                                ) ?>">
+                                <div
+                                    class="risk-cell risk-cell-clickable <?= warna_risiko_class(
+                                                                                $cell['warna'] ?? null
+                                                                            ) ?>"
+                                    data-kemungkinan="<?= $levelK ?>"
+                                    data-kemungkinan-label="<?= esc($namaK) ?>"
+                                    data-dampak="<?= $d ?>"
+                                    data-dampak-label="<?= esc($labelDampak[$d]) ?>"
+                                    data-nilai="<?= esc($cell['nilai_risiko'] ?? '-') ?>">
 
                                     <div class="risk-score">
                                         <?= $cell['nilai_risiko'] ?? '-' ?>
