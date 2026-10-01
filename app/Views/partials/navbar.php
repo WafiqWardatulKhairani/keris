@@ -127,6 +127,66 @@
 
                         </div>
 
+                        <?php
+                        $userRoles  = session('user_roles') ?? [];
+                        $activeRole = session('user_role');
+                        ?>
+
+                        <?php if (count($userRoles) > 1): ?>
+
+                            <div class="dropdown-divider"></div>
+
+                            <div class="px-3 py-2">
+                                <small class="text-muted d-block mb-2">
+                                    <strong>Ganti Role</strong>
+                                </small>
+
+                                <form method="post" action="<?= site_url('select-role') ?>">
+                                    <?= csrf_field() ?>
+
+                                    <?php foreach ($userRoles as $role): ?>
+
+                                        <?php
+                                        $roleLabel = match ($role) {
+                                            'admin'    => 'Admin',
+                                            'operator' => 'Operator',
+                                            'ketua'    => 'Ketua',
+                                            default    => ucfirst($role),
+                                        };
+
+                                        $roleIcon = match ($role) {
+                                            'admin'    => 'ti-shield',
+                                            'operator' => 'ti-edit',
+                                            'ketua'    => 'ti-circle-check',
+                                            default    => 'ti-user',
+                                        };
+
+                                        $isActive = $role === $activeRole;
+                                        ?>
+
+                                        <button
+                                            type="submit"
+                                            name="role"
+                                            value="<?= esc($role) ?>"
+                                            class="dropdown-item d-flex align-items-center rounded <?= $isActive ? 'active' : '' ?>"
+                                            <?= $isActive ? 'disabled' : '' ?>>
+                                            <i class="ti <?= $roleIcon ?> me-2"></i>
+
+                                            <span class="flex-grow-1 text-start">
+                                                <?= esc($roleLabel) ?>
+                                            </span>
+
+                                            <?php if ($isActive): ?>
+                                                <i class="ti ti-check"></i>
+                                            <?php endif; ?>
+                                        </button>
+
+                                    <?php endforeach; ?>
+                                </form>
+                            </div>
+
+                        <?php endif; ?>
+
                         <div class="dropdown-divider"></div>
 
                         <a href="<?= base_url('logout') ?>" class="dropdown-item">

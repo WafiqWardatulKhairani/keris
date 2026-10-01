@@ -26,35 +26,44 @@ class KonteksController extends BaseContextController
     }
 
     private function validateKonteksAccess($idKonteks): bool
-    {
-        $row = $this->model
-            ->select('id_tim')
-            ->where('id_konteks', $idKonteks)
-            ->first();
+{
+    $row = $this->model
+        ->select('id_tim')
+        ->where('id_konteks', $idKonteks)
+        ->first();
 
-        if (!$row) {
-            return false;
-        }
-
-        $role = session('user_role');
-        log_message('error', print_r([
-            'role' => $role,
-            'id_tim_session' => session('id_tim'),
-            'id_konteks' => $idKonteks,
-            'row' => $row,
-        ], true));
-
-        if ($role === 'admin') {
-            return true;
-        }
-
-        if ($role === 'ketua') {
-            return false;
-        }
-
-        return (string) session('id_tim')
-            === (string) $row['id_tim'];
+    if (!$row) {
+        return false;
     }
+
+    $role = session('user_role');
+
+    // Admin boleh akses semua tim
+    if ($role === 'admin') {
+        return true;
+    }
+
+    // Ketua tetap mengikuti rule existing
+    if ($role === 'ketua') {
+        return false;
+    }
+
+    // Ambil seluruh tim yang dimiliki user
+    $userTim = session('user_tim') ?? [];
+
+    // Fallback untuk kompatibilitas akun/data lama
+    if (empty($userTim) && session('id_tim')) {
+        $userTim = [session('id_tim')];
+    }
+
+    $userTim = array_map('strval', $userTim);
+
+    return in_array(
+        (string) $row['id_tim'],
+        $userTim,
+        true
+    );
+}
 
     public function show($id)
     {

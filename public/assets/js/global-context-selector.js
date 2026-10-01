@@ -11,7 +11,7 @@ let gcInitialized = false;
 
 document.addEventListener("DOMContentLoaded", () => {
   initGlobalContext();
-});
+}); 
 
 async function initGlobalContext() {
   bindEvents();

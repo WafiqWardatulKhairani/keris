@@ -10,18 +10,15 @@
         </div>
     </div>
 
-    <div class="card shadow-sm">
-        <div class="card-body p-0">
-            <div id="bankRisikoTableWrapper">
-                <?= view('bank_risiko/_table_section', [
-                    'data'    => $data,
-                    'pager'   => $pager,
-                    'perPage' => $perPage,
-                    'from'    => $from,
-                    'to'      => $to,
-                    'total'   => $total,
-                ]) ?> </div>
-        </div>
+    <div id="bankRisikoTableWrapper">
+        <?= view('bank_risiko/_table_section', [
+            'data'    => $data,
+            'pager'   => $pager,
+            'perPage' => $perPage,
+            'from'    => $from,
+            'to'      => $to,
+            'total'   => $total,
+        ]) ?>
     </div>
 
 </div>

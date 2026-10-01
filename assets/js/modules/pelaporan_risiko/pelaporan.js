@@ -10,7 +10,7 @@ function setText(id, value) {
 
 function setFormattedText(id, value) {
   const el = document.getElementById(id);
- 
+
   if (!el) return;
 
   if (!value) {
@@ -110,9 +110,11 @@ function openPelaporanDetail(id) {
       setText("plInfoProb", data.level_kemungkinan);
       setText("plInfoImpact", data.level_dampak);
 
-      document.getElementById("plPreviewNilai").textContent = data.nilai_risiko || 0;
-      document.getElementById("plPreviewBadge").textContent = data.nama_selera || "";
-      
+      document.getElementById("plPreviewNilai").textContent =
+        data.nilai_risiko || 0;
+      document.getElementById("plPreviewBadge").textContent =
+        data.nama_selera || "";
+
       applyBadgeColor(
         document.getElementById("plPreviewBadge"),
         data.warna_risiko,
@@ -145,10 +147,12 @@ function openPelaporanDetail(id) {
 
       setText("plInfoImpactResidu", data.level_dampak_residu);
 
-      document.getElementById("plPreviewNilaiResidu").textContent = data.nilai_residu || 0;
+      document.getElementById("plPreviewNilaiResidu").textContent =
+        data.nilai_residu || 0;
 
-      document.getElementById("plPreviewBadgeResidu").textContent = data.nama_selera_residu || "";
-      
+      document.getElementById("plPreviewBadgeResidu").textContent =
+        data.nama_selera_residu || "";
+
       applyBadgeColor(
         document.getElementById("plPreviewBadgeResidu"),
         data.warna_residu,
@@ -236,42 +240,7 @@ function plBatalAjukanKegiatan(idKegiatan) {
           return;
         }
 
-        Swal.fire(
-          "Berhasil",
-          "Pengajuan berhasil dibatalkan",
-          "success",
-        ).then(() => {
-          location.reload();
-        });
-      })
-      .catch(() => {
-        Swal.fire("Error", "Terjadi kesalahan server", "error");
-      });
-  });
-}
-
-function plApproveKegiatan(idKegiatan) {
-  Swal.fire({
-    title: "Setujui laporan kegiatan?",
-    text: "Semua RTP pada kegiatan ini akan disetujui.",
-    icon: "question",
-    showCancelButton: true,
-    confirmButtonText: "Ya, Setujui",
-    cancelButtonText: "Batal",
-  }).then((result) => {
-    if (!result.isConfirmed) return;
-
-    fetch(PL_URL.approveKegiatan(idKegiatan), {
-      method: "POST",
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        if (!data.success) {
-          Swal.fire("Error", data.error || "Gagal approve", "error");
-          return;
-        }
-
-        Swal.fire("Berhasil", "Laporan berhasil disetujui", "success").then(
+        Swal.fire("Berhasil", "Pengajuan berhasil dibatalkan", "success").then(
           () => {
             location.reload();
           },
@@ -283,7 +252,79 @@ function plApproveKegiatan(idKegiatan) {
   });
 }
 
+function plApproveKegiatan(idKegiatan) {
+  const timSelect = document.getElementById("plCsTimKerja");
+
+  const idTim = timSelect
+    ? timSelect.value
+    : window.PL_CS_DATA?.activeTimId;
+
+  if (!idTim) {
+    Swal.fire("Error", "Tim kerja belum dipilih", "error");
+    return;
+  }
+
+  Swal.fire({
+    title: "Setujui laporan kegiatan?",
+    text: "Semua RTP pada kegiatan ini akan disetujui.",
+    icon: "question",
+    showCancelButton: true,
+    confirmButtonText: "Ya, Setujui",
+    cancelButtonText: "Batal",
+  }).then((result) => {
+    if (!result.isConfirmed) return;
+
+    const url = new URL(
+      PL_URL.approveKegiatan(idKegiatan),
+      window.location.origin,
+    );
+
+    url.searchParams.set("id_tim", idTim);
+
+    fetch(url.toString(), {
+      method: "POST",
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (!data.success) {
+          Swal.fire(
+            "Error",
+            data.error || "Gagal approve",
+            "error",
+          );
+          return;
+        }
+
+        Swal.fire(
+          "Berhasil",
+          "Laporan berhasil disetujui",
+          "success",
+        ).then(() => {
+          location.reload();
+        });
+      })
+      .catch(() => {
+        Swal.fire(
+          "Error",
+          "Terjadi kesalahan server",
+          "error",
+        );
+      });
+  });
+}
+
 function plRejectKegiatan(idKegiatan) {
+  const timSelect = document.getElementById("plCsTimKerja");
+
+  const idTim = timSelect
+    ? timSelect.value
+    : window.PL_CS_DATA?.activeTimId;
+
+  if (!idTim) {
+    Swal.fire("Error", "Tim kerja belum dipilih", "error");
+    return;
+  }
+
   Swal.fire({
     title: "Reject laporan kegiatan?",
     input: "textarea",
@@ -305,7 +346,14 @@ function plRejectKegiatan(idKegiatan) {
   }).then((result) => {
     if (!result.isConfirmed) return;
 
-    fetch(PL_URL.rejectKegiatan(idKegiatan), {
+    const url = new URL(
+      PL_URL.rejectKegiatan(idKegiatan),
+      window.location.origin,
+    );
+
+    url.searchParams.set("id_tim", idTim);
+
+    fetch(url.toString(), {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -317,18 +365,28 @@ function plRejectKegiatan(idKegiatan) {
       .then((res) => res.json())
       .then((data) => {
         if (!data.success) {
-          Swal.fire("Error", data.error || "Gagal reject", "error");
+          Swal.fire(
+            "Error",
+            data.error || "Gagal reject",
+            "error",
+          );
           return;
         }
 
-        Swal.fire("Berhasil", "Laporan berhasil ditolak", "success").then(
-          () => {
-            location.reload();
-          },
-        );
+        Swal.fire(
+          "Berhasil",
+          "Laporan berhasil ditolak",
+          "success",
+        ).then(() => {
+          location.reload();
+        });
       })
       .catch(() => {
-        Swal.fire("Error", "Terjadi kesalahan server", "error");
+        Swal.fire(
+          "Error",
+          "Terjadi kesalahan server",
+          "error",
+        );
       });
   });
 }

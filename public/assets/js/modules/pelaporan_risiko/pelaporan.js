@@ -12,7 +12,7 @@
     const el = document.getElementById(id); 
 
     if (!el) return;
-
+ 
     if (!value) {
       el.innerHTML = "-";
       return;
@@ -204,90 +204,144 @@
     });
   }
 
+ function plApproveKegiatan(idKegiatan) {
+  const timSelect = document.getElementById("plCsTimKerja");
 
+  const idTim = timSelect
+    ? timSelect.value
+    : window.PL_CS_DATA?.activeTimId;
 
-  function plApproveKegiatan(idKegiatan) {
-    Swal.fire({
-      title: "Setujui laporan kegiatan?",
-      text: "Semua RTP pada kegiatan ini akan disetujui.",
-      icon: "question",
-      showCancelButton: true,
-      confirmButtonText: "Ya, Setujui",
-      cancelButtonText: "Batal",
-    }).then((result) => {
-      if (!result.isConfirmed) return;
-
-      fetch(PL_URL.approveKegiatan(idKegiatan), {
-        method: "POST",
-      })
-        .then((res) => res.json())
-        .then((data) => {
-          if (!data.success) {
-            Swal.fire("Error", data.error || "Gagal approve", "error");
-            return;
-          }
-
-          Swal.fire("Berhasil", "Laporan berhasil disetujui", "success").then(
-            () => {
-              location.reload();
-            },
-          );
-        })
-        .catch(() => {
-          Swal.fire("Error", "Terjadi kesalahan server", "error");
-        });
-    });
+  if (!idTim) {
+    Swal.fire("Error", "Tim kerja belum dipilih", "error");
+    return;
   }
+
+  Swal.fire({
+    title: "Setujui laporan kegiatan?",
+    text: "Semua RTP pada kegiatan ini akan disetujui.",
+    icon: "question",
+    showCancelButton: true,
+    confirmButtonText: "Ya, Setujui",
+    cancelButtonText: "Batal",
+  }).then((result) => {
+    if (!result.isConfirmed) return;
+
+    const url = new URL(
+      PL_URL.approveKegiatan(idKegiatan),
+      window.location.origin,
+    );
+
+    url.searchParams.set("id_tim", idTim);
+
+    fetch(url.toString(), {
+      method: "POST",
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (!data.success) {
+          Swal.fire(
+            "Error",
+            data.error || "Gagal approve",
+            "error",
+          );
+          return;
+        }
+
+        Swal.fire(
+          "Berhasil",
+          "Laporan berhasil disetujui",
+          "success",
+        ).then(() => {
+          location.reload();
+        });
+      })
+      .catch(() => {
+        Swal.fire(
+          "Error",
+          "Terjadi kesalahan server",
+          "error",
+        );
+      });
+  });
+}
 
   function plRejectKegiatan(idKegiatan) {
-    Swal.fire({
-      title: "Reject laporan kegiatan?",
-      input: "textarea",
-      inputLabel: "Catatan Ketua",
-      inputPlaceholder: "Wajib isi alasan reject...",
-      inputAttributes: {
-        "aria-label": "Catatan Ketua",
-      },
-      showCancelButton: true,
-      confirmButtonText: "Reject",
-      cancelButtonText: "Batal",
-      confirmButtonColor: "#dc3545",
+  const timSelect = document.getElementById("plCsTimKerja");
 
-      inputValidator: (value) => {
-        if (!value) {
-          return "Catatan wajib diisi";
-        }
-      },
-    }).then((result) => {
-      if (!result.isConfirmed) return;
+  const idTim = timSelect
+    ? timSelect.value
+    : window.PL_CS_DATA?.activeTimId;
 
-      fetch(PL_URL.rejectKegiatan(idKegiatan), {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          alasan: result.value,
-        }),
-      })
-        .then((res) => res.json())
-        .then((data) => {
-          if (!data.success) {
-            Swal.fire("Error", data.error || "Gagal reject", "error");
-            return;
-          }
-
-          Swal.fire("Berhasil", "Laporan berhasil ditolak", "success").then(
-            () => {
-              location.reload();
-            },
-          );
-        })
-        .catch(() => {
-          Swal.fire("Error", "Terjadi kesalahan server", "error");
-        });
-    });
+  if (!idTim) {
+    Swal.fire("Error", "Tim kerja belum dipilih", "error");
+    return;
   }
+
+  Swal.fire({
+    title: "Reject laporan kegiatan?",
+    input: "textarea",
+    inputLabel: "Catatan Ketua",
+    inputPlaceholder: "Wajib isi alasan reject...",
+    inputAttributes: {
+      "aria-label": "Catatan Ketua",
+    },
+    showCancelButton: true,
+    confirmButtonText: "Reject",
+    cancelButtonText: "Batal",
+    confirmButtonColor: "#dc3545",
+
+    inputValidator: (value) => {
+      if (!value) {
+        return "Catatan wajib diisi";
+      }
+    },
+  }).then((result) => {
+    if (!result.isConfirmed) return;
+
+    const url = new URL(
+      PL_URL.rejectKegiatan(idKegiatan),
+      window.location.origin,
+    );
+
+    url.searchParams.set("id_tim", idTim);
+
+    fetch(url.toString(), {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        alasan: result.value,
+      }),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (!data.success) {
+          Swal.fire(
+            "Error",
+            data.error || "Gagal reject",
+            "error",
+          );
+          return;
+        }
+
+        Swal.fire(
+          "Berhasil",
+          "Laporan berhasil ditolak",
+          "success",
+        ).then(() => {
+          location.reload();
+        });
+      })
+      .catch(() => {
+        Swal.fire(
+          "Error",
+          "Terjadi kesalahan server",
+          "error",
+        );
+      });
+  });
+}
 
   function plShowCatatan(catatan) {
     Swal.fire({

@@ -19,31 +19,67 @@ class AuthController extends BaseController
     }
 
     public function attemptLogin()
-    {
-        $email    = $this->request->getPost('email');
-        $password = $this->request->getPost('password');
+{
+    $email    = $this->request->getPost('email');
+    $password = $this->request->getPost('password');
 
-        if (!$this->authService->loginWithPassword($email, $password)) {
-            return redirect()->back()->with('error', 'Email atau password salah');
-        }
-
-        // REDIRECT SESUAI ROLE
-        $role = session('user_role');
-
-        if ($role === 'admin') {
-            return redirect()->to('/dashboard');
-        }
-
-        if ($role === 'operator') {
-            return redirect()->to('/dashboard');
-        }
-
-        if ($role === 'ketua') {
-            return redirect()->to('/dashboard');
-        }
-
-        return redirect()->to('/');
+    // Autentikasi user terlebih dahulu
+    if (!$this->authService->loginWithPassword($email, $password)) {
+        return redirect()
+            ->back()
+            ->withInput()
+            ->with('error', 'Email atau password salah');
     }
+
+    // Setelah user terautentikasi, ambil semua role miliknya
+    $roles = session('user_roles') ?? [];
+
+    // Kalau tidak punya role
+    if (empty($roles)) {
+        $this->authService->logout();
+
+        return redirect()
+            ->to('/login')
+            ->with('error', 'Akun tidak memiliki role');
+    }
+
+    // Kalau hanya punya satu role, langsung gunakan role tersebut
+    if (count($roles) === 1) {
+        $this->authService->selectRole($roles[0]);
+
+        return redirect()->to('/dashboard');
+    }
+
+    // Kalau punya lebih dari satu role, pilih role dulu
+    return redirect()->to('/select-role');
+}
+
+    public function selectRole()
+{
+    $roles = session('user_roles') ?? [];
+
+    if (empty($roles)) {
+        return redirect()->to('/login');
+    }
+
+    return view('auth/select_role', [
+        'roles' => $roles,
+        'userName' => session('user_name'),
+    ]);
+}
+
+public function setRole()
+{
+    $role = $this->request->getPost('role');
+
+    if (!$role || !$this->authService->selectRole($role)) {
+        return redirect()
+            ->to('/select-role')
+            ->with('error', 'Role tidak valid');
+    }
+
+    return redirect()->to('/dashboard');
+}
 
     public function logout()
     {

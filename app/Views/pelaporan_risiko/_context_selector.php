@@ -2,8 +2,18 @@
 $konteksMap = [];
 $timKerjaOpt = [];
 $pengelolaOpt = [];
+
+// Tim yang boleh diakses user
+$userTim = array_map('intval', session('user_tim') ?? []);
+
+// Fallback legacy
+if (empty($userTim) && session('id_tim')) {
+    $userTim = [(int) session('id_tim')];
+}
+
 foreach ($listKonteks as $k) {
     $id = $k['id_konteks'];
+
     $konteksMap[$id] = [
         'id_tim' => $k['id_tim'] ?? '',
         'pengelola_risiko_id' => $k['pengelola_risiko_id'] ?? '',
@@ -12,9 +22,26 @@ foreach ($listKonteks as $k) {
         'nama_kegiatan' => $k['nama_kegiatan'] ?? '',
         'tahun' => $k['tahun'],
     ];
-    if (!empty($k['id_tim'])) $timKerjaOpt[$k['id_tim']] = $k['nama_tim'];
-    if (!empty($k['pengelola_risiko_id'])) $pengelolaOpt[$k['pengelola_risiko_id']] = $k['nama_pengelola'];
+
+    // Admin boleh melihat seluruh tim.
+    // Operator/Ketua hanya tim yang dimiliki.
+    if (!empty($k['id_tim'])) {
+        $idTimKonteks = (int) $k['id_tim'];
+
+        if (
+            $userRole === 'admin'
+            || in_array($idTimKonteks, $userTim, true)
+        ) {
+            $timKerjaOpt[$idTimKonteks] = $k['nama_tim'];
+        }
+    }
+
+    if (!empty($k['pengelola_risiko_id'])) {
+        $pengelolaOpt[$k['pengelola_risiko_id']]
+            = $k['nama_pengelola'];
+    }
 }
+
 asort($timKerjaOpt);
 asort($pengelolaOpt);
 
@@ -35,21 +62,28 @@ $type = $tipe_periode ?? 'bulanan';
                 <div class="pl-field-group">
                     <div class="pl-field">
                         <span class="pl-field-label">Tim Kerja</span>
+
                         <div class="pl-field-value">
-                            <?php if ($userRole === 'admin'): ?>
-                                <select class="pl-select" id="plCsTimKerja" name="id_tim">
+                            <select
+                                class="pl-select"
+                                id="plCsTimKerja"
+                                name="id_tim">
+
+                                <?php if ($userRole === 'admin'): ?>
                                     <option value="">– Pilih Tim –</option>
-                                    <?php foreach ($timKerjaOpt as $id => $nama): ?>
-                                        <option value="<?= $id ?>" <?= ($sel['id_tim'] ?? '') == $id ? 'selected' : '' ?>>
-                                            <?= esc($nama) ?>
-                                        </option>
-                                    <?php endforeach; ?>
-                                </select>
-                            <?php else: ?>
-                                <span class="pl-field-static">
-                                    <?= esc($ketuaInfo['nama_tim'] ?? '-') ?>
-                                </span>
-                            <?php endif; ?>
+                                <?php endif; ?>
+
+                                <?php foreach ($timKerjaOpt as $id => $nama): ?>
+                                    <option
+                                        value="<?= (int) $id ?>"
+                                        <?= (string)($sel['id_tim'] ?? '') === (string)$id
+                                            ? 'selected'
+                                            : '' ?>>
+                                        <?= esc($nama) ?>
+                                    </option>
+                                <?php endforeach; ?>
+
+                            </select>
                         </div>
                     </div>
                     <div class="pl-field">
@@ -169,7 +203,15 @@ $type = $tipe_periode ?? 'bulanan';
     window.PL_CS_DATA = {
         konteksMap: <?= json_encode($konteksMap) ?>,
         listKegiatan: <?= json_encode($listKegiatan) ?>,
-        activeTimId: <?= json_encode($sel['id_tim'] ?? session('id_tim')) ?>,
-        selectedKegiatan: <?= json_encode($selectedKegiatan ?? '') ?>
+        activeTimId: <?= json_encode(
+                            $sel['id_tim']
+                                ?? session('global_id_tim')
+                                ?? session('id_tim')
+                        ) ?>,
+        selectedKegiatan: <?= json_encode(
+    $selectedKegiatan
+        ?: session('global_id_kegiatan')
+        ?: ''
+) ?>
     };
 </script>

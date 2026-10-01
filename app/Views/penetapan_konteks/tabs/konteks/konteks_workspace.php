@@ -430,18 +430,30 @@ if (session('global_id_kegiatan')) {
 
     $canEdit = false;
 
-    if ($user['role'] === 'admin') {
+    if (($user['role'] ?? null) === 'admin') {
         $canEdit = true;
     }
 
     if (
-        $user['role'] === 'operator'
+        ($user['role'] ?? null) === 'operator'
         &&
         !empty($activeKonteks)
-        &&
-        (int)$user['id_tim'] === (int)$activeKonteks['id_tim']
     ) {
-        $canEdit = true;
+        // Semua tim yang dimiliki user
+        $userTim = $user['tim'] ?? [];
+
+        // Fallback untuk akun/session lama
+        if (empty($userTim) && !empty($user['id_tim'])) {
+            $userTim = [$user['id_tim']];
+        }
+
+        $userTim = array_map('intval', $userTim);
+
+        $canEdit = in_array(
+            (int)$activeKonteks['id_tim'],
+            $userTim,
+            true
+        );
     }
     ?>
 

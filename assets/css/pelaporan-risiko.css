@@ -16,7 +16,7 @@
 }
 
 #plOffcanvas .offcanvas-header small {
-    font-size: 11px;
+    font-size: 11px; 
 }
 
 #plOffcanvas .offcanvas-body {
@@ -60,8 +60,8 @@
 
 /* ===== SHARED: TABLE SCROLL ===== */
 .ar-table-scroll {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
+    width: 100%;
+    overflow-x: hidden;
 }
 
 /* ===== SHARED: RISIKO CELL ===== */
@@ -508,15 +508,55 @@
 }
 
 /* ===== REPORT TABLE ===== */
+
 .pl-report-table {
-    table-layout: fixed;
     width: 100%;
+    table-layout: fixed;
+    font-size: 12px;
+    margin: 0;
 }
 
 .pl-report-table th,
 .pl-report-table td {
     vertical-align: middle;
+    box-sizing: border-box;
 }
+
+/* ===== HEADER ===== */
+
+.pl-report-table thead th {
+    background: #f8fafc;
+    color: #374151;
+    font-weight: 600;
+    padding: 11px 8px;
+    border-color: #e5e7eb;
+}
+
+.pl-report-table thead tr:first-child th {
+    border-bottom: 2px solid #e5e7eb;
+}
+
+.pl-report-table thead tr:nth-child(2) th {
+    font-size: 11px;
+}
+
+/* ===== ROW ===== */
+
+.pl-report-table tbody .pl-row td {
+    padding: 10px 8px;
+    border-color: #edf0f3;
+}
+
+.pl-row {
+    cursor: pointer;
+    transition: background-color .12s ease;
+}
+
+.pl-row:hover td {
+    background: #f8fafc;
+}
+
+/* ===== TEXT ===== */
 
 .pl-col-risiko,
 .pl-col-rtp {
@@ -524,41 +564,92 @@
 }
 
 .pl-truncate {
+    display: block;
+    width: 100%;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+}
+
+.pl-col-risiko .text-muted {
+    margin-top: 3px;
+    font-size: 10px !important;
+}
+
+/* ===== WAKTU ===== */
+
+.pl-report-table td:nth-child(5),
+.pl-report-table td:nth-child(7) {
+    text-align: center;
+    white-space: nowrap;
+}
+
+/* ===== STATUS REALISASI ===== */
+
+.pl-report-table td:nth-child(8) {
+    text-align: center;
+}
+
+.pl-report-table td:nth-child(8) .badge {
+    display: inline-block;
     max-width: 100%;
+    padding: 4px 6px;
+    font-size: 9.5px;
+    font-weight: 500;
+    line-height: 1.2;
+    white-space: normal;
+    text-align: center;
+    border-radius: 4px;
 }
 
-/* ===== REPORT TABLE HEADER ===== */
-.pl-report-table thead th {
-    vertical-align: middle;
-}
+/* ===== KEGIATAN ===== */
 
-.pl-report-table thead tr:first-child th {
-    border-bottom: 2px solid #dee2e6;
-}
-
-.pl-report-table thead tr:nth-child(2) th {
-    font-size: 12px;
-}
-
-/* ===== KEGIATAN SEPARATOR ===== */
 .pl-kegiatan-separator td {
-    background: #f8fafc;
-    border-top: 1px solid #e5e7eb;
-    border-bottom: 1px solid #e5e7eb;
-    padding: 10px 14px !important;
+    background: #f3f6fa !important;
+    border-top: 1px solid #dce3ea;
+    border-bottom: 1px solid #dce3ea;
+    padding: 8px 10px !important;
 }
 
 .pl-kegiatan-title {
+    min-width: 0;
     font-size: 12px;
     font-weight: 700;
-    color: #374151;
-    letter-spacing: 0.02em;
+    color: #344054;
     display: flex;
     align-items: center;
 }
+
+.pl-kegiatan-title i {
+    color: #667085;
+    font-size: 14px;
+}
+
+/* status kegiatan */
+.pl-kegiatan-separator .badge {
+    flex-shrink: 0;
+    padding: 4px 6px;
+    font-size: 10px;
+    font-weight: 500;
+    border-radius: 4px;
+}
+
+/* action kegiatan */
+.pl-kegiatan-separator .btn {
+    height: 28px;
+    padding: 0 8px;
+    font-size: 10.5px;
+    font-weight: 500;
+    border-radius: 5px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    white-space: nowrap;
+}
+
+/* ===== CATATAN ===== */
 
 .pl-catatan-validasi {
     max-width: 420px;
@@ -566,4 +657,3 @@
     word-break: break-word;
     line-height: 1.35;
 }
-

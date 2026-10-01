@@ -4,9 +4,25 @@ use App\Models\TimKerjaModel;
 
 $timModel = new TimKerjaModel();
 
-$listTim = $timModel
-    ->orderBy('nama_tim', 'ASC')
-    ->findAll();
+$userRole = session('user_role');
+$userTim  = session('user_tim') ?? [];
+
+// Admin tetap dapat melihat semua tim.
+// User non-admin hanya melihat tim yang terhubung dengan akunnya.
+if ($userRole === 'admin') {
+    $listTim = $timModel
+        ->orderBy('nama_tim', 'ASC')
+        ->findAll();
+} else {
+    if (!empty($userTim)) {
+        $listTim = $timModel
+            ->whereIn('id_tim', $userTim)
+            ->orderBy('nama_tim', 'ASC')
+            ->findAll();
+    } else {
+        $listTim = [];
+    }
+}
 
 $db = \Config\Database::connect();
 

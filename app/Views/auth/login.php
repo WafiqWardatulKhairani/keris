@@ -97,7 +97,6 @@
                             </button>
                         </div>
                     </div>
-
                     <!-- Tombol Login -->
                     <button type="submit" class="btn-login">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
@@ -109,9 +108,7 @@
                         Masuk
                     </button>
 
-                    <!--//<div class="divider">atau</div>
-
-                     Tombol SSO
+                    <div class="divider">atau</div>
                      <a href="<?= site_url('auth/sso') ?>" class="btn-sso">
                         <svg class="sso-icon"
                             xmlns="http://www.w3.org/2000/svg"
@@ -127,7 +124,7 @@
                             <circle cx="12" cy="7" r="4" />
                         </svg>
                         Masuk dengan SSO
-                    </a> -->
+                    </a> 
 
                 </form>
 

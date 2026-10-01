@@ -28,7 +28,7 @@
                     </ol>
 
                     <h2 class="page-title mb-0">
-                        Manajemen User
+                        Manajemen User 
                     </h2>
                 </div>
 

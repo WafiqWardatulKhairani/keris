@@ -7,8 +7,11 @@ use CodeIgniter\Router\RouteCollection;
 // Auth
 $routes->get('login', 'AuthController::login');
 $routes->post('login', 'AuthController::attemptLogin');
-$routes->get('logout', 'AuthController::logout');
 
+$routes->get('select-role', 'AuthController::selectRole');
+$routes->post('select-role', 'AuthController::setRole');
+
+$routes->get('logout', 'AuthController::logout');
 // Dashboard
 $routes->group('', ['filter' => ['auth']], function ($routes) {
 
@@ -346,4 +349,5 @@ $routes->group('pelaporan-risiko', ['filter' => ['auth']], function ($routes) {
 
 $routes->group('api', function ($routes) {
     $routes->get('bank-risiko', 'Api\BankRisikoApiController::index');
+    $routes->get('analisis-risiko', 'Api\AnalisisRisikoApiController::index');
 });

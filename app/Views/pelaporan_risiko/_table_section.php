@@ -3,21 +3,41 @@
 
         <div class="ar-table-scroll">
             <table class="table table-hover align-middle mb-0 pl-report-table" id="plTable">
+
+                <colgroup>
+                    <col style="width:4%">
+                    <col style="width:23%">
+                    <col style="width:22%">
+                    <col style="width:12%">
+                    <col style="width:7%">
+                    <col style="width:11%">
+                    <col style="width:7%">
+                    <col style="width:14%">
+                </colgroup>
+
                 <thead class="table-light">
                     <tr>
-                        <th rowspan="2" style="width:50px">#</th>
-                        <th rowspan="2" style="width:24%">Risiko</th>
-                        <th rowspan="2" style="width:24%">RTP</th>
-                        <th colspan="2" class="text-center" style="width:22%">Target</th>
-                        <th colspan="3" class="text-center" style="width:30%">Realisasi</th>
-                    </tr>
-                    <tr>
-                        <th style="width:14%">Output</th>
-                        <th style="width:8%" class="text-center">Waktu</th>
-                        <th style="width:14%">Output</th>
-                        <th style="width:8%" class="text-center">Waktu</th>
-                        <th style="width:8%" class="text-center">Status</th>
-                    </tr>
+    <th rowspan="2" class="text-center">#</th>
+    <th rowspan="2">Risiko</th>
+    <th rowspan="2">RTP</th>
+
+    <th colspan="2" class="text-center">
+        Target
+    </th>
+
+    <th colspan="3" class="text-center">
+        Realisasi
+    </th>
+</tr>
+
+<tr>
+    <th>Output</th>
+    <th class="text-center">Waktu</th>
+
+    <th>Output</th>
+    <th class="text-center">Waktu</th>
+    <th class="text-center">Status</th>
+</tr>
                 </thead>
                 <tbody>
                     <?php if (empty($data)): ?>
@@ -54,13 +74,13 @@
                                                 <?php
                                                 $idKegiatanCurrent = $row['id_kegiatan'] ?? null;
 
-$statusInfo = $statusKegiatan[$idKegiatanCurrent] ?? [
-    'status' => 'Draft',
-    'catatan' => null,
-];
+                                                $statusInfo = $statusKegiatan[$idKegiatanCurrent] ?? [
+                                                    'status' => 'Draft',
+                                                    'catatan' => null,
+                                                ];
 
-$statusValidasi = $statusInfo['status'];
-$catatanValidasi = $statusInfo['catatan'];
+                                                $statusValidasi = $statusInfo['status'];
+                                                $catatanValidasi = $statusInfo['catatan'];
 
                                                 $badgeClass = match ($statusValidasi) {
                                                     'Diajukan'  => 'bg-warning-subtle text-warning-emphasis border border-warning',
@@ -79,10 +99,10 @@ $catatanValidasi = $statusInfo['catatan'];
                                             <!-- RIGHT -->
                                             <div class="d-flex align-items-center gap-2 flex-shrink-0">
 
-                                               <?php if (
-    $statusValidasi === 'Ditolak'
-    && !empty($catatanValidasi)
-): ?>
+                                                <?php if (
+                                                    $statusValidasi === 'Ditolak'
+                                                    && !empty($catatanValidasi)
+                                                ): ?>
 
                                                     <button
                                                         type="button"
@@ -91,7 +111,7 @@ $catatanValidasi = $statusInfo['catatan'];
                                                         plShowCatatan(`<?= esc($catatanValidasi) ?>`)">
 
                                                         <i class="ti ti-message-circle-exclamation me-1"></i>
-                                                        Catata
+                                                        Catatan
                                                     </button>
 
                                                 <?php endif; ?>

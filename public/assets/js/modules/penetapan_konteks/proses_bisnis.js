@@ -13,11 +13,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const isKetua = currentUser.role === "ketua";
 
-  const bedaTim =
-    currentUser.role === "operator" &&
-    String(currentUser.id_tim) !== String(activeKonteks.id_tim);
+// Semua tim yang dimiliki user
+let userTim = Array.isArray(currentUser.tim)
+  ? currentUser.tim.map(String)
+  : [];
 
-  const canManage = !isKetua && !bedaTim;
+// Fallback untuk session/user lama
+if (userTim.length === 0 && currentUser.id_tim) {
+  userTim = [String(currentUser.id_tim)];
+}
+
+const bedaTim =
+  currentUser.role === "operator" &&
+  !userTim.includes(String(activeKonteks.id_tim));
+
+const canManage = !isKetua && !bedaTim;
 
   function setCreateMode() {
     document.getElementById("pbMode").value = "create";
