@@ -8,7 +8,7 @@ class AnalisisRisikoApiController extends BaseController
 {
     public function index()
     {
-        // Validasi API Key
+        // Validasi API Key 
         $apiKey = $this->request->getHeaderLine('X-API-Key');
         $validApiKey = env('CAPKIN_API_KEY');
 
