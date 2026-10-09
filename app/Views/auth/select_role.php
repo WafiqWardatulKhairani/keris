@@ -13,200 +13,222 @@
 
 <body>
 
-<div class="role-page">
+    <div class="role-page">
 
-    <!-- Dekorasi background -->
-    <div class="role-bg role-bg-left"></div>
-    <div class="role-bg role-bg-right"></div>
+        <!-- Dekorasi background -->
+        <div class="role-bg role-bg-left"></div>
+        <div class="role-bg role-bg-right"></div>
 
-    <div class="role-wrapper">
+        <div class="role-wrapper">
 
-        <!-- Logo -->
-        <div class="role-logo">
-            <img
-                src="<?= base_url('assets/images/logo-keris-v2.png') ?>"
-                class="keris-icon"
-                alt="KERIS">
+            <!-- Logo -->
+            <div class="role-logo">
+                <img
+                    src="<?= base_url('assets/images/logo-keris-v2.png') ?>"
+                    class="keris-icon"
+                    alt="KERIS">
 
-            <img
-                src="<?= base_url('assets/images/logo-keris-text-v2.png') ?>"
-                class="keris-text-logo"
-                alt="KERIS">
-        </div>
+                <img
+                    src="<?= base_url('assets/images/logo-keris-text-v2.png') ?>"
+                    class="keris-text-logo"
+                    alt="KERIS">
+            </div>
 
-        <!-- Card utama -->
-        <div class="role-box">
+            <!-- Card utama -->
+            <div class="role-box">
 
-            <div class="role-header">
-                <p class="role-eyebrow">AKSES PENGGUNA</p>
+                <div class="role-header">
+                    <p class="role-eyebrow">AKSES PENGGUNA</p>
 
-                <h1>Pilih Role</h1>
+                    <h1>Pilih Role</h1>
 
-                <p>
-                    Pilih role yang ingin digunakan untuk mengakses KERIS.
+                    <p>
+                        Pilih role yang ingin digunakan untuk mengakses KERIS.
+                    </p>
+                </div>
+
+                <!-- User yang sudah login -->
+                <div class="role-user">
+                    <div class="role-user-avatar">
+                        <?= strtoupper(substr($userName, 0, 1)) ?>
+                    </div>
+
+                    <div class="role-user-info">
+                        <span>Masuk sebagai</span>
+                        <strong><?= esc($userName) ?></strong>
+                    </div>
+
+                    <div class="role-user-status">
+                        <span></span>
+                        Terverifikasi
+                    </div>
+                </div>
+
+                <?php if (session()->getFlashdata('error')): ?>
+                    <div class="role-alert">
+                        <?= esc(session()->getFlashdata('error')) ?>
+                    </div>
+                <?php endif; ?>
+
+                <!-- Pilihan role -->
+                <form
+                    method="post"
+                    action="<?= site_url('select-role') ?>"
+                    class="role-list">
+
+                    <?= csrf_field() ?>
+
+                    <?php foreach ($roles as $role): ?>
+
+                        <?php
+                        $roleLabel = match ($role) {
+                            'admin'    => 'Admin',
+                            'operator' => 'Operator',
+                            'ketua'    => 'Ketua',
+                            'pimpinan' => 'Pimpinan',
+                            default    => ucfirst($role),
+                        };
+
+                        $roleDescription = match ($role) {
+                            'admin'    => 'Kelola sistem dan data pengguna',
+                            'operator' => 'Kelola dan input data risiko',
+                            'ketua'    => 'Review dan persetujuan risiko',
+                            'pimpinan' => 'Monitoring dashboard dan informasi risiko',
+                            default    => 'Akses sistem KERIS',
+                        };
+                        ?>
+
+                        <button
+                            type="submit"
+                            name="role"
+                            value="<?= esc($role) ?>"
+                            class="role-option">
+
+                            <div class="role-option-icon">
+
+                                <?php if ($role === 'admin'): ?>
+
+                                    <svg
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="1.8"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round">
+
+                                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+
+                                    </svg>
+
+                                <?php elseif ($role === 'operator'): ?>
+
+                                    <svg
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="1.8"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round">
+
+                                        <path d="M12 20h9" />
+                                        <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" />
+
+                                    </svg>
+
+                                <?php elseif ($role === 'pimpinan'): ?>
+
+                                    <!-- Ikon Dashboard untuk Pimpinan -->
+                                    <svg
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="1.8"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round">
+
+                                        <rect x="3" y="3" width="7" height="9" rx="1.5" />
+                                        <rect x="14" y="3" width="7" height="5" rx="1.5" />
+                                        <rect x="14" y="12" width="7" height="9" rx="1.5" />
+                                        <rect x="3" y="16" width="7" height="5" rx="1.5" />
+
+                                    </svg>
+
+                                <?php else: ?>
+
+                                    <!-- Ikon Ketua / role lainnya -->
+                                    <svg
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="1.8"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round">
+
+                                        <circle cx="12" cy="12" r="9" />
+                                        <path d="m8 12 2.5 2.5L16 9" />
+
+                                    </svg>
+
+                                <?php endif; ?>
+
+                            </div>
+
+                            <div class="role-option-text">
+                                <strong><?= esc($roleLabel) ?></strong>
+                                <span><?= esc($roleDescription) ?></span>
+                            </div>
+
+                            <div class="role-option-arrow">
+                                <svg
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round">
+
+                                    <path d="m9 18 6-6-6-6" />
+
+                                </svg>
+                            </div>
+
+                        </button>
+
+                    <?php endforeach; ?>
+
+                </form>
+
+                <p class="role-note">
+                    Role yang dipilih akan digunakan selama sesi berlangsung.
                 </p>
+
             </div>
 
-            <!-- User yang sudah login -->
-            <div class="role-user">
-                <div class="role-user-avatar">
-                    <?= strtoupper(substr($userName, 0, 1)) ?>
-                </div>
+            <!-- Bawah card -->
+            <a href="<?= site_url('logout') ?>" class="role-back">
+                <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round">
 
-                <div class="role-user-info">
-                    <span>Masuk sebagai</span>
-                    <strong><?= esc($userName) ?></strong>
-                </div>
+                    <path d="m15 18-6-6 6-6" />
 
-                <div class="role-user-status">
-                    <span></span>
-                    Terverifikasi
-                </div>
-            </div>
+                </svg>
 
-            <?php if (session()->getFlashdata('error')): ?>
-                <div class="role-alert">
-                    <?= esc(session()->getFlashdata('error')) ?>
-                </div>
-            <?php endif; ?>
+                Kembali ke Login
+            </a>
 
-            <!-- Pilihan role -->
-            <form
-                method="post"
-                action="<?= site_url('select-role') ?>"
-                class="role-list">
-
-                <?= csrf_field() ?>
-
-                <?php foreach ($roles as $role): ?>
-
-                    <?php
-                    $roleLabel = match ($role) {
-                        'admin'    => 'Admin',
-                        'operator' => 'Operator',
-                        'ketua'    => 'Ketua',
-                        default    => ucfirst($role),
-                    };
-
-                    $roleDescription = match ($role) {
-                        'admin'    => 'Kelola sistem dan data pengguna',
-                        'operator' => 'Kelola dan input data risiko',
-                        'ketua'    => 'Review dan persetujuan risiko',
-                        default    => 'Akses sistem KERIS',
-                    };
-                    ?>
-
-                    <button
-                        type="submit"
-                        name="role"
-                        value="<?= esc($role) ?>"
-                        class="role-option">
-
-                        <div class="role-option-icon">
-
-                            <?php if ($role === 'admin'): ?>
-
-                                <svg
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    stroke-width="1.8"
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round">
-
-                                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-
-                                </svg>
-
-                            <?php elseif ($role === 'operator'): ?>
-
-                                <svg
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    stroke-width="1.8"
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round">
-
-                                    <path d="M12 20h9" />
-                                    <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" />
-
-                                </svg>
-
-                            <?php else: ?>
-
-                                <svg
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    stroke-width="1.8"
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round">
-
-                                    <circle cx="12" cy="12" r="9" />
-                                    <path d="m8 12 2.5 2.5L16 9" />
-
-                                </svg>
-
-                            <?php endif; ?>
-
-                        </div>
-
-                        <div class="role-option-text">
-                            <strong><?= esc($roleLabel) ?></strong>
-                            <span><?= esc($roleDescription) ?></span>
-                        </div>
-
-                        <div class="role-option-arrow">
-                            <svg
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                stroke-width="2"
-                                stroke-linecap="round"
-                                stroke-linejoin="round">
-
-                                <path d="m9 18 6-6-6-6" />
-
-                            </svg>
-                        </div>
-
-                    </button>
-
-                <?php endforeach; ?>
-
-            </form>
-
-            <p class="role-note">
-                Role yang dipilih akan digunakan selama sesi berlangsung.
+            <p class="role-copyright">
+                &copy; <?= date('Y') ?> BPS Provinsi Riau &mdash; KERIS v1.0
             </p>
 
         </div>
 
-        <!-- Bawah card -->
-        <a href="<?= site_url('logout') ?>" class="role-back">
-            <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round">
-
-                <path d="m15 18-6-6 6-6" />
-
-            </svg>
-
-            Kembali ke Login
-        </a>
-
-        <p class="role-copyright">
-            &copy; <?= date('Y') ?> BPS Provinsi Riau &mdash; KERIS v1.0
-        </p>
-
     </div>
 
-</div>
-
 </body>
+
 </html>

@@ -4,6 +4,9 @@ use CodeIgniter\Router\RouteCollection;
 
 /** @var RouteCollection $routes */
 
+// Nonaktifkan Auto Routing
+$routes->setAutoRoute(false);
+
 // Auth
 $routes->get('login', 'AuthController::login');
 $routes->post('login', 'AuthController::attemptLogin');
@@ -18,26 +21,26 @@ $routes->group('', ['filter' => ['auth']], function ($routes) {
     $routes->get(
         '/',
         'DashboardController::index',
-        ['filter' => 'role:admin,operator,ketua']
+        ['filter' => 'role:admin,operator,ketua,pimpinan']
     );
 
     $routes->get(
         'dashboard',
         'DashboardController::index',
-        ['filter' => 'role:admin,operator,ketua']
+        ['filter' => 'role:admin,operator,ketua,pimpinan']
     );
 
     $routes->get(
         'dashboard/data',
         'DashboardController::data',
-        ['filter' => 'role:admin,operator,ketua']
+        ['filter' => 'role:admin,operator,ketua,pimpinan']
     );
 
     // Detail risiko berdasarkan cell Peta Risiko
     $routes->get(
         'dashboard/risk-detail',
         'DashboardController::riskDetail',
-        ['filter' => 'role:admin,operator,ketua']
+        ['filter' => 'role:admin,operator,ketua,pimpinan']
     );
 
     $routes->get(

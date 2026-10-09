@@ -97,3 +97,27 @@ VALUES
     (6, 1),
     (6, 3)
 ON CONFLICT (user_id, role_id) DO NOTHING;
+
+-- 4. Tambahan role baru untuk pimpinan
+INSERT INTO roles (name, description)
+SELECT 'pimpinan', 'Monitoring dashboard dan informasi risiko'
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM roles
+    WHERE name = 'pimpinan'
+);
+
+-- 5. Tambahan permission dashboard untuk role pimpinan
+INSERT INTO role_permissions (role_id, permission_id)
+SELECT r.id, p.id
+FROM roles r
+CROSS JOIN permissions p
+WHERE r.name = 'pimpinan'
+  AND p.name = 'view_dashboard'
+  AND p.module = 'dashboard'
+  AND NOT EXISTS (
+      SELECT 1
+      FROM role_permissions rp
+      WHERE rp.role_id = r.id
+        AND rp.permission_id = p.id
+  );

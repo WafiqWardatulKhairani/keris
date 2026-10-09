@@ -14,7 +14,7 @@
                     </a>
                 </li>
 
-                <?php if (session()->get('user_role')): ?>
+                <?php if (in_array(session('user_role'), ['admin', 'operator', 'ketua'], true)): ?>
                     <li class="pc-item">
                         <a href="<?= base_url('bank-risiko') ?>" class="pc-link">
                             <span class="pc-micon"><i class="ti ti-database"></i></span>
@@ -23,7 +23,7 @@
                     </li>
                 <?php endif; ?>
 
-                <?php if (session()->get('user_role')): ?>
+                <?php if (in_array(session('user_role'), ['admin', 'operator', 'ketua'], true)): ?>
                     <li class="pc-item pc-hasmenu">
                         <a href="javascript:void(0)" class="pc-link pc-parent">
                             <span class="pc-micon"><i class="ti ti-folders"></i></span>

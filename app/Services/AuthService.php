@@ -96,23 +96,16 @@ class AuthService
         // Role utama lama tetap dipertahankan untuk kompatibilitas
         $roleId = $user['role_id'] ?? null;
 
-        switch ($roleId) {
-            case 1:
-                $finalRole = 'admin';
-                break;
-            case 2:
-                $finalRole = 'operator';
-                break;
-            case 3:
-                $finalRole = 'ketua';
-                break;
-            default:
-                $finalRole = 'operator';
-                break;
-        }
-
-        // Ambil semua role yang dimiliki user dari tabel user_roles
+        // Ambil nama role dari database
         $db = \Config\Database::connect();
+
+        $roleUtama = $db->table('roles')
+            ->select('name')
+            ->where('id', $roleId)
+            ->get()
+            ->getRowArray();
+
+        $finalRole = $roleUtama['name'] ?? null;
 
         $roleRows = $db->table('user_roles ur')
             ->select('r.id, r.name')
@@ -123,9 +116,13 @@ class AuthService
 
         $userRoles = array_column($roleRows, 'name');
 
-        // Fallback ke role lama jika relasi belum tersedia
-        if (empty($userRoles)) {
+        if (empty($userRoles) && $finalRole !== null) {
             $userRoles = [$finalRole];
+        }
+
+        // Pastikan role awal termasuk role yang dimiliki user
+        if (!in_array($finalRole, $userRoles, true)) {
+            $finalRole = $userRoles[0] ?? null;
         }
 
         // Ambil semua tim kerja yang dimiliki user dari tabel user_tim_kerja
@@ -178,25 +175,25 @@ class AuthService
     }
 
     public function selectRole(string $role): bool
-{
-    $userId = session('user_id');
-    $userRoles = session('user_roles') ?? [];
+    {
+        $userId = session('user_id');
+        $userRoles = session('user_roles') ?? [];
 
-    if (!$userId || !in_array($role, $userRoles, true)) {
-        return false;
+        if (!$userId || !in_array($role, $userRoles, true)) {
+            return false;
+        }
+
+        // Set role aktif
+        session()->set('user_role', $role);
+
+        // Sinkronkan juga object user lama
+        $user = session('user') ?? [];
+        $user['role'] = $role;
+
+        session()->set('user', $user);
+
+        return true;
     }
-
-    // Set role aktif
-    session()->set('user_role', $role);
-
-    // Sinkronkan juga object user lama
-    $user = session('user') ?? [];
-    $user['role'] = $role;
-
-    session()->set('user', $user);
-
-    return true;
-}
 
     public function logout()
     {
