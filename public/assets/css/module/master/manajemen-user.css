@@ -530,3 +530,11 @@
         max-height: 200px;
     }
 }
+
+/* ==============================
+   SWEETALERT2 MODAL LAYER
+================================ */
+
+.swal2-container {
+    z-index: 20000 !important;
+}

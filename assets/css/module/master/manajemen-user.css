@@ -517,7 +517,7 @@
 
     .mu-user-modal .modal-body {
         padding: 16px;
-    }
+    } 
 
     .mu-user-modal .modal-header,
     .mu-user-modal .modal-footer {
@@ -529,4 +529,12 @@
     .mu-team-box {
         max-height: 200px;
     }
+}
+
+/* ==============================
+   SWEETALERT2 MODAL LAYER
+================================ */
+
+.swal2-container {
+    z-index: 20000 !important;
 }

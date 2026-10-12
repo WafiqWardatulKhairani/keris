@@ -194,7 +194,7 @@ function loadTable() {
       filteredData = [...data];
 
       renderTable();
-    });
+    }); 
 }
 
 function updateTitle(mode) {
