@@ -121,3 +121,22 @@
   color: #111827;
   line-height: 1.5;
 }
+
+/* ===================================
+   STICKY FOOTER - KERIS
+=================================== */
+
+.pc-container {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.pc-container > .pc-content {
+    flex: 1 0 auto;
+}
+
+.pc-container > .pc-footer {
+    margin-top: auto;
+    flex-shrink: 0;
+}

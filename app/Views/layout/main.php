@@ -68,11 +68,12 @@
     <?= $this->include('partials/navbar') ?>
 
     <div class="pc-container">
-        <div class="pc-content">
-            <?= $this->renderSection('content') ?>
-            <?= $this->include('partials/footer') ?>
-        </div>
+    <div class="pc-content">
+        <?= $this->renderSection('content') ?>
     </div>
+
+    <?= $this->include('partials/footer') ?>
+</div>
     <!-- ================= JS AREA ================= -->
 
     <!-- Global JS Variables -->

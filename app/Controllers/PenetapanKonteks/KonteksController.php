@@ -26,44 +26,44 @@ class KonteksController extends BaseContextController
     }
 
     private function validateKonteksAccess($idKonteks): bool
-{
-    $row = $this->model
-        ->select('id_tim')
-        ->where('id_konteks', $idKonteks)
-        ->first();
+    {
+        $row = $this->model
+            ->select('id_tim')
+            ->where('id_konteks', $idKonteks)
+            ->first();
 
-    if (!$row) {
-        return false;
+        if (!$row) {
+            return false;
+        }
+
+        $role = session('user_role');
+
+        // Admin boleh akses semua tim
+        if ($role === 'admin') {
+            return true;
+        }
+
+        // Ketua tetap mengikuti rule existing
+        if ($role === 'ketua') {
+            return false;
+        }
+
+        // Ambil seluruh tim yang dimiliki user
+        $userTim = session('user_tim') ?? [];
+
+        // Fallback untuk kompatibilitas akun/data lama
+        if (empty($userTim) && session('id_tim')) {
+            $userTim = [session('id_tim')];
+        }
+
+        $userTim = array_map('strval', $userTim);
+
+        return in_array(
+            (string) $row['id_tim'],
+            $userTim,
+            true
+        );
     }
-
-    $role = session('user_role');
-
-    // Admin boleh akses semua tim
-    if ($role === 'admin') {
-        return true;
-    }
-
-    // Ketua tetap mengikuti rule existing
-    if ($role === 'ketua') {
-        return false;
-    }
-
-    // Ambil seluruh tim yang dimiliki user
-    $userTim = session('user_tim') ?? [];
-
-    // Fallback untuk kompatibilitas akun/data lama
-    if (empty($userTim) && session('id_tim')) {
-        $userTim = [session('id_tim')];
-    }
-
-    $userTim = array_map('strval', $userTim);
-
-    return in_array(
-        (string) $row['id_tim'],
-        $userTim,
-        true
-    );
-}
 
     public function show($id)
     {
@@ -206,7 +206,7 @@ class KonteksController extends BaseContextController
                 [
                     'activeTab'         => 'konteks',
                     'mode' => $mode,
-                    'hasKegiatan' => $hasKegiatan,
+                    'hasKegiatan' => !empty(session('global_id_kegiatan')),
                     'hasScope' => $hasScope,
                     'hideGlobalContext' => false,
                     'listPemangku'      => $listPemangku,
@@ -265,13 +265,9 @@ class KonteksController extends BaseContextController
             ->first();
 
         if (!$konteks) {
-
-            return redirect()
-                ->to(site_url('penetapan-konteks'))
-                ->with(
-                    'warning',
-                    'Belum ada Ruang Lingkup untuk tim dan tahun yang dipilih.'
-                );
+            return redirect()->to(
+                site_url('penetapan-konteks/konteks/0')
+            );
         }
 
         // Sinkronkan Global Context Selector
