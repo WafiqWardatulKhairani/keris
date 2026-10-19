@@ -12,7 +12,7 @@ document.addEventListener("DOMContentLoaded", function () {
       input.type = "month";
     });
     input.addEventListener("blur", function () {
-      if (!input.value) input.type = "text"; 
+      if (!input.value) input.type = "text";
     });
     if (!input.value) {
       input.type = "text";
@@ -23,11 +23,22 @@ document.addEventListener("DOMContentLoaded", function () {
   if (startEl) setMonthPlaceholder(startEl, "Pilih bulan awal");
   if (endEl) setMonthPlaceholder(endEl, "Pilih bulan akhir");
 
-  function toggleMode() {
-    const isRange = typeEl.value === "range";
-    single.style.display = isRange ? "none" : "block";
-    range.style.display = isRange ? "block" : "none";
+
+function toggleMode() {
+  const isRange = typeEl.value === "range";
+  const isSemua = typeEl.value === "semua";
+
+  single.style.display = isRange ? "none" : "block";
+  range.style.display = isRange ? "block" : "none";
+
+  // Kosongkan bulan saat memilih Semua Periode
+  const periodeEl = document.getElementById("plCsPeriode");
+
+  if (periodeEl && isSemua) {
+    periodeEl.value = "";
   }
+}
+
 
   typeEl.addEventListener("change", toggleMode);
 
@@ -37,7 +48,10 @@ document.addEventListener("DOMContentLoaded", function () {
       const s = new Date(startEl.value);
       const exactEnd = new Date(s);
       exactEnd.setMonth(s.getMonth() + 2);
-      const exactEndStr = exactEnd.toISOString().slice(0, 7);
+      const exactEndStr =
+        exactEnd.getFullYear() +
+        "-" +
+        String(exactEnd.getMonth() + 1).padStart(2, "0");
       endEl.min = exactEndStr;
       endEl.max = exactEndStr;
       endEl.value = exactEndStr;
@@ -63,52 +77,51 @@ document.addEventListener("DOMContentLoaded", function () {
   const pengelolaSelect = document.getElementById("plCsPengelola");
   const kegiatanSelect = document.getElementById("plCsKegiatan");
 
-  if (window.PL_CS_DATA) {
-    const konteksMap = window.PL_CS_DATA.konteksMap;
-    const listKegiatan = window.PL_CS_DATA.listKegiatan || [];
+  
+if (window.PL_CS_DATA) {
+  const konteksMap = window.PL_CS_DATA.konteksMap || {};
+  const listKegiatan = window.PL_CS_DATA.listKegiatan || [];
 
-    function filterPengelola() {
-      const selectedTim = timSelect
-        ? timSelect.value
-        : window.PL_CS_DATA.activeTimId;
+  // Ambil kegiatan yang sebelumnya dipilih
+  let selectedKegiatan =
+    window.PL_CS_DATA.selectedKegiatan || "";
 
-      // simpan selected lama
-      const currentPengelola = pengelolaSelect
-  ? pengelolaSelect.value
-  : "";
+  function filterPengelola() {
+    const selectedTim = timSelect
+      ? timSelect.value
+      : window.PL_CS_DATA.activeTimId;
 
-const currentKegiatan =
-  kegiatanSelect && kegiatanSelect.value
-    ? kegiatanSelect.value
-    : window.PL_CS_DATA.selectedKegiatan || "";
-    
-      // reset pengelola
-      if (pengelolaSelect) {
-        pengelolaSelect.innerHTML =
-          '<option value="">– Pilih Pengelola –</option>';
-      }
+    const currentPengelola = pengelolaSelect
+      ? pengelolaSelect.value
+      : "";
 
-      // reset kegiatan
-      if (kegiatanSelect) {
-        kegiatanSelect.innerHTML = '<option value="">Semua Kegiatan</option>';
-      }
+    const currentKegiatan =
+      kegiatanSelect?.value || selectedKegiatan;
 
-      const addedPengelola = new Set();
-      const addedKegiatan = new Set();
+    if (pengelolaSelect) {
+      pengelolaSelect.innerHTML =
+        '<option value="">– Pilih Pengelola –</option>';
+    }
 
-      Object.values(konteksMap).forEach((item) => {
-        // FILTER BERDASARKAN TIM
-        if (item.id_tim != selectedTim) return;
+    if (kegiatanSelect) {
+      kegiatanSelect.innerHTML =
+        '<option value="">Semua Kegiatan</option>';
+    }
 
-        // PENGELOLA
-        if (
-          item.pengelola_risiko_id &&
-          !addedPengelola.has(item.pengelola_risiko_id)
-        ) {
-          addedPengelola.add(item.pengelola_risiko_id);
+    const addedPengelola = new Set();
+    const addedKegiatan = new Set();
 
+    Object.values(konteksMap).forEach((item) => {
+      if (item.id_tim != selectedTim) return;
+
+      if (
+        item.pengelola_risiko_id &&
+        !addedPengelola.has(item.pengelola_risiko_id)
+      ) {
+        addedPengelola.add(item.pengelola_risiko_id);
+
+        if (pengelolaSelect) {
           const opt = document.createElement("option");
-
           opt.value = item.pengelola_risiko_id;
           opt.textContent = item.nama_pengelola;
 
@@ -116,46 +129,59 @@ const currentKegiatan =
             opt.selected = true;
           }
 
-          if (pengelolaSelect) {
-            pengelolaSelect.appendChild(opt);
-          }
+          pengelolaSelect.appendChild(opt);
         }
+      }
+    });
+
+    if (kegiatanSelect) {
+      listKegiatan.forEach((item) => {
+        if (item.id_tim != selectedTim) return;
+        if (addedKegiatan.has(item.id_kegiatan)) return;
+
+        addedKegiatan.add(item.id_kegiatan);
+
+        const opt = document.createElement("option");
+        opt.value = item.id_kegiatan;
+        opt.textContent = item.nama_kegiatan;
+
+        if (item.id_kegiatan == currentKegiatan) {
+          opt.selected = true;
+        }
+
+        kegiatanSelect.appendChild(opt);
       });
 
-      if (kegiatanSelect) {
-        listKegiatan.forEach((item) => {
-          if (item.id_tim != selectedTim) return;
-
-          if (addedKegiatan.has(item.id_kegiatan)) return;
-
-          addedKegiatan.add(item.id_kegiatan);
-
-          const kegiatanOpt = document.createElement("option");
-
-          kegiatanOpt.value = item.id_kegiatan;
-          kegiatanOpt.textContent = item.nama_kegiatan;
-
-          if (item.id_kegiatan == currentKegiatan) {
-            kegiatanOpt.selected = true;
-          }
-
-          kegiatanSelect.appendChild(kegiatanOpt);
-        });
-      }
+      selectedKegiatan = kegiatanSelect.value;
     }
-
-    if (timSelect) {
-      timSelect.addEventListener("change", filterPengelola);
-    }
-
-    filterPengelola();
   }
+
+  if (timSelect) {
+    timSelect.addEventListener("change", () => {
+      selectedKegiatan = "";
+      filterPengelola();
+    });
+  }
+
+  filterPengelola();
+}
+
 
   toggleMode();
 
+  // Pastikan input range tetap bertipe month setelah reload
+  if (typeEl.value === "range" && startEl && endEl) {
+    if (startEl.value) {
+      startEl.type = "month";
+    }
+
+    if (endEl.value) {
+      endEl.type = "month";
+    }
+  }
+
   // SAVE SCROLL POSITION
   const form = document.getElementById("plContextSelectorForm");
-
   if (form) {
     form.addEventListener("submit", function () {
       sessionStorage.setItem("plScrollY", window.scrollY);
@@ -172,6 +198,5 @@ const currentKegiatan =
         sessionStorage.removeItem("plScrollY");
       }, 50);
     }
-  });  
+  });
 });
-

@@ -3,7 +3,7 @@
 
 <div class="pk-page">
 
-    <div class="page-header pk-header mb-3"> 
+    <div class="page-header pk-header mb-3">
         <div class="page-block">
             <div class="row align-items-center">
                 <div class="col-12 col-lg-8">
@@ -120,15 +120,15 @@
     ]) ?>
 
     <?= view('pelaporan_risiko/_table_section', [
-    'data'    => $data,
-    'pager'   => $pager   ?? null,
-    'perPage' => $perPage ?? 10,
-    'total'   => $total   ?? count($data),
-    'from'    => $from    ?? 1,
-    'to'      => $to      ?? count($data),
-    'userRole' => $userRole,
-    'statusKegiatan' => $statusKegiatan ?? [],
-]) ?>
+        'data'    => $data,
+        'pager'   => $pager   ?? null,
+        'perPage' => $perPage ?? 10,
+        'total'   => $total   ?? count($data),
+        'from'    => $from    ?? 1,
+        'to'      => $to      ?? count($data),
+        'userRole' => $userRole,
+        'statusKegiatan' => $statusKegiatan ?? [],
+    ]) ?>
 
     <?= view('pelaporan_risiko/_offcanvas_form') ?>
 

@@ -50,6 +50,9 @@ $currentMonth = $periode['bulan'] ?? date('m');
 $currentYear = $periode['tahun'] ?? date('Y');
 $currentPeriode = $currentYear . '-' . $currentMonth;
 $type = $tipe_periode ?? 'bulanan';
+
+$startPeriode = service('request')->getGet('start_periode') ?? '';
+$endPeriode   = service('request')->getGet('end_periode') ?? '';
 ?>
 
 <div class="pl-filter-card mb-3">
@@ -60,49 +63,49 @@ $type = $tipe_periode ?? 'bulanan';
             <div class="pl-filter-section pl-filter-context">
                 <div class="pl-section-label"><i class="ti ti-building"></i> Konteks</div>
                 <div class="pl-field-group">
+
                     <div class="pl-field">
                         <span class="pl-field-label">Tim Kerja</span>
-
                         <div class="pl-field-value">
-                            <select
-                                class="pl-select"
-                                id="plCsTimKerja"
-                                name="id_tim">
+                            <span class="pl-field-static">
+                                <?php
+                                $namaTimAktif = '-';
 
-                                <?php if ($userRole === 'admin'): ?>
-                                    <option value="">– Pilih Tim –</option>
-                                <?php endif; ?>
-
-                                <?php foreach ($timKerjaOpt as $id => $nama): ?>
-                                    <option
-                                        value="<?= (int) $id ?>"
-                                        <?= (string)($sel['id_tim'] ?? '') === (string)$id
-                                            ? 'selected'
-                                            : '' ?>>
-                                        <?= esc($nama) ?>
-                                    </option>
-                                <?php endforeach; ?>
-
-                            </select>
+                                foreach ($listKonteks as $k) {
+                                    if (
+                                        (string) ($k['id_tim'] ?? '') ===
+                                        (string) ($sel['id_tim'] ?? '')
+                                    ) {
+                                        $namaTimAktif = $k['nama_tim'] ?? '-';
+                                        break;
+                                    }
+                                }
+                                ?>
+                                <?= esc($namaTimAktif) ?>
+                            </span>
                         </div>
                     </div>
+
                     <div class="pl-field">
                         <span class="pl-field-label">Pengelola</span>
                         <div class="pl-field-value">
-                            <?php if ($userRole === 'admin'): ?>
-                                <select class="pl-select" id="plCsPengelola" name="pengelola_risiko_id">
-                                    <option value="">– Pilih Pengelola –</option>
-                                    <?php foreach ($pengelolaOpt as $id => $nama): ?>
-                                        <option value="<?= $id ?>" <?= ($sel['pengelola_risiko_id'] ?? '') == $id ? 'selected' : '' ?>>
-                                            <?= esc($nama) ?>
-                                        </option>
-                                    <?php endforeach; ?>
-                                </select>
-                            <?php else: ?>
-                                <span class="pl-field-static">
-                                    <?= esc($ketuaInfo['nama'] ?? '-') ?>
-                                </span>
-                            <?php endif; ?>
+                            <?php
+                            $namaPengelolaAktif = '-';
+
+                            foreach ($listKonteks as $k) {
+                                if (
+                                    (string) ($k['id_tim'] ?? '') ===
+                                    (string) ($sel['id_tim'] ?? '')
+                                    && !empty($k['nama_pengelola'])
+                                ) {
+                                    $namaPengelolaAktif = $k['nama_pengelola'];
+                                    break;
+                                }
+                            }
+                            ?>
+                            <span class="pl-field-static">
+                                <?= esc($namaPengelolaAktif) ?>
+                            </span>
                         </div>
                     </div>
                     <div class="pl-field">
@@ -163,10 +166,13 @@ $type = $tipe_periode ?? 'bulanan';
                 <div class="pl-periode-tipe">
                     <span class="pl-field-label">Tipe</span>
                     <div class="pl-field-value">
+
                         <select name="tipe_periode" id="plCsType" class="pl-select">
+                            <option value="semua" <?= $type === 'semua' ? 'selected' : '' ?>>Semua Periode</option>
                             <option value="bulanan" <?= $type === 'bulanan' ? 'selected' : '' ?>>Bulanan</option>
                             <option value="range" <?= $type === 'range' ? 'selected' : '' ?>>Range Bulan</option>
                         </select>
+
                     </div>
                 </div>
 
@@ -179,12 +185,12 @@ $type = $tipe_periode ?? 'bulanan';
                         <div class="pl-range-row">
                             <div class="pl-range-col">
                                 <div class="pl-slot-label">Dari</div>
-                                <input type="month" name="start_periode" id="plStart" class="pl-slot-input">
+                                <input type="month" name="start_periode" id="plStart" class="pl-slot-input" value="<?= esc($startPeriode) ?>">
                             </div>
                             <div class="pl-range-sep">→</div>
                             <div class="pl-range-col">
                                 <div class="pl-slot-label">Sampai</div>
-                                <input type="month" name="end_periode" id="plEnd" class="pl-slot-input">
+                                <input type="month" name="end_periode" id="plEnd" class="pl-slot-input" value="<?= esc($endPeriode) ?>">
                             </div>
                         </div>
                     </div>
@@ -209,9 +215,9 @@ $type = $tipe_periode ?? 'bulanan';
                                 ?? session('id_tim')
                         ) ?>,
         selectedKegiatan: <?= json_encode(
-    $selectedKegiatan
-        ?: session('global_id_kegiatan')
-        ?: ''
-) ?>
+                                $selectedKegiatan
+                                    ?: session('global_id_kegiatan')
+                                    ?: ''
+                            ) ?>
     };
 </script>

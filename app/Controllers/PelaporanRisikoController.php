@@ -73,28 +73,55 @@ class PelaporanRisikoController extends BaseController
     {
         $userRole  = session('user_role');
         $idKonteks = session('id_konteks_pl');
+
         $periodeInput = $this->request->getGet('periode');
+        $type = $this->request->getGet('tipe_periode') ?? 'bulanan';
 
-        if ($periodeInput) {
+        $start = $this->request->getGet('start_periode');
+        $end = $this->request->getGet('end_periode');
 
+        $filterPeriode = ($type !== 'semua');
+
+        if ($type === 'range' && $start && $end) {
+            $tahun = substr($start, 0, 4);
+            $bulan = substr($start, 5, 2);
+
+            $startDate = date('Y-m-01', strtotime($start . '-01'));
+            $endDate = date('Y-m-t', strtotime($end . '-01'));
+
+            $periode = [
+                'bulan' => $bulan,
+                'tahun' => $tahun,
+            ];
+        } elseif ($type === 'bulanan' && $periodeInput) {
             [$tahun, $bulan] = explode('-', $periodeInput);
 
             $periode = [
                 'bulan' => $bulan,
-                'tahun' => $tahun
+                'tahun' => $tahun,
             ];
 
-            // Simpan periode aktif supaya approve/reject
-            // menggunakan tahun yang sama dengan halaman
-            session()->set('pl_periode', $periode);
+            [$startDate, $endDate] = $this->getDateRange(
+                $bulan,
+                $tahun,
+                'bulanan'
+            );
         } else {
-
             $periode = $this->getPeriode();
 
             $bulan = $periode['bulan'];
             $tahun = $periode['tahun'];
+
+            if ($type !== 'semua') {
+                [$startDate, $endDate] = $this->getDateRange(
+                    $bulan,
+                    $tahun,
+                    'bulanan'
+                );
+            }
         }
-        $type       = $this->request->getGet('tipe_periode') ?? 'bulanan';
+
+
         $idKegiatan = $this->request->getGet('id_kegiatan');
         $statusValidasi = $this->request->getGet('status_validasi');
 
@@ -130,11 +157,7 @@ class PelaporanRisikoController extends BaseController
             // Semua tim yang memang dimiliki user
             $userTim = array_map('intval', session('user_tim') ?? []);
 
-            // Tim yang dipilih dari filter Pelaporan
-            $requestTim = $this->request->getGet('id_tim');
-
-            // Fallback ke Global Context
-            $globalTim = $requestTim ?: session('global_id_tim');
+            $globalTim = session('global_id_tim') ?: session('id_tim');
 
             // Fallback legacy jika user_tim belum tersedia
             if (empty($userTim) && session('id_tim')) {
@@ -192,47 +215,34 @@ class PelaporanRisikoController extends BaseController
             $builder->where('pm.status_validasi', $statusValidasi);
         }
 
-        // Filter konteks berdasarkan tahun periode
-        if (!empty($tahun)) {
-            $builder->where('k.tahun', $tahun);
-        }
+        // Filter tahun dan tanggal realisasi hanya jika
+        // pengguna memilih periode tertentu.
+        if ($type !== 'semua') {
 
-        if ($type === 'range') {
-            $start = $this->request->getGet('start_periode');
-            $end   = $this->request->getGet('end_periode');
-
-            if ($start && $end) {
-                $startDate = date('Y-m-01', strtotime($start));
-                $endDate   = date('Y-m-t', strtotime($end));
+            if ($type === 'range') {
+                if ($start && $end) {
+                    $startDate = date('Y-m-01', strtotime($start));
+                    $endDate = date('Y-m-t', strtotime($end));
+                } else {
+                    [$startDate, $endDate] = $this->getDateRange(
+                        $bulan,
+                        $tahun,
+                        'bulanan'
+                    );
+                }
             } else {
-                [$startDate, $endDate] = $this->getDateRange($bulan, $tahun, 'bulanan');
+                [$startDate, $endDate] = $this->getDateRange(
+                    $bulan,
+                    $tahun,
+                    $type
+                );
             }
-        } else {
-            [$startDate, $endDate] = $this->getDateRange($bulan, $tahun, $type);
+
+            $builder
+                ->where('pm.realisasi_waktu >=', $startDate)
+                ->where('pm.realisasi_waktu <=', $endDate);
         }
 
-        $builder->groupStart()
-
-            ->groupStart()
-            ->where('pm.status IS NULL', null, false)
-            ->orWhereIn('pm.status', [
-                'Dalam Proses',
-                'Belum Dilaksanakan',
-                'Terlambat'
-            ])
-            ->groupEnd()
-
-            ->orGroupStart()
-            ->where('pm.realisasi_waktu >=', $startDate)
-            ->where('pm.realisasi_waktu <=', $endDate)
-            ->groupEnd()
-
-            ->orGroupStart()
-            ->where('pm.updated_at >=', $startDate)
-            ->where('pm.updated_at <=', $endDate)
-            ->groupEnd()
-
-            ->groupEnd();
 
         $builder->orderBy('kegiatan.nama_kegiatan', 'ASC');
         $builder->orderBy('rtp.id_rtp', 'ASC');
@@ -626,211 +636,262 @@ class PelaporanRisikoController extends BaseController
     }
 
     public function approveKegiatan($idKegiatan)
-{
-    if (session('user_role') !== 'ketua') {
-        return $this->response
-            ->setStatusCode(403)
-            ->setJSON(['error' => 'Akses ditolak']);
-    }
+    {
+        if (session('user_role') !== 'ketua') {
+            return $this->response
+                ->setStatusCode(403)
+                ->setJSON(['error' => 'Akses ditolak']);
+        }
 
-    // Tim yang boleh diakses user
-    $userTim = array_map('intval', session('user_tim') ?? []);
+        // Tim yang boleh diakses user
+        $userTim = array_map('intval', session('user_tim') ?? []);
 
-    // Fallback legacy
-    if (empty($userTim) && session('id_tim')) {
-        $userTim = [(int) session('id_tim')];
-    }
+        // Fallback legacy
+        if (empty($userTim) && session('id_tim')) {
+            $userTim = [(int) session('id_tim')];
+        }
 
-    // Tim aktif
-    $idTim = (int) (
-        $this->request->getGet('id_tim')
-        ?? session('global_id_tim')
-        ?? 0
-    );
+        // Tim aktif
+        $idTim = (int) (
+            $this->request->getGet('id_tim')
+            ?? session('global_id_tim')
+            ?? 0
+        );
 
-    // Pastikan user memang punya akses ke tim tersebut
-    if (!$idTim || !in_array($idTim, $userTim, true)) {
-        return $this->response
-            ->setStatusCode(403)
-            ->setJSON([
-                'error' => 'Tim kerja tidak valid atau tidak dapat diakses'
+        // Pastikan user memang punya akses ke tim tersebut
+        if (!$idTim || !in_array($idTim, $userTim, true)) {
+            return $this->response
+                ->setStatusCode(403)
+                ->setJSON([
+                    'error' => 'Tim kerja tidak valid atau tidak dapat diakses'
+                ]);
+        }
+
+        $periode = $this->getPeriode();
+        $tahun = $periode['tahun'] ?? null;
+
+        $rtpList = $this->db->table('rencana_penanganan_risiko rtp')
+            ->select('pm.id_pemantauan')
+            ->join(
+                'evaluasi_risiko er',
+                'er.id_evaluasi = rtp.id_penilaian_awal'
+            )
+            ->join(
+                'identifikasi_risiko ir',
+                'ir.id_identifikasi = er.id_identifikasi'
+            )
+            ->join(
+                'konteks_proses_bisnis kpb',
+                'kpb.id_konteks_proses = ir.id_konteks_proses'
+            )
+            ->join(
+                'konteks k',
+                'k.id_konteks = kpb.id_konteks'
+            )
+            ->join(
+                'pemantauan_risiko pm',
+                'pm.id_rtp = rtp.id_rtp'
+            )
+            ->where('k.id_kegiatan', $idKegiatan)
+            ->where('k.id_tim', $idTim)
+            ->where('pm.status_validasi', 'Diajukan');
+
+        // Approval mengikuti kegiatan dan tim yang dipilih.
+        // Tidak membatasi tahun dari filter periode halaman.
+
+        log_message('debug', 'PERIODE APPROVE: ' . json_encode([
+            'pl_periode' => session('pl_periode'),
+            'global_tahun' => session('global_tahun'),
+            'tahun_dipakai' => $tahun,
+        ]));
+
+        log_message('debug', 'APPROVE KEGIATAN: ' . json_encode([
+            'id_kegiatan' => $idKegiatan,
+            'id_tim'      => $idTim,
+            'tahun'       => $tahun,
+        ]));
+
+        $rtpList = $rtpList
+            ->get()
+            ->getResultArray();
+
+        log_message('debug', 'HASIL APPROVE: ' . json_encode([
+            'jumlah' => count($rtpList),
+            'data'   => $rtpList,
+        ]));
+
+        if (empty($rtpList)) {
+            return $this->response
+                ->setStatusCode(404)
+                ->setJSON([
+                    'error' => 'Data pengajuan tidak ditemukan'
+                ]);
+        }
+
+        $ids = array_column($rtpList, 'id_pemantauan');
+
+        $this->db->table('pemantauan_risiko')
+            ->whereIn('id_pemantauan', $ids)
+            ->update([
+                'status_validasi' => 'Disetujui',
+                'validated_by'    => session('user_id'),
+                'validated_at'    => date('Y-m-d H:i:s'),
+                'updated_at'      => date('Y-m-d H:i:s'),
             ]);
-    }
 
-    $periode = $this->getPeriode();
-    $tahun = $periode['tahun'] ?? null;
-
-    $rtpList = $this->db->table('rencana_penanganan_risiko rtp')
-        ->select('pm.id_pemantauan')
-        ->join(
-            'evaluasi_risiko er',
-            'er.id_evaluasi = rtp.id_penilaian_awal'
-        )
-        ->join(
-            'identifikasi_risiko ir',
-            'ir.id_identifikasi = er.id_identifikasi'
-        )
-        ->join(
-            'konteks_proses_bisnis kpb',
-            'kpb.id_konteks_proses = ir.id_konteks_proses'
-        )
-        ->join(
-            'konteks k',
-            'k.id_konteks = kpb.id_konteks'
-        )
-        ->join(
-            'pemantauan_risiko pm',
-            'pm.id_rtp = rtp.id_rtp'
-        )
-        ->where('k.id_kegiatan', $idKegiatan)
-        ->where('k.id_tim', $idTim)
-        ->where('pm.status_validasi', 'Diajukan');
-
-    if (!empty($tahun)) {
-        $rtpList->where('k.tahun', $tahun);
-    }
-
-    $rtpList = $rtpList
-        ->get()
-        ->getResultArray();
-
-    if (empty($rtpList)) {
-        return $this->response
-            ->setStatusCode(404)
-            ->setJSON([
-                'error' => 'Data pengajuan tidak ditemukan'
-            ]);
-    }
-
-    $ids = array_column($rtpList, 'id_pemantauan');
-
-    $this->db->table('pemantauan_risiko')
-        ->whereIn('id_pemantauan', $ids)
-        ->update([
-            'status_validasi' => 'Disetujui',
-            'validated_by'    => session('user_id'),
-            'validated_at'    => date('Y-m-d H:i:s'),
-            'updated_at'      => date('Y-m-d H:i:s'),
+        return $this->response->setJSON([
+            'success' => true
         ]);
-
-    return $this->response->setJSON([
-        'success' => true
-    ]);
-}
+    }
 
     public function rejectKegiatan($idKegiatan)
-{
-    if (session('user_role') !== 'ketua') {
-        return $this->response
-            ->setStatusCode(403)
-            ->setJSON(['error' => 'Akses ditolak']);
-    }
+    {
+        if (session('user_role') !== 'ketua') {
+            return $this->response
+                ->setStatusCode(403)
+                ->setJSON(['error' => 'Akses ditolak']);
+        }
 
-    $payload = $this->request->getJSON(true);
+        $payload = $this->request->getJSON(true);
 
-    // Tim yang boleh diakses user
-    $userTim = array_map('intval', session('user_tim') ?? []);
+        // Tim yang boleh diakses user
+        $userTim = array_map('intval', session('user_tim') ?? []);
 
-    // Fallback legacy
-    if (empty($userTim) && session('id_tim')) {
-        $userTim = [(int) session('id_tim')];
-    }
+        // Fallback legacy
+        if (empty($userTim) && session('id_tim')) {
+            $userTim = [(int) session('id_tim')];
+        }
 
-    // Tim aktif
-    $idTim = (int) (
-        $this->request->getGet('id_tim')
-        ?? session('global_id_tim')
-        ?? 0
-    );
+        // Tim aktif
+        $idTim = (int) (
+            $this->request->getGet('id_tim')
+            ?? session('global_id_tim')
+            ?? 0
+        );
 
-    // Pastikan user memang punya akses ke tim tersebut
-    if (!$idTim || !in_array($idTim, $userTim, true)) {
-        return $this->response
-            ->setStatusCode(403)
-            ->setJSON([
-                'error' => 'Tim kerja tidak valid atau tidak dapat diakses'
+        // Pastikan user memang punya akses ke tim tersebut
+        if (!$idTim || !in_array($idTim, $userTim, true)) {
+            return $this->response
+                ->setStatusCode(403)
+                ->setJSON([
+                    'error' => 'Tim kerja tidak valid atau tidak dapat diakses'
+                ]);
+        }
+
+        $periode = $this->getPeriode();
+        $tahun = $periode['tahun'] ?? null;
+
+        $rtpList = $this->db->table('rencana_penanganan_risiko rtp')
+            ->select('pm.id_pemantauan')
+            ->join(
+                'evaluasi_risiko er',
+                'er.id_evaluasi = rtp.id_penilaian_awal'
+            )
+            ->join(
+                'identifikasi_risiko ir',
+                'ir.id_identifikasi = er.id_identifikasi'
+            )
+            ->join(
+                'konteks_proses_bisnis kpb',
+                'kpb.id_konteks_proses = ir.id_konteks_proses'
+            )
+            ->join(
+                'konteks k',
+                'k.id_konteks = kpb.id_konteks'
+            )
+            ->join(
+                'pemantauan_risiko pm',
+                'pm.id_rtp = rtp.id_rtp'
+            )
+            ->where('k.id_kegiatan', $idKegiatan)
+            ->where('k.id_tim', $idTim)
+            ->where('pm.status_validasi', 'Diajukan');
+
+        if (!empty($tahun)) {
+            $rtpList->where('k.tahun', $tahun);
+        }
+
+        $rtpList = $rtpList
+            ->get()
+            ->getResultArray();
+
+        if (empty($rtpList)) {
+            return $this->response
+                ->setStatusCode(404)
+                ->setJSON([
+                    'error' => 'Data pengajuan tidak ditemukan'
+                ]);
+        }
+
+        $ids = array_column($rtpList, 'id_pemantauan');
+
+        $this->db->table('pemantauan_risiko')
+            ->whereIn('id_pemantauan', $ids)
+            ->update([
+                'status_validasi'  => 'Ditolak',
+                'catatan_validasi' => $payload['alasan'] ?? null,
+                'validated_by'     => session('user_id'),
+                'validated_at'     => date('Y-m-d H:i:s'),
+                'updated_at'       => date('Y-m-d H:i:s'),
             ]);
-    }
 
-    $periode = $this->getPeriode();
-    $tahun = $periode['tahun'] ?? null;
-
-    $rtpList = $this->db->table('rencana_penanganan_risiko rtp')
-        ->select('pm.id_pemantauan')
-        ->join(
-            'evaluasi_risiko er',
-            'er.id_evaluasi = rtp.id_penilaian_awal'
-        )
-        ->join(
-            'identifikasi_risiko ir',
-            'ir.id_identifikasi = er.id_identifikasi'
-        )
-        ->join(
-            'konteks_proses_bisnis kpb',
-            'kpb.id_konteks_proses = ir.id_konteks_proses'
-        )
-        ->join(
-            'konteks k',
-            'k.id_konteks = kpb.id_konteks'
-        )
-        ->join(
-            'pemantauan_risiko pm',
-            'pm.id_rtp = rtp.id_rtp'
-        )
-        ->where('k.id_kegiatan', $idKegiatan)
-        ->where('k.id_tim', $idTim)
-        ->where('pm.status_validasi', 'Diajukan');
-
-    if (!empty($tahun)) {
-        $rtpList->where('k.tahun', $tahun);
-    }
-
-    $rtpList = $rtpList
-        ->get()
-        ->getResultArray();
-
-    if (empty($rtpList)) {
-        return $this->response
-            ->setStatusCode(404)
-            ->setJSON([
-                'error' => 'Data pengajuan tidak ditemukan'
-            ]);
-    }
-
-    $ids = array_column($rtpList, 'id_pemantauan');
-
-    $this->db->table('pemantauan_risiko')
-        ->whereIn('id_pemantauan', $ids)
-        ->update([
-            'status_validasi'  => 'Ditolak',
-            'catatan_validasi' => $payload['alasan'] ?? null,
-            'validated_by'     => session('user_id'),
-            'validated_at'     => date('Y-m-d H:i:s'),
-            'updated_at'       => date('Y-m-d H:i:s'),
+        return $this->response->setJSON([
+            'success' => true
         ]);
-
-    return $this->response->setJSON([
-        'success' => true
-    ]);
-}
+    }
 
     public function print()
     {
-        $periodeInput = $this->request->getGet('periode');
 
-        if ($periodeInput) {
-            [$tahun, $bulan] = explode('-', $periodeInput);
-        } else {
-            $periode = session('pl_periode') ?? [
-                'bulan' => date('m'),
-                'tahun' => date('Y')
+        $periodeInput = $this->request->getGet('periode');
+        $type = $this->request->getGet('tipe_periode') ?? 'bulanan';
+        $filterPeriode = ($type !== 'semua');
+
+        $start = $this->request->getGet('start_periode');
+        $end = $this->request->getGet('end_periode');
+
+
+        if ($type === 'range' && $start && $end) {
+            $tahun = substr($start, 0, 4);
+            $bulan = substr($start, 5, 2);
+
+            $startDate = date('Y-m-01', strtotime($start));
+            $endDate = date('Y-m-t', strtotime($end));
+
+            $periode = [
+                'bulan' => $bulan,
+                'tahun' => $tahun,
             ];
+        } elseif ($periodeInput) {
+            [$tahun, $bulan] = explode('-', $periodeInput);
+
+            $periode = [
+                'bulan' => $bulan,
+                'tahun' => $tahun,
+            ];
+
+            session()->set('pl_periode', $periode);
+
+            [$startDate, $endDate] = $this->getDateRange(
+                $bulan,
+                $tahun,
+                $type
+            );
+        } else {
+            $periode = $this->getPeriode();
 
             $bulan = $periode['bulan'];
             $tahun = $periode['tahun'];
+
+            [$startDate, $endDate] = $this->getDateRange(
+                $bulan,
+                $tahun,
+                $type
+            );
         }
 
         $idKegiatan = $this->request->getGet('id_kegiatan');
+        $statusValidasi = $this->request->getGet('status_validasi');
         $form = $this->request->getGet('form') ?? 'form4';
         $idTimAktif = session('global_id_tim') ?? session('id_tim');
 
@@ -925,8 +986,7 @@ class PelaporanRisikoController extends BaseController
             ->join('tim_kerja sk', 'sk.id_tim = k.id_tim', 'left')
             ->join('kegiatan', 'kegiatan.id_kegiatan = k.id_kegiatan', 'left')
 
-            ->join('pemantauan_risiko pm', 'pm.id_rtp = rtp.id_rtp', 'left')
-            ->where('pm.status_validasi', 'Disetujui');
+            ->join('pemantauan_risiko pm', 'pm.id_rtp = rtp.id_rtp', 'left');
 
         // FILTER TIM AKTIF OPERATOR
         if (session('user_role') === 'operator') {
@@ -1389,15 +1449,40 @@ class PelaporanRisikoController extends BaseController
                 }
             }
 
-            // FILTER TAHUN
-            $form3Builder->where('k.tahun', $tahun);
-
+            
             // FILTER KEGIATAN
             if (!empty($idKegiatan)) {
                 $form3Builder->where(
                     'k.id_kegiatan',
                     $idKegiatan
                 );
+            }
+
+            // FILTER TAHUN KONTEKS
+            if ($type !== 'semua') {
+                $form3Builder->where('k.tahun', $tahun);
+            }
+
+            // FILTER PERIODE RTP BERDASARKAN TARGET WAKTU
+            if ($type === 'range' && $start && $end) {
+                $form3StartDate = date('Y-m-01', strtotime($start));
+                $form3EndExclusive = date(
+                    'Y-m-01',
+                    strtotime($end . ' +1 month')
+                );
+
+                $form3Builder
+                    ->where('rtp.target_waktu >=', $form3StartDate)
+                    ->where('rtp.target_waktu <', $form3EndExclusive);
+            } elseif ($type !== 'semua') {
+                $form3EndExclusive = date(
+                    'Y-m-d',
+                    strtotime($endDate . ' +1 day')
+                );
+
+                $form3Builder
+                    ->where('rtp.target_waktu >=', $startDate)
+                    ->where('rtp.target_waktu <', $form3EndExclusive);
             }
 
             $form3Data = $form3Builder
@@ -1531,14 +1616,44 @@ class PelaporanRisikoController extends BaseController
                 }
             }
 
-            // FILTER TAHUN
-            $form4Builder->where('k.tahun', $tahun);
+
+
+            if ($type === 'range' && $start && $end) {
+                $startDate = date('Y-m-01', strtotime($start));
+                $endExclusive = date(
+                    'Y-m-01',
+                    strtotime($end . ' +1 month')
+                );
+
+                $form4Builder
+                    ->where('pm.realisasi_waktu >=', $startDate)
+                    ->where('pm.realisasi_waktu <', $endExclusive);
+            } elseif ($type !== 'semua') {
+                $endExclusive = date(
+                    'Y-m-d',
+                    strtotime($endDate . ' +1 day')
+                );
+
+                $form4Builder
+                    ->where('pm.realisasi_waktu >=', $startDate)
+                    ->where('pm.realisasi_waktu <', $endExclusive);
+            }
+
+
 
             // FILTER KEGIATAN
             if (!empty($idKegiatan)) {
                 $form4Builder->where(
                     'k.id_kegiatan',
                     $idKegiatan
+                );
+            }
+
+            // FILTER STATUS VALIDASI
+            if (!empty($statusValidasi)) {
+                $form4Builder->where(
+                    'pm.status_validasi',
+                    $statusValidasi
                 );
             }
 

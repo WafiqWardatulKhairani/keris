@@ -29,7 +29,7 @@ $db = \Config\Database::connect();
 $listTahun = $db->table('konteks')
     ->select('tahun')
     ->distinct()
-    ->orderBy('tahun', 'DESC')
+    ->orderBy('tahun', 'DESC') 
     ->get()
     ->getResultArray();
 

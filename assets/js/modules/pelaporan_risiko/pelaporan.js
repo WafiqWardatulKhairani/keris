@@ -16,7 +16,7 @@ function setFormattedText(id, value) {
   if (!value) {
     el.innerHTML = "-";
     return;
-  }
+  } 
 
   let formatted = value;
 
