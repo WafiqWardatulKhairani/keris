@@ -8,6 +8,18 @@ use App\Models\KegiatanModel;
 
 class GlobalContextController extends BaseController
 {
+
+
+private function isExcludedTeam($idTim): bool
+{
+    $tim = (new TimKerjaModel())
+        ->where('nama_tim', 'Bagian Umum')
+        ->first();
+
+    return $tim !== null
+        && (string) $tim['id_tim'] === (string) $idTim;
+}
+
     public function set()
 {
     $tahun      = $this->request->getPost('tahun');
@@ -16,6 +28,16 @@ class GlobalContextController extends BaseController
 
     $userRole = session('user_role');
     $userTim  = session('user_tim') ?? [];
+
+    // Bagian Umum tidak boleh dipilih sebagai konteks dashboard.
+if ($this->isExcludedTeam($idTim)) {
+    return $this->response
+        ->setStatusCode(403)
+        ->setJSON([
+            'status'  => 'error',
+            'message' => 'Tim Bagian Umum tidak tersedia pada dashboard.'
+        ]);
+}
 
     // User non-admin hanya boleh memilih tim yang dimilikinya
     if ($userRole !== 'admin') {
@@ -62,6 +84,15 @@ class GlobalContextController extends BaseController
     public function getKegiatanByTim()
 {
     $idTim = $this->request->getGet('id_tim');
+
+    if ($this->isExcludedTeam($idTim)) {
+    return $this->response
+        ->setStatusCode(403)
+        ->setJSON([
+            'status'  => 'error',
+            'message' => 'Tim Bagian Umum tidak tersedia pada dashboard.'
+        ]);
+}
 
     $userRole = session('user_role');
     $userTim  = session('user_tim') ?? [];

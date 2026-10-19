@@ -120,8 +120,7 @@ class PelaporanRisikoController extends BaseController
                 );
             }
         }
-
-
+        
         $idKegiatan = $this->request->getGet('id_kegiatan');
         $statusValidasi = $this->request->getGet('status_validasi');
 
@@ -1515,6 +1514,8 @@ class PelaporanRisikoController extends BaseController
 
             unset($row);
         }
+
+        //batas form 3
 
         // =====================================================
         // DATA KHUSUS FORM 4 - PELAPORAN RISIKO

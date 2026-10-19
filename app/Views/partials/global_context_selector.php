@@ -7,16 +7,20 @@ $timModel = new TimKerjaModel();
 $userRole = session('user_role');
 $userTim  = session('user_tim') ?? [];
 
-// Admin tetap dapat melihat semua tim.
-// User non-admin hanya melihat tim yang terhubung dengan akunnya.
+// Tim yang tidak ditampilkan pada dropdown dashboard.
+$timDikecualikan = ['Bagian Umum'];
+
+// Admin tetap dapat melihat semua tim, kecuali tim yang dikecualikan.
 if ($userRole === 'admin') {
     $listTim = $timModel
+        ->whereNotIn('nama_tim', $timDikecualikan)
         ->orderBy('nama_tim', 'ASC')
         ->findAll();
 } else {
     if (!empty($userTim)) {
         $listTim = $timModel
             ->whereIn('id_tim', $userTim)
+            ->whereNotIn('nama_tim', $timDikecualikan)
             ->orderBy('nama_tim', 'ASC')
             ->findAll();
     } else {
@@ -29,7 +33,7 @@ $db = \Config\Database::connect();
 $listTahun = $db->table('konteks')
     ->select('tahun')
     ->distinct()
-    ->orderBy('tahun', 'DESC') 
+    ->orderBy('tahun', 'DESC')
     ->get()
     ->getResultArray();
 
@@ -102,15 +106,15 @@ $selectedKegiatan = session('global_id_kegiatan') ?? '';
         },
 
         default: {
-    tahun: '<?= session('global_tahun') ?? date('Y') ?>',
-    id_tim: '<?= session('global_id_tim') ?? session('id_tim') ?>',
-    id_kegiatan: '<?= session('global_id_kegiatan') ?? '' ?>',
+            tahun: '<?= session('global_tahun') ?? date('Y') ?>',
+            id_tim: '<?= session('global_id_tim') ?? session('id_tim') ?>',
+            id_kegiatan: '<?= session('global_id_kegiatan') ?? '' ?>',
 
-    has_context: <?= (
-        session('global_tahun') !== null &&
-        session('global_id_tim') !== null
-    ) ? 'true' : 'false' ?>
-},
+            has_context: <?= (
+                                session('global_tahun') !== null &&
+                                session('global_id_tim') !== null
+                            ) ? 'true' : 'false' ?>
+        },
 
         user: {
             role: '<?= session('user_role') ?>',
