@@ -6,7 +6,7 @@
     </div>
     <div class="kpi-card">
         <div class="kpi-icon icon-purple"><i class="ti ti-list-check"></i></div>
-        <div class="kpi-body"><span>Rencana Penanganan (RTP)</span><b id="kTotalRtp">—</b></div>
+        <div class="kpi-body"><span><span>Total RTP</span></span><b id="kTotalRtp">—</b></div>
         <div class="kpi-bar" id="kBarRtp" style="--p:0%;--c:#8b5cf6"></div>
     </div>
     <div class="kpi-card">

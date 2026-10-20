@@ -295,7 +295,8 @@ function fetchData() {
       // KPI cards
       document.getElementById("kTotalRisiko").textContent = kpi.totalRisiko;
       document.getElementById("kTotalRtp").textContent = kpi.totalRtp;
-      document.getElementById("kRealisasi").textContent = kpi.realisasi + "%";
+    document.getElementById("kRealisasi").textContent =
+  `${kpi.rtpSelesai} (${kpi.realisasi}%)`;
       setBar("kBarRisiko", 100);
       setBar(
         "kBarRtp",

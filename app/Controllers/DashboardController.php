@@ -16,10 +16,13 @@ class DashboardController extends BaseController
              ORDER BY tahun DESC"
         )->getResultArray();
 
-        $timKerjaList = $db->table('tim_kerja')
-            ->select('id_tim, nama_tim')
-            ->orderBy('nama_tim')
-            ->get()->getResultArray();
+       
+$timKerjaList = $db->table('tim_kerja')
+    ->select('id_tim, nama_tim')
+    ->where('nama_tim !=', 'Bagian Umum')
+    ->orderBy('nama_tim')
+    ->get()
+    ->getResultArray();
 
         $kategoriList = $db->table('kategori_risiko')
             ->select('id_kategori_risiko, nama_kategori')
@@ -449,7 +452,7 @@ class DashboardController extends BaseController
 
                 $js
                 " . (($ws ? $ws : "WHERE 1=1")
-                    . (!empty($rtpPeriodConditions) ? " AND " . implode(" AND ", $rtpPeriodConditions) : "")) . "
+                . (!empty($rtpPeriodConditions) ? " AND " . implode(" AND ", $rtpPeriodConditions) : "")) . "
             ", array_merge($ps, $rtpPeriodParams))->getResultArray();
 
             $statusRtp = [
@@ -529,56 +532,56 @@ class DashboardController extends BaseController
             }
 
             $progressRows = $db->query("
-    SELECT
-        tk.id_tim,
-        tk.nama_tim,
+        SELECT
+            tk.id_tim,
+            tk.nama_tim,
 
-        COUNT(DISTINCT k.id_konteks) AS f1,
+            COUNT(DISTINCT k.id_konteks) AS f1,
 
-        COUNT(
-    DISTINCT CASE
-        WHEN ev.id_evaluasi IS NOT NULL
-        THEN k.id_konteks
-    END
-) AS f2,
+            COUNT(
+        DISTINCT CASE
+            WHEN ev.id_evaluasi IS NOT NULL
+            THEN k.id_konteks
+        END
+    ) AS f2,
 
-        COUNT(
-            DISTINCT CASE
-                WHEN rp.id_rtp IS NOT NULL
-                THEN k.id_konteks
-            END
-        ) AS f3,
+            COUNT(
+                DISTINCT CASE
+                    WHEN rp.id_rtp IS NOT NULL
+                    THEN k.id_konteks
+                END
+            ) AS f3,
 
-        COUNT(
-            DISTINCT CASE
-                WHEN pm.id_pemantauan IS NOT NULL
-                THEN k.id_konteks
-            END
-        ) AS f4
+            COUNT(
+                DISTINCT CASE
+                    WHEN pm.id_pemantauan IS NOT NULL
+                    THEN k.id_konteks
+                END
+            ) AS f4
 
-    FROM tim_kerja tk
+        FROM tim_kerja tk
 
-    $pgFromTim
+        $pgFromTim
 
-    $pgToIr
+        $pgToIr
 
-    LEFT JOIN evaluasi_risiko ev
-        ON ev.id_identifikasi = ir.id_identifikasi
+        LEFT JOIN evaluasi_risiko ev
+            ON ev.id_identifikasi = ir.id_identifikasi
 
-    LEFT JOIN rencana_penanganan_risiko rp
-        ON rp.id_penilaian_awal = ev.id_evaluasi
-        " . (!empty($rtpPeriodConditions)
-            ? " AND " . implode(' AND ', $rtpPeriodConditions)
-            : "") . "
+        LEFT JOIN rencana_penanganan_risiko rp
+            ON rp.id_penilaian_awal = ev.id_evaluasi
+            " . (!empty($rtpPeriodConditions)
+                ? " AND " . implode(' AND ', $rtpPeriodConditions)
+                : "") . "
 
-    LEFT JOIN pemantauan_risiko pm
-        ON pm.id_rtp = rp.id_rtp
+        LEFT JOIN pemantauan_risiko pm
+            ON pm.id_rtp = rp.id_rtp
 
-    $pgWhere
+        $pgWhere
 
-    GROUP BY tk.id_tim, tk.nama_tim
-    ORDER BY tk.nama_tim
-", $pgParams)->getResultArray();
+        GROUP BY tk.id_tim, tk.nama_tim
+        ORDER BY tk.nama_tim
+    ", $pgParams)->getResultArray();
 
             // return $this->response->setJSON([
             //     'debug_kategori' => $katRows
@@ -595,11 +598,14 @@ class DashboardController extends BaseController
                     'filter_tim'      => $timId,
                     'filter_kategori' => $katId,
                 ],
+
                 'kpi' => [
                     'totalRisiko' => $totalRisiko,
                     'totalRtp'    => $totalRtp,
+                    'rtpSelesai'  => $rtpSelesai,
                     'realisasi'   => $realisasi,
                 ],
+
                 'heatmap'        => $heatmap,
                 'pieLabels'      => $pieLabels,
                 'pieValues'      => $pieValues,
@@ -614,7 +620,7 @@ class DashboardController extends BaseController
                 'error'   => true,
                 'message' => $e->getMessage(),
                 'line'    => $e->getLine(),
-                'kpi'     => ['totalRisiko' => 0, 'totalRtp' => 0, 'realisasi' => 0],
+                'kpi'     => ['totalRisiko' => 0, 'totalRtp' => 0,'rtpSelesai' => 0, 'realisasi' => 0],
                 'heatmap' => [],
                 'pieLabels' => [],
                 'pieValues' => [],
@@ -677,19 +683,19 @@ class DashboardController extends BaseController
 
             $builder = $db->table('penilaian_risiko pr');
 
+
             $builder->select([
                 'ir.id_identifikasi',
                 'ir.pernyataan_risiko',
-
                 'tk.nama_tim',
-                'pb.jenis_proses',
                 'pb.uraian_proses',
-
+                'kg.nama_kegiatan',
                 'mr.nilai_risiko',
                 'mr.level_kemungkinan',
                 'mr.level_dampak',
                 'mr.warna'
             ]);
+
 
 
             // ==============================
@@ -721,6 +727,13 @@ class DashboardController extends BaseController
             $builder->join(
                 'konteks k',
                 'k.id_konteks = kpb.id_konteks',
+                'left'
+            );
+
+
+            $builder->join(
+                'kegiatan kg',
+                'kg.id_kegiatan = k.id_kegiatan',
                 'left'
             );
 
