@@ -16,7 +16,6 @@ class DashboardController extends BaseController
              ORDER BY tahun DESC"
         )->getResultArray();
 
-       
 $timKerjaList = $db->table('tim_kerja')
     ->select('id_tim, nama_tim')
     ->where('nama_tim !=', 'Bagian Umum')
