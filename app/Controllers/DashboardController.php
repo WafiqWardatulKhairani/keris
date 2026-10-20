@@ -8,8 +8,12 @@ class DashboardController extends BaseController
     {
         $db = \Config\Database::connect();
 
+        // Opsi tahun mengikuti tahun target RTP yang tersedia.
         $tahunList = $db->query(
-            "SELECT DISTINCT tahun FROM konteks WHERE tahun IS NOT NULL ORDER BY tahun DESC"
+            "SELECT DISTINCT EXTRACT(YEAR FROM target_waktu)::int AS tahun
+             FROM rencana_penanganan_risiko
+             WHERE target_waktu IS NOT NULL
+             ORDER BY tahun DESC"
         )->getResultArray();
 
         $timKerjaList = $db->table('tim_kerja')
@@ -115,10 +119,31 @@ class DashboardController extends BaseController
     public function data()
     {
         $db    = \Config\Database::connect();
+        $tahun    = $this->request->getGet('tahun');
+        $triwulan = $this->request->getGet('triwulan');
+        $timId    = $this->request->getGet('tim');
+        $katId    = $this->request->getGet('kategori');
 
-        $tahun = $this->request->getGet('tahun');
-        $timId = $this->request->getGet('tim');
-        $katId = $this->request->getGet('kategori');
+        // Periode dashboard mengikuti target_waktu RTP, bukan created_at.
+        $rtpPeriodConditions = [];
+        $rtpPeriodParams = [];
+
+        if ($tahun !== null && $tahun !== '') {
+            $rtpPeriodConditions[] = 'EXTRACT(YEAR FROM rp.target_waktu) = ?';
+            $rtpPeriodParams[] = (int) $tahun;
+        }
+
+        if ($triwulan !== null && $triwulan !== '') {
+            $triwulanInt = (int) $triwulan;
+            if ($triwulanInt >= 1 && $triwulanInt <= 4) {
+                $rtpPeriodConditions[] = 'EXTRACT(QUARTER FROM rp.target_waktu) = ?';
+                $rtpPeriodParams[] = $triwulanInt;
+            } else {
+                $triwulan = null;
+            }
+        }
+
+        $hasPeriodFilter = !empty($rtpPeriodConditions);
 
         try {
             // ── Deteksi join path yang benar ─────────────────────────────────
@@ -146,21 +171,25 @@ class DashboardController extends BaseController
             $buildJoin = function (string $irAlias = 'ir') use (
                 $db,
                 $tahun,
+                $triwulan,
                 $timId,
                 $katId,
-
                 $konteksHasIdTim,
-                $konteksColumns
+                $konteksColumns,
+                $rtpPeriodConditions,
+                $rtpPeriodParams,
+                $hasPeriodFilter
             ): array {
                 $join   = "";
                 $where  = [];
                 $params = [];
 
-                $needKonteks = $tahun || $timId;
-                $needKat     = (bool)$katId;
+                // Tahun/triwulan memakai target_waktu RTP. JOIN konteks hanya
+                // diperlukan bila filter Tim Kerja dipakai.
+                $needKonteks = (bool) $timId;
+                $needKat     = (bool) $katId;
 
                 if ($needKonteks) {
-
                     $join .= "
         LEFT JOIN konteks_proses_bisnis kpb
             ON kpb.id_konteks_proses = {$irAlias}.id_konteks_proses
@@ -169,15 +198,27 @@ class DashboardController extends BaseController
             ON k.id_konteks = kpb.id_konteks
     ";
 
-                    if ($tahun) {
-                        $where[]  = "k.tahun = ?";
-                        $params[] = $tahun;
+                    $where[]  = "k.id_tim = ?";
+                    $params[] = $timId;
+                }
+
+                // Risiko hanya masuk dashboard jika memiliki RTP pada periode
+                // target yang dipilih.
+                if ($hasPeriodFilter) {
+                    $periodConditions = [];
+                    foreach ($rtpPeriodConditions as $condition) {
+                        $periodConditions[] = str_replace('rp.target_waktu', 'rp_filter.target_waktu', $condition);
                     }
 
-                    if ($timId) {
-                        $where[]  = "k.id_tim = ?";
-                        $params[] = $timId;
-                    }
+                    $where[] = "EXISTS (
+                        SELECT 1
+                        FROM evaluasi_risiko er_filter
+                        JOIN rencana_penanganan_risiko rp_filter
+                            ON rp_filter.id_penilaian_awal = er_filter.id_evaluasi
+                        WHERE er_filter.id_identifikasi = {$irAlias}.id_identifikasi
+                          AND " . implode(' AND ', $periodConditions) . "
+                    )";
+                    $params = array_merge($params, $rtpPeriodParams);
                 }
 
                 if ($needKat) {
@@ -203,31 +244,30 @@ class DashboardController extends BaseController
                 )->getRowArray()['total'];
             }
 
-            // ── KPI 2: Total RTP ─────────────────────────────────────────────
-            if (empty($p)) {
-
-                $totalRtp = (int)$db->query("
-        SELECT COUNT(*) AS total
-        FROM rencana_penanganan_risiko
-    ")->getRowArray()['total'];
+            // ── KPI 2: Total RTP pada periode target ─────────────────────────
+            if (empty($p) && !$hasPeriodFilter) {
+                $totalRtp = (int) $db->query("
+                    SELECT COUNT(*) AS total
+                    FROM rencana_penanganan_risiko
+                ")->getRowArray()['total'];
             } else {
-
                 [$j2, $w2, $p2] = $buildJoin('ir');
+                $whereRtp = $w2 ?: 'WHERE 1=1';
 
-                $totalRtp = (int)$db->query("
-        SELECT COUNT(DISTINCT rp.id_rtp) AS total
+                if (!empty($rtpPeriodConditions)) {
+                    $whereRtp .= ' AND ' . implode(' AND ', $rtpPeriodConditions);
+                }
 
-        FROM rencana_penanganan_risiko rp
-
-        JOIN evaluasi_risiko er
-            ON er.id_evaluasi = rp.id_penilaian_awal
-
-        JOIN identifikasi_risiko ir
-            ON ir.id_identifikasi = er.id_identifikasi
-
-        $j2
-        $w2
-    ", $p2)->getRowArray()['total'];
+                $totalRtp = (int) $db->query("
+                    SELECT COUNT(DISTINCT rp.id_rtp) AS total
+                    FROM rencana_penanganan_risiko rp
+                    JOIN evaluasi_risiko er
+                        ON er.id_evaluasi = rp.id_penilaian_awal
+                    JOIN identifikasi_risiko ir
+                        ON ir.id_identifikasi = er.id_identifikasi
+                    $j2
+                    $whereRtp
+                ", array_merge($p2, $rtpPeriodParams))->getRowArray()['total'];
             }
 
             // ── KPI 3: Realisasi ─────────────────────────────────────────────
@@ -254,14 +294,12 @@ class DashboardController extends BaseController
 
                 $j3
 
-                " . ($w3
-                    ? "$w3 AND pm.realisasi_output IS NOT NULL
-                    AND pm.realisasi_waktu IS NOT NULL
-                    AND bp.id_bukti IS NOT NULL"
-                    : "WHERE pm.realisasi_output IS NOT NULL
+                " . (($w3 ? $w3 : "WHERE 1=1")
+                    . (!empty($rtpPeriodConditions) ? " AND " . implode(" AND ", $rtpPeriodConditions) : "")
+                    . " AND pm.realisasi_output IS NOT NULL
                     AND pm.realisasi_waktu IS NOT NULL
                     AND bp.id_bukti IS NOT NULL"),
-                $p3
+                array_merge($p3, $rtpPeriodParams)
             )->getRowArray()['total'];
 
             $realisasi = $totalRtp > 0
@@ -409,8 +447,10 @@ class DashboardController extends BaseController
                 JOIN identifikasi_risiko ir
                     ON ir.id_identifikasi = er.id_identifikasi
 
-                $js $ws
-            ", $ps)->getResultArray();
+                $js
+                " . (($ws ? $ws : "WHERE 1=1")
+                    . (!empty($rtpPeriodConditions) ? " AND " . implode(" AND ", $rtpPeriodConditions) : "")) . "
+            ", array_merge($ps, $rtpPeriodParams))->getResultArray();
 
             $statusRtp = [
                 'selesai'   => 0,
@@ -459,11 +499,30 @@ class DashboardController extends BaseController
             ";
 
             $pgWhere  = "WHERE 1=1";
-            $pgParams = [];
-            if ($tahun) {
-                $pgWhere .= " AND k.tahun = ?";
-                $pgParams[] = $tahun;
+            // Parameter untuk kondisi periode pada JOIN rp (urutan placeholder SQL).
+            $pgParams = $hasPeriodFilter ? $rtpPeriodParams : [];
+
+            if ($hasPeriodFilter) {
+                $progressPeriodConditions = [];
+                foreach ($rtpPeriodConditions as $condition) {
+                    $progressPeriodConditions[] = str_replace('rp.target_waktu', 'rp_progress.target_waktu', $condition);
+                }
+
+                $pgWhere .= " AND EXISTS (
+                    SELECT 1
+                    FROM konteks_proses_bisnis kpb_progress
+                    JOIN identifikasi_risiko ir_progress
+                        ON ir_progress.id_konteks_proses = kpb_progress.id_konteks_proses
+                    JOIN evaluasi_risiko er_progress
+                        ON er_progress.id_identifikasi = ir_progress.id_identifikasi
+                    JOIN rencana_penanganan_risiko rp_progress
+                        ON rp_progress.id_penilaian_awal = er_progress.id_evaluasi
+                    WHERE kpb_progress.id_konteks = k.id_konteks
+                      AND " . implode(' AND ', $progressPeriodConditions) . "
+                )";
+                $pgParams = array_merge($pgParams, $rtpPeriodParams);
             }
+
             if ($timId) {
                 $pgWhere .= " AND tk.id_tim = ?";
                 $pgParams[] = $timId;
@@ -508,6 +567,9 @@ class DashboardController extends BaseController
 
     LEFT JOIN rencana_penanganan_risiko rp
         ON rp.id_penilaian_awal = ev.id_evaluasi
+        " . (!empty($rtpPeriodConditions)
+            ? " AND " . implode(' AND ', $rtpPeriodConditions)
+            : "") . "
 
     LEFT JOIN pemantauan_risiko pm
         ON pm.id_rtp = rp.id_rtp
@@ -529,6 +591,7 @@ class DashboardController extends BaseController
                     'totalRtp'        => $totalRtp,
 
                     'filter_tahun'    => $tahun,
+                    'filter_triwulan' => $triwulan,
                     'filter_tim'      => $timId,
                     'filter_kategori' => $katId,
                 ],
@@ -581,6 +644,7 @@ class DashboardController extends BaseController
         // ==============================
 
         $tahun    = $this->request->getGet('tahun');
+        $triwulan = $this->request->getGet('triwulan');
         $tim      = $this->request->getGet('tim');
         $kategori = $this->request->getGet('kategori');
 
@@ -682,14 +746,34 @@ class DashboardController extends BaseController
 
 
             // ==============================
-            // FILTER TAHUN
+            // FILTER PERIODE BERDASARKAN TARGET WAKTU RTP
             // ==============================
 
-            if ($tahun !== null && $tahun !== '') {
+            $detailPeriodConditions = [];
 
+            if ($tahun !== null && $tahun !== '') {
+                $detailPeriodConditions[] = 'EXTRACT(YEAR FROM rp_detail.target_waktu) = ' . (int) $tahun;
+            }
+
+            if ($triwulan !== null && $triwulan !== '') {
+                $triwulanInt = (int) $triwulan;
+                if ($triwulanInt >= 1 && $triwulanInt <= 4) {
+                    $detailPeriodConditions[] = 'EXTRACT(QUARTER FROM rp_detail.target_waktu) = ' . $triwulanInt;
+                }
+            }
+
+            if (!empty($detailPeriodConditions)) {
                 $builder->where(
-                    'k.tahun',
-                    (int) $tahun
+                    "EXISTS (
+                        SELECT 1
+                        FROM evaluasi_risiko er_detail
+                        JOIN rencana_penanganan_risiko rp_detail
+                            ON rp_detail.id_penilaian_awal = er_detail.id_evaluasi
+                        WHERE er_detail.id_identifikasi = ir.id_identifikasi
+                          AND " . implode(' AND ', $detailPeriodConditions) . "
+                    )",
+                    null,
+                    false
                 );
             }
 

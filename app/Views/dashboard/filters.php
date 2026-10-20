@@ -8,6 +8,17 @@
             <?php endforeach; ?>
         </select>
     </div>
+    <!-- Filter Triwulan -->
+    <div class="filter-group">
+        <label>Triwulan</label>
+        <select id="fTriwulan">
+            <option value="">Semua Triwulan</option>
+            <option value="1">Triwulan I (Jan–Mar)</option>
+            <option value="2">Triwulan II (Apr–Jun)</option>
+            <option value="3">Triwulan III (Jul–Sep)</option>
+            <option value="4">Triwulan IV (Okt–Des)</option>
+        </select>
+    </div>
     <div class="filter-group">
         <label>Tim Kerja</label>
         <select id="fTim">

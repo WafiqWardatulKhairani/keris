@@ -9,7 +9,7 @@ document.getElementById("dashDate").textContent = new Date().toLocaleDateString(
 
 let chartPie, chartKategori;
 
-function initCharts() { 
+function initCharts() {
   chartPie = new Chart(document.getElementById("chartPie"), {
     type: "pie",
     data: {
@@ -215,14 +215,20 @@ function renderProgress(rows) {
 
 function updateFilterBadge() {
   const t = document.getElementById("fTahun").value;
+  const tw = document.getElementById("fTriwulan");
   const tm = document.getElementById("fTim").selectedOptions[0];
   const k = document.getElementById("fKategori").selectedOptions[0];
+
   const parts = [];
+
   if (t) parts.push(t);
+  if (tw.value) parts.push(tw.selectedOptions[0].text);
   if (tm && tm.value) parts.push(tm.text);
   if (k && k.value) parts.push(k.text);
+
   const ind = document.getElementById("filterIndicator");
   const badge = document.getElementById("filterBadge");
+
   if (parts.length) {
     badge.textContent = parts.join(" · ");
     ind.style.display = "flex";
@@ -252,16 +258,29 @@ function fetchData() {
 
   fetchTimer = setTimeout(async () => {
     const tahun = document.getElementById("fTahun").value;
+    const triwulan = document.getElementById("fTriwulan").value;
     const tim = document.getElementById("fTim").value;
     const kategori = document.getElementById("fKategori").value;
-    console.log("tahun=", tahun, "tim=", tim, "kategori=", kategori);
+
+    console.log(
+      "tahun=",
+      tahun,
+      "triwulan=",
+      triwulan,
+      "tim=",
+      tim,
+      "kategori=",
+      kategori,
+    );
     const overlay = document.getElementById("loadingOverlay");
 
     updateFilterBadge();
     overlay.classList.add("active");
 
     const params = new URLSearchParams();
+
     if (tahun) params.set("tahun", tahun);
+    if (triwulan) params.set("triwulan", triwulan);
     if (tim) params.set("tim", tim);
     if (kategori) params.set("kategori", kategori);
 
@@ -321,15 +340,18 @@ function fetchData() {
 }
 
 document.getElementById("fTahun").addEventListener("change", fetchData);
+document.getElementById("fTriwulan").addEventListener("change", fetchData);
 document.getElementById("fTim").addEventListener("change", fetchData);
 document.getElementById("fKategori").addEventListener("change", fetchData);
+
 document.getElementById("btnReset").addEventListener("click", () => {
   document.getElementById("fTahun").value = "";
+  document.getElementById("fTriwulan").value = "";
   document.getElementById("fTim").value = "";
   document.getElementById("fKategori").value = "";
+
   fetchData();
 });
 
 initCharts();
 fetchData();
- 
