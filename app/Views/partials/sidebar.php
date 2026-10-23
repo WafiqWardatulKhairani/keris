@@ -14,6 +14,15 @@
                     </a>
                 </li>
 
+                <?php if (in_array(session('user_role'), ['admin', 'operator', 'ketua', 'pimpinan'], true)): ?>
+                    <li class="pc-item">
+                        <a href="<?= base_url('glosarium') ?>" class="pc-link">
+                            <span class="pc-micon"><i class="ti ti-bookmarks"></i></span>
+                            <span class="pc-mtext">Glosarium</span>
+                        </a>
+                    </li>
+                <?php endif; ?>
+
                 <?php if (in_array(session('user_role'), ['admin', 'operator', 'ketua'], true)): ?>
                     <li class="pc-item">
                         <a href="<?= base_url('bank-risiko') ?>" class="pc-link">
@@ -23,6 +32,7 @@
                     </li>
                 <?php endif; ?>
 
+
                 <?php if (in_array(session('user_role'), ['admin', 'operator', 'ketua'], true)): ?>
                     <li class="pc-item pc-hasmenu">
                         <a href="javascript:void(0)" class="pc-link pc-parent">
@@ -30,7 +40,7 @@
                             <span class="pc-mtext">Manajemen Risiko</span>
                             <span class="pc-arrow"><i data-feather="chevron-right"></i></span>
                         </a>
-                    
+
                         <ul class="pc-submenu">
 
                             <!--<li class="pc-item pc-hasmenu">-->

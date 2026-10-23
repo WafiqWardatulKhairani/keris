@@ -4,7 +4,6 @@ namespace App\Controllers\Master;
 
 use App\Controllers\BaseController;
 
-class BankRisikoController extends BaseController
 {
     protected $db;
     protected $table = 'bank_risiko';

@@ -346,6 +346,31 @@ $routes->group('pelaporan-risiko', ['filter' => ['auth']], function ($routes) {
     });
 });
 
+
+ // Glosarium
+$routes->group('glosarium', ['filter' => ['auth']], function ($routes) {
+    $routes->get('/', 'Master\GlosariumController::index', [
+        'filter' => 'role:admin,operator,ketua,pimpinan'
+    ]);
+
+    $routes->get('table', 'Master\GlosariumController::table', [
+        'filter' => 'role:admin,operator,ketua,pimpinan'
+    ]);
+
+    $routes->post('store', 'Master\GlosariumController::store', [
+        'filter' => 'role:admin'
+    ]);
+
+    $routes->post('update/(:num)', 'Master\GlosariumController::update/$1', [
+        'filter' => 'role:admin'
+    ]);
+
+    $routes->post('delete/(:num)', 'Master\GlosariumController::delete/$1', [
+        'filter' => 'role:admin'
+    ]);
+});
+
+
 // ======================================================
 // API
 // ======================================================
