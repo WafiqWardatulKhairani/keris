@@ -183,5 +183,11 @@ $canManageContext = in_array(
     window.APP_USER = <?= json_encode(session('user')) ?>;
     window.APP_KONTEKS = <?= json_encode($activeKonteks ?? null) ?>;
 </script>
+<?php if (($activeTab ?? '') === 'konteks'): ?>
+    <script>
+        window.BASE_URL = <?= json_encode(rtrim(site_url(), '/')) ?>;
+    </script>
+    <script src="<?= base_url('assets/js/modules/penetapan_konteks/analisis_swot_pestle.js') ?>"></script>
+<?php endif; ?>
 <script src="<?= base_url('assets/js/modules/penetapan_konteks/' . $activeTab . '.js') ?>"></script>
 <?= $this->endSection() ?>

@@ -1,9 +1,11 @@
 /* ── Layout ───────────────────────────────────────────────────────────────── */
 .dash-wrap {
-  padding: 24px;
+  padding: 16px;
   display: flex;
   flex-direction: column;
   gap: 20px;
+  min-width: 0;
+  box-sizing: border-box;
 }
 .dash-header {
   display: flex;
@@ -12,7 +14,7 @@
 }
 .dash-header h4 {
   font-size: 20px;
-  font-weight: 700;
+  font-weight: 700; 
   margin: 0 0 4px;
   color: #0f172a;
 }

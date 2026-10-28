@@ -1,0 +1,52 @@
+
+/* =========================================
+   GLOSARIUM — Layout konsisten KERIS
+   ========================================= */
+
+.pk-page {
+    width: 100%;
+    min-width: 0;
+    padding: 16px;
+    box-sizing: border-box;
+
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* Header halaman */
+.pk-page .pk-header {
+    margin-bottom: 0 !important;
+    padding: 0;
+}
+
+/* Judul dan deskripsi */
+.pk-page .page-title {
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1.4;
+    color: #0f172a;
+}
+
+.pk-page .page-header small {
+    font-size: 13px;
+}
+
+/* Card tabel memenuhi area konten */
+.pk-page #glosariumTableCard {
+    width: 100%;
+    min-width: 0;
+    margin: 0;
+}
+
+/* Responsif untuk layar kecil */
+@media (max-width: 768px) {
+    .pk-page {
+        padding: 16px;
+        gap: 16px;
+    }
+
+    .pk-page .page-title {
+        font-size: 20px;
+    }
+}

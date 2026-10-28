@@ -214,6 +214,47 @@ $routes->group('penetapan-konteks', [
     $routes->get('matriks', 'MasterDataController::matriks');
     $routes->get('selera', 'MasterDataController::selera');
     $routes->get('sasaran-strategis', 'MasterDataController::sasaranStrategis');
+
+    // Analisis SWOT dan PESTLE
+    $routes->get(
+        'analisis-swot-pestle/list',
+        'AnalisisSwotPestleController::list',
+        ['filter' => 'role:admin,operator,ketua,pimpinan']
+    );
+
+    $routes->post(
+        'analisis-swot-pestle/store',
+        'AnalisisSwotPestleController::store',
+        ['filter' => 'role:admin,operator']
+    );
+
+    $routes->post(
+        'analisis-swot-pestle/update/(:num)',
+        'AnalisisSwotPestleController::update/$1',
+        ['filter' => 'role:admin,operator']
+    );
+
+    $routes->post(
+        'analisis-swot-pestle/delete/(:num)',
+        'AnalisisSwotPestleController::delete/$1',
+        ['filter' => 'role:admin,operator']
+    );
+
+
+    // Pengelolaan Periode Analisis SWOT dan PESTLE
+    // Membuka kembali periode hanya dapat dilakukan admin.
+    $routes->post(
+        'analisis-swot-pestle/buka-periode',
+        'AnalisisSwotPestleController::bukaPeriode',
+        ['filter' => 'role:admin']
+    );
+
+    // Mengunci kembali periode yang sebelumnya dibuka.
+    $routes->post(
+        'analisis-swot-pestle/tutup-periode',
+        'AnalisisSwotPestleController::tutupPeriode',
+        ['filter' => 'role:admin']
+    );
 });
 
 // Identifikasi
@@ -347,7 +388,7 @@ $routes->group('pelaporan-risiko', ['filter' => ['auth']], function ($routes) {
 });
 
 
- // Glosarium
+// Glosarium
 $routes->group('glosarium', ['filter' => ['auth']], function ($routes) {
     $routes->get('/', 'Master\GlosariumController::index', [
         'filter' => 'role:admin,operator,ketua,pimpinan'

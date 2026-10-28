@@ -1,9 +1,11 @@
 /* ── Layout ───────────────────────────────────────────────────────────────── */
 .dash-wrap {
-  padding: 24px;
+  padding: 16px;
   display: flex;
   flex-direction: column;
   gap: 20px;
+  min-width: 0;
+  box-sizing: border-box;
 }
 .dash-header {
   display: flex;

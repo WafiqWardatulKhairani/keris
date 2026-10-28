@@ -1,6 +1,8 @@
 
 <?= $this->extend('layout/main') ?>
 <?= $this->section('content') ?>
+<link rel="stylesheet"
+      href="<?= base_url('assets/css/module/master/glosarium.css') ?>">
 
 <script>
     window.GLOSARIUM_CONFIG = {
@@ -16,7 +18,7 @@
 
 <div class="pk-page">
 
-    <div class="page-header pk-header mb-3">
+    <div class="page-header pk-header">
         <div class="page-block">
             <div class="row align-items-center">
                 <div class="col-12 col-lg-8">
