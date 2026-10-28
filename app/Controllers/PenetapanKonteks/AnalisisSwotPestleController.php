@@ -28,59 +28,59 @@ class AnalisisSwotPestleController extends BaseContextController
         return in_array(session('user_role'), ['admin', 'operator'], true);
     }
 
-    
-/**
- * Memastikan konteks ada dan user memiliki akses.
- */
-private function getAuthorizedContext(int $idKonteks): ?array
-{
-    // Ambil data konteks terlebih dahulu.
-    $konteks = $this->konteksModel
-        ->where('id_konteks', $idKonteks)
-        ->first();
 
-    // Catat informasi untuk debugging tanpa menghentikan proses.
-    log_message('debug', 'SWOT SESSION CHECK: ' . json_encode([
-        'id_konteks'         => $idKonteks,
-        'konteks_ditemukan'  => (bool) $konteks,
-        'user_role'          => session('user_role'),
-        'user_id_tim'        => session('id_tim'),
-        'user_tim'           => session('user_tim'),
-        'user_session'       => session('user'),
-    ]));
+    /**
+     * Memastikan konteks ada dan user memiliki akses.
+     */
+    private function getAuthorizedContext(int $idKonteks): ?array
+    {
+        // Ambil data konteks terlebih dahulu.
+        $konteks = $this->konteksModel
+            ->where('id_konteks', $idKonteks)
+            ->first();
 
-    if (!$konteks) {
+        // Catat informasi untuk debugging tanpa menghentikan proses.
+        log_message('debug', 'SWOT SESSION CHECK: ' . json_encode([
+            'id_konteks'         => $idKonteks,
+            'konteks_ditemukan'  => (bool) $konteks,
+            'user_role'          => session('user_role'),
+            'user_id_tim'        => session('id_tim'),
+            'user_tim'           => session('user_tim'),
+            'user_session'       => session('user'),
+        ]));
+
+        if (!$konteks) {
+            return null;
+        }
+
+        $role = session('user_role');
+        $user = session('user') ?? [];
+
+        // Admin dapat mengakses semua konteks.
+        if ($role === 'admin') {
+            return $konteks;
+        }
+
+        // Gunakan daftar tim dari session KERIS.
+        $userTim = session('user_tim')
+            ?? ($user['tim'] ?? []);
+
+        if (empty($userTim) && session('id_tim')) {
+            $userTim = [session('id_tim')];
+        }
+
+        $userTim = array_map('strval', (array) $userTim);
+
+        // User non-admin hanya boleh mengakses konteks timnya.
+        if (
+            in_array((string) $konteks['id_tim'], $userTim, true)
+            && in_array($role, ['operator', 'ketua', 'pimpinan'], true)
+        ) {
+            return $konteks;
+        }
+
         return null;
     }
-
-    $role = session('user_role');
-    $user = session('user') ?? [];
-
-    // Admin dapat mengakses semua konteks.
-    if ($role === 'admin') {
-        return $konteks;
-    }
-
-    // Gunakan daftar tim dari session KERIS.
-    $userTim = session('user_tim')
-        ?? ($user['tim'] ?? []);
-
-    if (empty($userTim) && session('id_tim')) {
-        $userTim = [session('id_tim')];
-    }
-
-    $userTim = array_map('strval', (array) $userTim);
-
-    // User non-admin hanya boleh mengakses konteks timnya.
-    if (
-        in_array((string) $konteks['id_tim'], $userTim, true)
-        && in_array($role, ['operator', 'ketua', 'pimpinan'], true)
-    ) {
-        return $konteks;
-    }
-
-    return null;
-}
 
 
     /**
@@ -159,9 +159,28 @@ private function getAuthorizedContext(int $idKonteks): ?array
             ->orderBy('id_analisis', 'ASC')
             ->findAll();
 
+        $endMonth = $triwulan * 3;
+
+        $endDate = new \DateTimeImmutable(
+            sprintf('%04d-%02d-01 23:59:59', $tahun, $endMonth)
+        );
+
+        $endDate = $endDate->modify('last day of this month');
+
+        $isEnded = new \DateTimeImmutable('now') > $endDate;
+
+        $periodeConfig = $this->periodeModel->getPeriode(
+            $idKonteks,
+            $tahun,
+            $triwulan
+        );
+
+        $isReopened = (bool) ($periodeConfig['dibuka_kembali'] ?? false);
+
         return $this->response->setJSON([
             'status' => 'success',
             'data'   => $data,
+
             'periode' => [
                 'tahun'    => $tahun,
                 'triwulan' => $triwulan,
@@ -171,7 +190,14 @@ private function getAuthorizedContext(int $idKonteks): ?array
                         $tahun,
                         $triwulan
                     ),
+
+                'status_periode' => [
+                    'sudah_berakhir' => $isEnded,
+                    'dibuka_kembali' => $isReopened,
+                    'terkunci'       => $isEnded && !$isReopened,
+                ],
             ],
+
         ]);
     }
 
@@ -340,136 +366,135 @@ private function getAuthorizedContext(int $idKonteks): ?array
         ]);
     }
 
-    
-/**
- * Membuka kembali periode SWOT/PESTLE yang sudah terkunci.
- *
- * Hak akses: admin saja.
- * Alasan pembukaan wajib dicatat untuk kebutuhan dokumentasi.
- */
-public function bukaPeriode()
-{
-    if (session('user_role') !== 'admin') {
-        return $this->forbidden(
-            'Hanya admin yang dapat membuka kembali periode.'
+
+    /**
+     * Membuka kembali periode SWOT/PESTLE yang sudah terkunci.
+     *
+     * Hak akses: admin saja.
+     * Alasan pembukaan wajib dicatat untuk kebutuhan dokumentasi.
+     */
+    public function bukaPeriode()
+    {
+        if (session('user_role') !== 'admin') {
+            return $this->forbidden(
+                'Hanya admin yang dapat membuka kembali periode.'
+            );
+        }
+
+        $idKonteks = (int) $this->request->getPost('id_konteks');
+        $tahun     = (int) $this->request->getPost('tahun');
+        $triwulan  = (int) $this->request->getPost('triwulan');
+        $alasan    = trim((string) $this->request->getPost('alasan_buka'));
+
+        $konteks = $this->konteksModel->find($idKonteks);
+
+        if (!$konteks) {
+            return $this->invalid('Konteks tidak ditemukan.');
+        }
+
+        if ($tahun !== (int) $konteks['tahun']) {
+            return $this->invalid('Tahun tidak sesuai dengan konteks.');
+        }
+
+        if ($triwulan < 1 || $triwulan > 4) {
+            return $this->invalid('Triwulan harus bernilai 1 sampai 4.');
+        }
+
+        if ($alasan === '') {
+            return $this->invalid(
+                'Alasan pembukaan kembali periode wajib diisi.'
+            );
+        }
+
+        $periode = $this->periodeModel->getPeriode(
+            $idKonteks,
+            $tahun,
+            $triwulan
         );
+
+        $user = session('user') ?? [];
+
+        // Sesuaikan dengan struktur sesi autentikasi KERIS.
+        $idAdmin = $user['id']
+            ?? session('user_id')
+            ?? session('id_user')
+            ?? null;
+
+        $data = [
+            'dibuka_kembali' => true,
+            'dibuka_oleh'    => $idAdmin ? (int) $idAdmin : null,
+            'dibuka_pada'    => date('Y-m-d H:i:s'),
+            'alasan_buka'    => $alasan,
+        ];
+
+        if ($periode) {
+            $this->periodeModel->update(
+                (int) $periode['id_periode'],
+                $data
+            );
+        } else {
+            $this->periodeModel->insert(array_merge($data, [
+                'id_konteks' => $idKonteks,
+                'tahun'      => $tahun,
+                'triwulan'   => $triwulan,
+            ]));
+        }
+
+        return $this->response->setJSON([
+            'status'  => 'success',
+            'message' => 'Periode berhasil dibuka kembali.',
+        ]);
     }
 
-    $idKonteks = (int) $this->request->getPost('id_konteks');
-    $tahun     = (int) $this->request->getPost('tahun');
-    $triwulan  = (int) $this->request->getPost('triwulan');
-    $alasan    = trim((string) $this->request->getPost('alasan_buka'));
+    /**
+     * Mengunci kembali periode yang sebelumnya dibuka admin.
+     *
+     * Hak akses: admin saja.
+     */
+    public function tutupPeriode()
+    {
+        if (session('user_role') !== 'admin') {
+            return $this->forbidden(
+                'Hanya admin yang dapat mengunci kembali periode.'
+            );
+        }
 
-    $konteks = $this->konteksModel->find($idKonteks);
+        $idKonteks = (int) $this->request->getPost('id_konteks');
+        $tahun     = (int) $this->request->getPost('tahun');
+        $triwulan  = (int) $this->request->getPost('triwulan');
 
-    if (!$konteks) {
-        return $this->invalid('Konteks tidak ditemukan.');
-    }
+        $konteks = $this->konteksModel->find($idKonteks);
 
-    if ($tahun !== (int) $konteks['tahun']) {
-        return $this->invalid('Tahun tidak sesuai dengan konteks.');
-    }
+        if (!$konteks || $tahun !== (int) $konteks['tahun']) {
+            return $this->invalid(
+                'Konteks atau tahun tidak valid.'
+            );
+        }
 
-    if ($triwulan < 1 || $triwulan > 4) {
-        return $this->invalid('Triwulan harus bernilai 1 sampai 4.');
-    }
+        if ($triwulan < 1 || $triwulan > 4) {
+            return $this->invalid('Triwulan tidak valid.');
+        }
 
-    if ($alasan === '') {
-        return $this->invalid(
-            'Alasan pembukaan kembali periode wajib diisi.'
+        $periode = $this->periodeModel->getPeriode(
+            $idKonteks,
+            $tahun,
+            $triwulan
         );
-    }
 
-    $periode = $this->periodeModel->getPeriode(
-        $idKonteks,
-        $tahun,
-        $triwulan
-    );
+        if (!$periode) {
+            return $this->invalid(
+                'Pengaturan periode tidak ditemukan.'
+            );
+        }
 
-    $user = session('user') ?? [];
-
-    // Sesuaikan dengan struktur sesi autentikasi KERIS.
-    $idAdmin = $user['id']
-        ?? session('user_id')
-        ?? session('id_user')
-        ?? null;
-
-    $data = [
-        'dibuka_kembali' => true,
-        'dibuka_oleh'    => $idAdmin ? (int) $idAdmin : null,
-        'dibuka_pada'    => date('Y-m-d H:i:s'),
-        'alasan_buka'    => $alasan,
-    ];
-
-    if ($periode) {
         $this->periodeModel->update(
             (int) $periode['id_periode'],
-            $data
+            ['dibuka_kembali' => false]
         );
-    } else {
-        $this->periodeModel->insert(array_merge($data, [
-            'id_konteks' => $idKonteks,
-            'tahun'      => $tahun,
-            'triwulan'   => $triwulan,
-        ]));
+
+        return $this->response->setJSON([
+            'status'  => 'success',
+            'message' => 'Periode berhasil dikunci kembali.',
+        ]);
     }
-
-    return $this->response->setJSON([
-        'status'  => 'success',
-        'message' => 'Periode berhasil dibuka kembali.',
-    ]);
-}
-
-/**
- * Mengunci kembali periode yang sebelumnya dibuka admin.
- *
- * Hak akses: admin saja.
- */
-public function tutupPeriode()
-{
-    if (session('user_role') !== 'admin') {
-        return $this->forbidden(
-            'Hanya admin yang dapat mengunci kembali periode.'
-        );
-    }
-
-    $idKonteks = (int) $this->request->getPost('id_konteks');
-    $tahun     = (int) $this->request->getPost('tahun');
-    $triwulan  = (int) $this->request->getPost('triwulan');
-
-    $konteks = $this->konteksModel->find($idKonteks);
-
-    if (!$konteks || $tahun !== (int) $konteks['tahun']) {
-        return $this->invalid(
-            'Konteks atau tahun tidak valid.'
-        );
-    }
-
-    if ($triwulan < 1 || $triwulan > 4) {
-        return $this->invalid('Triwulan tidak valid.');
-    }
-
-    $periode = $this->periodeModel->getPeriode(
-        $idKonteks,
-        $tahun,
-        $triwulan
-    );
-
-    if (!$periode) {
-        return $this->invalid(
-            'Pengaturan periode tidak ditemukan.'
-        );
-    }
-
-    $this->periodeModel->update(
-        (int) $periode['id_periode'],
-        ['dibuka_kembali' => false]
-    );
-
-    return $this->response->setJSON([
-        'status'  => 'success',
-        'message' => 'Periode berhasil dikunci kembali.',
-    ]);
-}
-
 }

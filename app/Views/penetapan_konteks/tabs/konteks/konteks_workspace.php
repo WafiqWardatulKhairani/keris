@@ -476,9 +476,6 @@ if (session('global_id_kegiatan')) {
     </div>
 </form>
 
-    </div>
-</form>
-
 <?php if (!empty($activeKonteks['id_konteks'])): ?>
     <?= view('penetapan_konteks/tabs/konteks/_analisis_swot_pestle', [
         'activeKonteks' => $activeKonteks,
