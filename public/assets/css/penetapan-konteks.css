@@ -140,3 +140,222 @@
     margin-top: auto;
     flex-shrink: 0;
 }
+
+.sp-analysis {
+    margin-top: 24px;
+    padding-top: 0;
+}
+
+.sp-analysis .pk-section-title {
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+
+.sp-analysis .pk-context-panel {
+    margin-top: 0;
+    padding: 1rem;
+}
+
+.sp-analysis {
+        margin-top: 1rem;
+    }
+
+    .sp-analysis .pk-context-panel {
+        padding: 1rem;
+    }
+
+    .sp-analysis-heading {
+        font-size: 1rem;
+        font-weight: 700;
+        margin: 0 0 .5rem;
+    }
+
+    .sp-category-list {
+        border-top: 1px solid #e5e7eb;
+    }
+
+    .sp-category-row {
+        display: flex;
+        align-items: center;
+        gap: .75rem;
+        width: 100%;
+        padding: .65rem .25rem;
+        text-align: left;
+        color: inherit;
+        background: transparent;
+        border: 0;
+        border-bottom: 1px solid #e5e7eb;
+        transition: background .15s ease;
+    }
+
+    .sp-category-row:hover {
+        background: #f8fafc;
+    }
+
+    .sp-category-letter {
+        flex: 0 0 25px;
+        width: 25px;
+        font-weight: 700;
+        font-size: .95rem;
+    }
+
+    .sp-category-content {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .sp-category-name {
+        display: block;
+        font-size: .9rem;
+        font-weight: 500;
+        line-height: 1.35;
+    }
+
+    .sp-category-meaning,
+    .sp-category-count {
+        display: none;
+    }
+
+    .sp-category-meta {
+        flex: 0 0 auto;
+        display: flex;
+        align-items: center;
+        gap: .75rem;
+        color: #6b7280;
+        font-size: .8rem;
+    }
+
+    .sp-category-action {
+        color: #64748b;
+        font-size: .75rem;
+    }
+
+    .sp-period-info {
+        font-size: .85rem;
+        padding: .6rem .85rem;
+        margin-bottom: 1rem;
+    }
+
+    .sp-analysis-description {
+        display: none;
+    }
+
+    .sp-category-group+.sp-category-group {
+        margin-top: 1.25rem;
+    }
+
+    @media (max-width: 576px) {
+        .sp-analysis .pk-context-panel {
+            padding: .75rem;
+        }
+
+        .sp-category-row {
+            gap: .5rem;
+            padding: .65rem .15rem;
+        }
+
+        .sp-category-meta {
+            gap: .45rem;
+        }
+
+        .sp-category-name {
+            font-size: .85rem;
+        }
+    }
+
+    /* Ringkasan SWOT & PESTLE */
+    .sp-category-group {
+        margin-top: 12px;
+    }
+
+    .sp-group-toggle {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        padding: 12px 14px;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        background: #fff;
+        color: #1f2937;
+        font-weight: 600;
+        text-align: left;
+        cursor: pointer;
+    }
+
+    .sp-group-toggle:hover {
+        background: #f8fafc;
+    }
+
+    .sp-group-toggle .sp-group-label {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .sp-group-toggle .sp-group-count {
+        padding: 3px 9px;
+        border-radius: 6px;
+        background: #eff6ff;
+        color: #2563eb;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .sp-group-content {
+        padding: 4px 12px 8px;
+        border: 1px solid #e5e7eb;
+        border-top: 0;
+        border-radius: 0 0 8px 8px;
+    }
+
+    .sp-group-content[hidden] {
+        display: none !important;
+    }
+
+    /* Riwayat */
+    .sp-history {
+        margin-top: 24px;
+    }
+
+    .sp-history-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 16px;
+    }
+
+    .sp-history-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 42px;
+        height: 42px;
+        border-radius: 10px;
+        background: #eff6ff;
+        color: #2563eb;
+        font-size: 18px;
+    }
+
+    .sp-history-table th,
+    .sp-history-table td {
+        vertical-align: middle;
+        padding: 12px;
+    }
+
+    .sp-history-detail {
+        white-space: nowrap;
+    }
+
+    @media (max-width: 576px) {
+        .sp-group-content {
+            padding-right: 6px;
+            padding-left: 6px;
+        }
+
+        .sp-history-table th,
+        .sp-history-table td {
+            padding: 8px;
+            font-size: 12px;
+        }
+    }

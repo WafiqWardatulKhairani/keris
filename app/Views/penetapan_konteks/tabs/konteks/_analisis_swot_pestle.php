@@ -1,7 +1,18 @@
 <?php
 
 $idKonteks = (int) ($activeKonteks['id_konteks'] ?? 0);
-$tahun     = (int) ($activeKonteks['tahun'] ?? date('Y'));
+
+$idTim = (int) (
+    session('global_id_tim')
+    ?? $activeKonteks['id_tim']
+    ?? 0
+);
+
+$tahun = (int) (
+    session('global_tahun')
+    ?? $activeKonteks['tahun']
+    ?? date('Y')
+);
 $userRole  = session('user_role');
 
 $canManage = !empty($canEdit)
@@ -31,119 +42,11 @@ $pestle = [
 ];
 ?>
 
-<style>
-    .sp-analysis {
-        margin-top: 1rem;
-    }
-
-    .sp-analysis .pk-context-panel {
-        padding: 1rem;
-    }
-
-    .sp-analysis-heading {
-        font-size: 1rem;
-        font-weight: 700;
-        margin: 0 0 .5rem;
-    }
-
-    .sp-category-list {
-        border-top: 1px solid #e5e7eb;
-    }
-
-    .sp-category-row {
-        display: flex;
-        align-items: center;
-        gap: .75rem;
-        width: 100%;
-        padding: .65rem .25rem;
-        text-align: left;
-        color: inherit;
-        background: transparent;
-        border: 0;
-        border-bottom: 1px solid #e5e7eb;
-        transition: background .15s ease;
-    }
-
-    .sp-category-row:hover {
-        background: #f8fafc;
-    }
-
-    .sp-category-letter {
-        flex: 0 0 25px;
-        width: 25px;
-        font-weight: 700;
-        font-size: .95rem;
-    }
-
-    .sp-category-content {
-        flex: 1;
-        min-width: 0;
-    }
-
-    .sp-category-name {
-        display: block;
-        font-size: .9rem;
-        font-weight: 500;
-        line-height: 1.35;
-    }
-
-    .sp-category-meaning,
-    .sp-category-count {
-        display: none;
-    }
-
-    .sp-category-meta {
-        flex: 0 0 auto;
-        display: flex;
-        align-items: center;
-        gap: .75rem;
-        color: #6b7280;
-        font-size: .8rem;
-    }
-
-    .sp-category-action {
-        color: #64748b;
-        font-size: .75rem;
-    }
-
-    .sp-period-info {
-        font-size: .85rem;
-        padding: .6rem .85rem;
-        margin-bottom: 1rem;
-    }
-
-    .sp-analysis-description {
-        display: none;
-    }
-
-    .sp-category-group+.sp-category-group {
-        margin-top: 1.25rem;
-    }
-
-    @media (max-width: 576px) {
-        .sp-analysis .pk-context-panel {
-            padding: .75rem;
-        }
-
-        .sp-category-row {
-            gap: .5rem;
-            padding: .65rem .15rem;
-        }
-
-        .sp-category-meta {
-            gap: .45rem;
-        }
-
-        .sp-category-name {
-            font-size: .85rem;
-        }
-    }
-</style>
-
 <section
     class="pk-section sp-analysis"
     id="swotPestleSection"
     data-id-konteks="<?= $idKonteks ?>"
+    data-id-tim="<?= $idTim ?>"
     data-tahun="<?= $tahun ?>"
     data-can-manage="<?= $canManage ? '1' : '0' ?>">
     <div class="pk-section-title">Analisis SWOT dan PESTLE</div>
@@ -196,87 +99,123 @@ $pestle = [
 
         <!-- ANALISIS SWOT -->
         <div class="sp-category-group">
-            <div class="sp-analysis-heading">Analisis SWOT</div>
+            <button
+                type="button"
+                class="sp-group-toggle"
+                aria-expanded="false"
+                aria-controls="spSwotContent"
+                data-target="spSwotContent">
 
-            <div class="sp-category-list">
-                <?php foreach ($swot as $kode => $item): ?>
-                    <button
-                        type="button"
-                        class="sp-category-row swot-pestle-category"
-                        data-jenis="SWOT"
-                        data-kategori="<?= esc($kode) ?>"
-                        aria-label="Buka <?= esc($item['nama']) ?>">
-                        <span class="sp-category-letter">
-                            <?= esc($kode) ?>
-                        </span>
+                <span class="sp-group-label">
+                    <i class="fas fa-chevron-right sp-toggle-icon"></i>
+                    <span>Analisis SWOT</span>
+                </span>
 
-                        <span class="sp-category-content">
-                            <span class="sp-category-name">
-                                <?= esc($item['nama']) ?>
-                                (<?= esc($item['arti']) ?>)
+                <span class="sp-group-count" id="spSwotTotal">
+                    0 poin
+                </span>
+            </button>
+
+            <div class="sp-group-content" id="spSwotContent" hidden>
+                <div class="sp-category-list">
+                    <?php foreach ($swot as $kode => $item): ?>
+                        <button
+                            type="button"
+                            class="sp-category-row swot-pestle-category"
+                            data-jenis="SWOT"
+                            data-kategori="<?= esc($kode) ?>"
+                            aria-label="Buka <?= esc($item['nama']) ?>">
+
+                            <span class="sp-category-letter">
+                                <?= esc($kode) ?>
                             </span>
 
-                            <span
-                                class="sp-category-count"
-                                id="count-SWOT-<?= esc($kode) ?>">
-                                Memuat data...
-                            </span>
-                        </span>
+                            <span class="sp-category-content">
+                                <span class="sp-category-name">
+                                    <?= esc($item['nama']) ?>
+                                    (<?= esc($item['arti']) ?>)
+                                </span>
 
-                        <span class="sp-category-meta">
-                            <span
-                                class="sp-category-count-visible"
-                                data-count-for="count-SWOT-<?= esc($kode) ?>">— poin</span>
-
-                            <span class="sp-category-action" aria-hidden="true">
-                                <i class="fas fa-chevron-right"></i>
+                                <span
+                                    class="sp-category-count"
+                                    id="count-SWOT-<?= esc($kode) ?>">
+                                    Memuat data...
+                                </span>
                             </span>
-                        </span>
-                    </button>
-                <?php endforeach; ?>
+
+                            <span class="sp-category-meta">
+                                <span
+                                    class="sp-category-count-visible"
+                                    data-count-for="count-SWOT-<?= esc($kode) ?>">
+                                    — poin
+                                </span>
+
+                                <i class="fas fa-chevron-right sp-category-action"></i>
+                            </span>
+                        </button>
+                    <?php endforeach; ?>
+                </div>
             </div>
         </div>
 
         <!-- ANALISIS PESTLE -->
         <div class="sp-category-group">
-            <div class="sp-analysis-heading">Analisis PESTLE</div>
+            <button
+                type="button"
+                class="sp-group-toggle"
+                aria-expanded="false"
+                aria-controls="spPestleContent"
+                data-target="spPestleContent">
 
-            <div class="sp-category-list">
-                <?php foreach ($pestle as $kode => $item): ?>
-                    <button
-                        type="button"
-                        class="sp-category-row swot-pestle-category"
-                        data-jenis="PESTLE"
-                        data-kategori="<?= esc($kode) ?>"
-                        aria-label="Buka <?= esc($item['nama']) ?>">
-                        <span class="sp-category-letter">
-                            <?= $kode === 'ENV' ? 'E' : esc($kode) ?>
-                        </span>
+                <span class="sp-group-label">
+                    <i class="fas fa-chevron-right sp-toggle-icon"></i>
+                    <span>Analisis PESTLE</span>
+                </span>
 
-                        <span class="sp-category-content">
-                            <span class="sp-category-name">
-                                <?= esc($item['nama']) ?>
-                                (<?= esc($item['arti']) ?>)
+                <span class="sp-group-count" id="spPestleTotal">
+                    0 poin
+                </span>
+            </button>
+
+            <div class="sp-group-content" id="spPestleContent" hidden>
+                <div class="sp-category-list">
+                    <?php foreach ($pestle as $kode => $item): ?>
+                        <button
+                            type="button"
+                            class="sp-category-row swot-pestle-category"
+                            data-jenis="PESTLE"
+                            data-kategori="<?= esc($kode) ?>"
+                            aria-label="Buka <?= esc($item['nama']) ?>">
+
+                            <span class="sp-category-letter">
+                                <?= $kode === 'ENV' ? 'E' : esc($kode) ?>
                             </span>
 
-                            <span
-                                class="sp-category-count"
-                                id="count-PESTLE-<?= esc($kode) ?>">
-                                Memuat data...
-                            </span>
-                        </span>
+                            <span class="sp-category-content">
+                                <span class="sp-category-name">
+                                    <?= esc($item['nama']) ?>
+                                    (<?= esc($item['arti']) ?>)
+                                </span>
 
-                        <span class="sp-category-meta">
-                            <span
-                                class="sp-category-count-visible"
-                                data-count-for="count-PESTLE-<?= esc($kode) ?>">— poin</span>
-
-                            <span class="sp-category-action" aria-hidden="true">
-                                <i class="fas fa-chevron-right"></i>
+                                <span
+                                    class="sp-category-count"
+                                    id="count-PESTLE-<?= esc($kode) ?>">
+                                    Memuat data...
+                                </span>
                             </span>
-                        </span>
-                    </button>
-                <?php endforeach; ?>
+
+                            <span class="sp-category-meta">
+                                <span
+                                    class="sp-category-count-visible"
+                                    data-count-for="count-PESTLE-<?= esc($kode) ?>">
+                                    — poin
+                                </span>
+
+                                <i class="fas fa-chevron-right sp-category-action"></i>
+                            </span>
+                        </button>
+                    <?php endforeach; ?>
+                </div>
             </div>
         </div>
 
@@ -300,6 +239,90 @@ $pestle = [
                 </button>
             </div>
         <?php endif; ?>
+    </div>
+</section>
+
+<section class="sp-history" id="swotPestleHistory">
+    <div class="sp-history-header">
+        <div class="sp-history-icon">
+            <i class="fas fa-history"></i>
+        </div>
+
+        <div>
+            <h5 class="mb-1 fw-semibold">
+                Riwayat Analisis SWOT & PESTLE
+            </h5>
+
+            <p class="text-muted small mb-0">
+                Pilih periode untuk melihat analisis sebelumnya.
+                Riwayat hanya dapat dibaca.
+            </p>
+        </div>
+    </div>
+
+    <div class="pk-context-panel">
+        <div class="row g-2 mb-3">
+            <div class="col-md-3">
+                <label for="spHistoryYear" class="form-label small">
+                    Tahun
+                </label>
+
+                <select
+                    id="spHistoryYear"
+                    class="form-select form-select-sm">
+                    <option value="">Semua Tahun</option>
+                </select>
+            </div>
+
+            <div class="col-md-3">
+                <label for="spHistoryQuarter" class="form-label small">
+                    Triwulan
+                </label>
+
+                <select
+                    id="spHistoryQuarter"
+                    class="form-select form-select-sm">
+                    <option value="">Semua Triwulan</option>
+                    <option value="1">Triwulan I</option>
+                    <option value="2">Triwulan II</option>
+                    <option value="3">Triwulan III</option>
+                    <option value="4">Triwulan IV</option>
+                </select>
+            </div>
+
+            <div class="col-md-6">
+                <label for="spHistorySearch" class="form-label small">
+                    Cari periode
+                </label>
+
+                <input
+                    type="search"
+                    id="spHistorySearch"
+                    class="form-control form-control-sm"
+                    placeholder="Cari tahun atau triwulan...">
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-hover sp-history-table mb-0">
+                <thead>
+                    <tr>
+                        <th>Tahun</th>
+                        <th>Triwulan</th>
+                        <th>Jumlah Poin</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+
+                <tbody id="spHistoryTableBody">
+                    <tr>
+                        <td colspan="4" class="text-center text-muted py-4">
+                            Riwayat akan dimuat dari server.
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 </section>
 
@@ -327,4 +350,84 @@ $pestle = [
         visibleCount.textContent =
             source.textContent.trim() || 'Memuat data...';
     });
+</script>
+
+<script>
+    document.querySelectorAll(
+        '#swotPestleSection .sp-group-toggle'
+    ).forEach(function(button) {
+        button.addEventListener('click', function() {
+            const target = document.getElementById(
+                button.dataset.target
+            );
+
+            if (!target) return;
+
+            const isExpanded =
+                button.getAttribute('aria-expanded') === 'true';
+
+            button.setAttribute(
+                'aria-expanded',
+                String(!isExpanded)
+            );
+
+            target.hidden = isExpanded;
+
+            const icon = button.querySelector('.sp-toggle-icon');
+
+            if (icon) {
+                icon.classList.toggle('fa-chevron-right', isExpanded);
+                icon.classList.toggle('fa-chevron-down', !isExpanded);
+            }
+        });
+    });
+
+    function updateGroupTotal(type, targetId) {
+        const counts = document.querySelectorAll(
+            '#swotPestleSection [data-count-for^="count-' + type + '-"]'
+        );
+
+        let total = 0;
+
+        counts.forEach(function(element) {
+            const value = parseInt(element.textContent, 10);
+
+            if (Number.isFinite(value)) {
+                total += value;
+            }
+        });
+
+        const target = document.getElementById(targetId);
+
+        if (target) {
+            target.textContent = total + ' poin';
+        }
+    }
+
+    function observeGroupTotal(type, targetId) {
+        const counts = document.querySelectorAll(
+            '#swotPestleSection [data-count-for^="count-' + type + '-"]'
+        );
+
+        counts.forEach(function(element) {
+            const source = document.getElementById(
+                element.dataset.countFor
+            );
+
+            if (!source) return;
+
+            new MutationObserver(function() {
+                updateGroupTotal(type, targetId);
+            }).observe(source, {
+                childList: true,
+                characterData: true,
+                subtree: true
+            });
+        });
+
+        updateGroupTotal(type, targetId);
+    }
+
+    observeGroupTotal('SWOT', 'spSwotTotal');
+    observeGroupTotal('PESTLE', 'spPestleTotal');
 </script>

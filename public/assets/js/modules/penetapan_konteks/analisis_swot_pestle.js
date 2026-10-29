@@ -16,7 +16,7 @@
 
   if (!root) return;
 
-  const idKonteks = Number(root.dataset.idKonteks);
+  const idTim = Number(root.dataset.idTim);
   const tahun = Number(root.dataset.tahun);
   const canManage = root.dataset.canManage === "1";
   const role = window.APP_USER?.role ?? "";
@@ -331,7 +331,7 @@
         countElement.textContent = "Memuat...";
 
         const query = new URLSearchParams({
-          id_konteks: idKonteks,
+          id_tim: idTim,
           jenis,
           kategori,
           tahun,
@@ -379,7 +379,7 @@
 
     try {
       const query = new URLSearchParams({
-        id_konteks: idKonteks,
+        id_tim: idTim,
         jenis,
         kategori,
         tahun,
@@ -505,7 +505,7 @@
 
     const id = modal.save.dataset.id;
     const values = {
-      id_konteks: idKonteks,
+      id_tim: idTim,
       jenis_analisis: activeCategory.jenis,
       kategori: activeCategory.kategori,
       tahun,
@@ -558,6 +558,7 @@
 
     try {
       await post(`${BASE}/delete/${encodeURIComponent(item.id_analisis)}`, {
+        id_tim: idTim,
         tahun,
         triwulan: currentQuarter(),
       });
@@ -622,12 +623,12 @@
 
     try {
       const result = await post(`${BASE}/${action}`, {
-        id_konteks: idKonteks,
+        id_tim: idTim,
         tahun,
         triwulan: quarter,
         alasan_buka: alasan,
       });
-
+      
       // Perbarui status tombol setelah server menyatakan berhasil.
       if (action === "tutup-periode") {
         currentPeriodStatus = {

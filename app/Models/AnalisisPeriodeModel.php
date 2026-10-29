@@ -4,13 +4,6 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
-/**
- * Model pengaturan periode analisis SWOT dan PESTLE.
- *
- * Menyimpan status pembukaan kembali periode yang sudah berakhir.
- * Penguncian otomatis berdasarkan kalender akan divalidasi
- * oleh controller sebelum operasi tambah, edit, dan hapus.
- */
 class AnalisisPeriodeModel extends Model
 {
     protected $table            = 'analisis_periode';
@@ -19,6 +12,7 @@ class AnalisisPeriodeModel extends Model
 
     protected $allowedFields = [
         'id_konteks',
+        'id_tim',
         'tahun',
         'triwulan',
         'dibuka_kembali',
@@ -32,14 +26,15 @@ class AnalisisPeriodeModel extends Model
     protected $updatedField  = 'updated_at';
 
     /**
-     * Mengambil konfigurasi periode tertentu.
+     * Mengambil konfigurasi periode berdasarkan tim,
+     * tahun, dan triwulan.
      */
     public function getPeriode(
-        int $idKonteks,
+        int $idTim,
         int $tahun,
         int $triwulan
     ): ?array {
-        return $this->where('id_konteks', $idKonteks)
+        return $this->where('id_tim', $idTim)
             ->where('tahun', $tahun)
             ->where('triwulan', $triwulan)
             ->first();
