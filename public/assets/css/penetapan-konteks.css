@@ -946,3 +946,60 @@
         max-height: calc(100vh - 32px) !important;
     }
 }
+
+.sp-history-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 54px;
+    height: 54px;
+    flex-shrink: 0;
+    border-radius: 12px;
+    background: #e5f0ff;
+    color: #1670ef;
+}
+
+.sp-history-icon i {
+    font-size: 25px;
+    line-height: 1;
+}
+
+.sp-history-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 54px;
+    height: 54px;
+    flex: 0 0 54px;
+    border-radius: 12px;
+    background: #e5f0ff;
+    color: #1670ef;
+}
+
+.sp-history-icon svg {
+    display: block;
+    width: 27px;
+    height: 27px;
+    flex-shrink: 0;
+}
+
+/* ===== Perbaikan jarak Analisis dan Riwayat ===== */
+
+#swotPestleSection {
+    margin-bottom: 0 !important;
+    padding-bottom: 0 !important;
+}
+
+#swotPestleSection .pk-context-panel {
+    margin-bottom: 0 !important;
+}
+
+#swotPestleHistory {
+    margin-top: 24px !important;
+    padding-top: 0 !important;
+}
+
+#swotPestleHistory .sp-history-header {
+    margin-top: 0 !important;
+    margin-bottom: 12px !important;
+}

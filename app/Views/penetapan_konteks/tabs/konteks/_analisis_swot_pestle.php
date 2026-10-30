@@ -245,7 +245,20 @@ $pestle = [
 <section class="sp-history" id="swotPestleHistory">
     <div class="sp-history-header">
         <div class="sp-history-icon">
-            <i class="fas fa-history"></i>
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="27"
+                height="27"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round">
+
+                <circle cx="12" cy="12" r="10"></circle>
+                <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
         </div>
 
         <div>
@@ -255,7 +268,6 @@ $pestle = [
 
             <p class="text-muted small mb-0">
                 Pilih periode untuk melihat analisis sebelumnya.
-                Riwayat hanya dapat dibaca.
             </p>
         </div>
     </div>
