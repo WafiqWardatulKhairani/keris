@@ -628,7 +628,7 @@
         triwulan: quarter,
         alasan_buka: alasan,
       });
-      
+
       // Perbarui status tombol setelah server menyatakan berhasil.
       if (action === "tutup-periode") {
         currentPeriodStatus = {
@@ -691,6 +691,334 @@
 
     managePeriod(action).catch(showError);
   });
+
+  // =========================
+  // RIWAYAT SWOT & PESTLE
+  // =========================
+  const historyRoot = document.getElementById("swotPestleHistory");
+  const historyYear = document.getElementById("spHistoryYear");
+  const historyQuarter = document.getElementById("spHistoryQuarter");
+  const historySearch = document.getElementById("spHistorySearch");
+  const historyBody = document.getElementById("spHistoryTableBody");
+
+  const HISTORY_BASE = `${window.BASE_URL ?? window.location.origin}/penetapan-konteks`;
+
+  const quarterNames = {
+    1: "Triwulan I",
+    2: "Triwulan II",
+    3: "Triwulan III",
+    4: "Triwulan IV",
+  };
+
+  let historyRows = [];
+
+  function historyCell(text, className = "") {
+    const td = document.createElement("td");
+    td.textContent = text;
+    if (className) td.className = className;
+    return td;
+  }
+
+  function showHistoryMessage(message) {
+    if (!historyBody) return;
+
+    historyBody.replaceChildren();
+
+    const tr = document.createElement("tr");
+    const td = historyCell(message, "text-center text-muted py-4");
+    td.colSpan = 4;
+
+    tr.appendChild(td);
+    historyBody.appendChild(tr);
+  }
+
+  function renderHistoryTable() {
+    if (!historyBody) return;
+
+    const yearValue = historyYear?.value || "";
+    const quarterValue = historyQuarter?.value || "";
+    const keyword = (historySearch?.value || "").trim().toLowerCase();
+
+    const filtered = historyRows.filter((item) => {
+      const yearMatches = !yearValue || String(item.tahun) === yearValue;
+
+      const quarterMatches =
+        !quarterValue || String(item.triwulan) === quarterValue;
+
+      const searchText =
+        `${item.tahun} ${quarterNames[item.triwulan] || ""} ` +
+        `triwulan ${item.triwulan}`;
+
+      const searchMatches = searchText.toLowerCase().includes(keyword);
+
+      return yearMatches && quarterMatches && searchMatches;
+    });
+
+    historyBody.replaceChildren();
+
+    if (!filtered.length) {
+      showHistoryMessage("Belum ada riwayat analisis pada filter ini.");
+      return;
+    }
+
+    filtered.forEach((item) => {
+      const tr = document.createElement("tr");
+
+      tr.appendChild(historyCell(String(item.tahun)));
+      tr.appendChild(
+        historyCell(quarterNames[item.triwulan] || `Triwulan ${item.triwulan}`),
+      );
+      tr.appendChild(historyCell(`${Number(item.jumlah_poin) || 0} poin`));
+
+      const actionCell = document.createElement("td");
+      const button = document.createElement("button");
+
+      button.type = "button";
+      button.className = "btn btn-sm btn-outline-primary";
+      button.textContent = "Lihat Detail";
+
+      button.addEventListener("click", () => {
+        openHistoryDetail(item.tahun, item.triwulan).catch(showError);
+      });
+
+      actionCell.appendChild(button);
+      tr.appendChild(actionCell);
+      historyBody.appendChild(tr);
+    });
+  }
+
+  async function loadHistory() {
+    if (!historyRoot || !historyBody) return;
+
+    showHistoryMessage("Memuat riwayat...");
+
+    const query = new URLSearchParams({
+      id_tim: String(idTim),
+    });
+
+    if (historyYear?.value) {
+      query.set("tahun", historyYear.value);
+    }
+
+    if (historyQuarter?.value) {
+      query.set("triwulan", historyQuarter.value);
+    }
+
+    try {
+      const result = await request(
+        `${HISTORY_BASE}/riwayat?${query.toString()}`,
+      );
+
+      historyRows = Array.isArray(result.data) ? result.data : [];
+
+      // Isi pilihan tahun berdasarkan seluruh tahun yang tersedia.
+      // Request khusus untuk daftar tahun dilakukan tanpa filter tahun.
+      const allYearsQuery = new URLSearchParams({
+        id_tim: String(idTim),
+      });
+
+      const allYearsResult = await request(
+        `${HISTORY_BASE}/riwayat?${allYearsQuery.toString()}`,
+      );
+
+      const years = Array.isArray(allYearsResult.tahun)
+        ? allYearsResult.tahun
+        : [];
+
+      if (historyYear) {
+        const previousValue = historyYear.value;
+        historyYear.replaceChildren();
+
+        const allOption = document.createElement("option");
+        allOption.value = "";
+        allOption.textContent = "Semua Tahun";
+        historyYear.appendChild(allOption);
+
+        years.forEach((year) => {
+          const option = document.createElement("option");
+          option.value = String(year);
+          option.textContent = String(year);
+          historyYear.appendChild(option);
+        });
+
+        historyYear.value = years.map(String).includes(previousValue)
+          ? previousValue
+          : "";
+      }
+
+      renderHistoryTable();
+    } catch (error) {
+      showHistoryMessage("Gagal memuat riwayat analisis.");
+      showError(error);
+    }
+  }
+
+  
+  async function openHistoryDetail(year, quarter) {
+    const query = new URLSearchParams({
+      id_tim: String(idTim),
+      tahun: String(year),
+      triwulan: String(quarter),
+    });
+
+    const result = await request(
+      `${HISTORY_BASE}/detail-riwayat?${query.toString()}`
+    );
+
+    let detailModal = document.getElementById("spHistoryDetailModal");
+
+    if (!detailModal) {
+      detailModal = document.createElement("div");
+      detailModal.id = "spHistoryDetailModal";
+      detailModal.className = "modal fade sp-history-modal";
+      detailModal.tabIndex = -1;
+      detailModal.setAttribute("aria-hidden", "true");
+
+      detailModal.innerHTML = `
+        <div class="modal-dialog modal-xl modal-dialog-scrollable sp-history-dialog">
+          <div class="modal-content sp-history-modal-content">
+            <div class="modal-header sp-history-modal-header">
+              <div>
+                <h4 class="modal-title fw-bold">Detail Riwayat Analisis</h4>
+                <div class="text-muted small mt-1" id="spHistoryDetailPeriod"></div>
+              </div>
+              <div class="d-flex align-items-center gap-3">
+                <span class="sp-readonly-badge">Read Only</span>
+                <button type="button" class="btn-close"
+                  data-bs-dismiss="modal" aria-label="Tutup"></button>
+              </div>
+            </div>
+
+            <div class="modal-body sp-history-modal-body">
+              <div class="sp-history-tabs" role="tablist">
+                <button type="button" class="sp-history-tab active"
+                  data-history-tab="SWOT" role="tab" aria-selected="true">
+                  SWOT
+                </button>
+                <button type="button" class="sp-history-tab"
+                  data-history-tab="PESTLE" role="tab" aria-selected="false">
+                  PESTLE
+                </button>
+              </div>
+              <div id="spHistoryDetailBody" class="sp-history-detail-body"></div>
+            </div>
+          </div>
+        </div>`;
+
+      document.body.appendChild(detailModal);
+    }
+
+    const quarterName = quarterNames[quarter] || `Triwulan ${quarter}`;
+    const period = detailModal.querySelector("#spHistoryDetailPeriod");
+    const body = detailModal.querySelector("#spHistoryDetailBody");
+    const tabs = detailModal.querySelectorAll("[data-history-tab]");
+
+    period.textContent = `${quarterName} · ${year}`;
+
+    const groups = {
+      SWOT: [
+        { code: "S", label: "Strengths (Kekuatan)", color: "blue" },
+        { code: "W", label: "Weaknesses (Kelemahan)", color: "orange" },
+        { code: "O", label: "Opportunities (Peluang)", color: "green" },
+        { code: "T", label: "Threats (Ancaman)", color: "red" },
+      ],
+      PESTLE: [
+        { code: "P", label: "Political (Politik)", color: "blue" },
+        { code: "E", label: "Economic (Ekonomi)", color: "orange" },
+        { code: "S", label: "Social (Sosial)", color: "green" },
+        { code: "T", label: "Technological (Teknologi)", color: "red" },
+        { code: "L", label: "Legal (Hukum)", color: "purple" },
+        { code: "ENV", label: "Environmental (Lingkungan)", color: "green" },
+      ],
+    };
+
+    const items = Array.isArray(result.data) ? result.data : [];
+
+    function renderTab(type) {
+      body.replaceChildren();
+
+      groups[type].forEach((category) => {
+        const categoryItems = items.filter(
+          (item) =>
+            item.jenis_analisis === type &&
+            item.kategori === category.code
+        );
+
+        const section = document.createElement("section");
+        section.className = "sp-history-category";
+
+        const icon = document.createElement("div");
+        icon.className = `sp-history-category-icon ${category.color}`;
+        icon.textContent = category.code === "ENV" ? "E" : category.code;
+
+        const content = document.createElement("div");
+        content.className = "sp-history-category-content";
+
+        const heading = document.createElement("h6");
+        heading.className = "sp-history-category-title";
+        heading.textContent = category.label;
+
+        const description = document.createElement("div");
+        description.className = "sp-history-category-description";
+
+        if (!categoryItems.length) {
+          const empty = document.createElement("p");
+          empty.className = "text-muted small mb-0";
+          empty.textContent = "Belum ada poin analisis.";
+          description.appendChild(empty);
+        } else {
+          const list = document.createElement("ul");
+
+          categoryItems.forEach((item) => {
+            const point = document.createElement("li");
+            point.textContent = item.uraian || "";
+            list.appendChild(point);
+          });
+
+          description.appendChild(list);
+        }
+
+        content.append(heading, description);
+        section.append(icon, content);
+        body.appendChild(section);
+      });
+
+      tabs.forEach((tab) => {
+        const active = tab.dataset.historyTab === type;
+        tab.classList.toggle("active", active);
+        tab.setAttribute("aria-selected", String(active));
+      });
+    }
+
+    tabs.forEach((tab) => {
+      tab.onclick = () => renderTab(tab.dataset.historyTab);
+    });
+
+    renderTab("SWOT");
+
+    if (!window.bootstrap?.Modal) {
+      throw new Error("Bootstrap Modal belum tersedia pada halaman ini.");
+    }
+
+    bootstrap.Modal.getOrCreateInstance(detailModal, {
+  backdrop: false,
+  keyboard: true,
+  focus: true,
+}).show();
+  }
+
+
+  historyYear?.addEventListener("change", () => {
+    loadHistory().catch(showError);
+  });
+
+  historyQuarter?.addEventListener("change", () => {
+    loadHistory().catch(showError);
+  });
+
+  historySearch?.addEventListener("input", renderHistoryTable);
+
+  loadHistory().catch(showError);
 
   loadCategoryCounts().catch(showError);
 })();

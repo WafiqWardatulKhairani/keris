@@ -1,96 +1,92 @@
 /* ================= GRID SECTION ================= */
-.pk-section{
-    margin-top:10px;
+.pk-section {
+  margin-top: 10px;
 }
 
-.pk-section:first-child{
-    margin-top:0;
+.pk-section:first-child {
+  margin-top: 0;
 }
 
 .pk-grid-2 {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 18px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
 }
 /* ================= FIELD ROW ================= */
 .pk-field-row {
-    display: grid;
-    grid-template-columns: 120px 1fr;
-    align-items:center;
-    gap: 5px;
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  align-items: center;
+  gap: 5px;
 }
 
 .pk-field-label {
-    font-size: 13px;
-    font-weight: 500;
+  font-size: 13px;
+  font-weight: 500;
 }
 
 .pk-field-input {
-    flex: 1;
+  flex: 1;
 }
 /* ================= INPUT & SELECT ================= */
 .pk-offcanvas .form-control,
 .pk-offcanvas .form-select {
-    height: 40px;
-    border-radius: 6px;
-    font-size: 13px;
-    border: 1px solid #dcdfe4;
+  height: 40px;
+  border-radius: 6px;
+  font-size: 13px;
+  border: 1px solid #dcdfe4;
 }
 /* ================= SELECT2 ================= */
 
 .select2-container--default .select2-selection--single,
 .select2-container--default .select2-selection--multiple {
-    height: 40px;
-    border-radius: 6px;
-    font-size: 13px;
-    border: 1px solid #dcdfe4;
+  height: 40px;
+  border-radius: 6px;
+  font-size: 13px;
+  border: 1px solid #dcdfe4;
 }
 
 .select2-container--default .select2-selection--multiple {
-    min-height: 40px;
+  min-height: 40px;
 }
 /* ===============================
    INFORMASI KONTEKS PANEL
 =============================== */
-.pk-context-panel{
-    border:1px solid #e6eaf0;
-    border-radius:12px;
-    padding:18px;
-    margin-top:10px;
-    background:linear-gradient(
-        to bottom,
-        #ffffff,
-        #fafbfc
-    );
-    box-shadow:0 2px 8px rgba(0,0,0,0.03);
+.pk-context-panel {
+  border: 1px solid #e6eaf0;
+  border-radius: 12px;
+  padding: 18px;
+  margin-top: 10px;
+  background: linear-gradient(to bottom, #ffffff, #fafbfc);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
 }
 /* ============================
    FIELD SPACING
 ============================ */
-.pk-context-panel .pk-field-row{
-    margin-top:12px;
+.pk-context-panel .pk-field-row {
+  margin-top: 12px;
 }
 
-.pk-context-panel .pk-field-row:first-child{
-    margin-top:0;
+.pk-context-panel .pk-field-row:first-child {
+  margin-top: 0;
 }
-.pk-field-row + .pk-field-row{
-    margin-top:14px;
+.pk-field-row + .pk-field-row {
+  margin-top: 14px;
 }
 /* ============================
    MULTI INPUT GROUP
 ============================ */
-.pk-multi-input{
-    display:flex;
-    flex-direction:column;
-    gap:8px;
+.pk-multi-input {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 /* TITLE */
-.pk-section-title{
-    font-weight:600;
-    font-size:13px;
-    margin-bottom:10px;
+.pk-section-title {
+  font-weight: 600;
+  font-size: 13px;
+  margin-bottom: 10px;
 }
 .pk-truncate {
   max-width: 200px;
@@ -127,235 +123,826 @@
 =================================== */
 
 .pc-container {
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
 .pc-container > .pc-content {
-    flex: 1 0 auto;
+  flex: 1 0 auto;
 }
 
 .pc-container > .pc-footer {
-    margin-top: auto;
-    flex-shrink: 0;
+  margin-top: auto;
+  flex-shrink: 0;
 }
 
 .sp-analysis {
-    margin-top: 24px;
-    padding-top: 0;
+  margin-top: 24px;
+  padding-top: 0;
 }
 
 .sp-analysis .pk-section-title {
-    margin-top: 0;
-    margin-bottom: 10px;
+  margin-top: 0;
+  margin-bottom: 10px;
 }
 
 .sp-analysis .pk-context-panel {
-    margin-top: 0;
-    padding: 1rem;
+  margin-top: 0;
+  padding: 1rem;
 }
 
 .sp-analysis {
-        margin-top: 1rem;
+  margin-top: 1rem;
+}
+
+.sp-analysis .pk-context-panel {
+  padding: 1rem;
+}
+
+.sp-analysis-heading {
+  font-size: 1rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem;
+}
+
+.sp-category-list {
+  border-top: 1px solid #e5e7eb;
+}
+
+.sp-category-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.65rem 0.25rem;
+  text-align: left;
+  color: inherit;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid #e5e7eb;
+  transition: background 0.15s ease;
+}
+
+.sp-category-row:hover {
+  background: #f8fafc;
+}
+
+.sp-category-letter {
+  flex: 0 0 25px;
+  width: 25px;
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.sp-category-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.sp-category-name {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 500;
+  line-height: 1.35;
+}
+
+.sp-category-meaning,
+.sp-category-count {
+  display: none;
+}
+
+.sp-category-meta {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: #6b7280;
+  font-size: 0.8rem;
+}
+
+.sp-category-action {
+  color: #64748b;
+  font-size: 0.75rem;
+}
+
+.sp-period-info {
+  font-size: 0.85rem;
+  padding: 0.6rem 0.85rem;
+  margin-bottom: 1rem;
+}
+
+.sp-analysis-description {
+  display: none;
+}
+
+.sp-category-group + .sp-category-group {
+  margin-top: 1.25rem;
+}
+
+@media (max-width: 576px) {
+  .sp-analysis .pk-context-panel {
+    padding: 0.75rem;
+  }
+
+  .sp-category-row {
+    gap: 0.5rem;
+    padding: 0.65rem 0.15rem;
+  }
+
+  .sp-category-meta {
+    gap: 0.45rem;
+  }
+
+  .sp-category-name {
+    font-size: 0.85rem;
+  }
+}
+
+/* Ringkasan SWOT & PESTLE */
+.sp-category-group {
+  margin-top: 12px;
+}
+
+.sp-group-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #fff;
+  color: #1f2937;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+}
+
+.sp-group-toggle:hover {
+  background: #f8fafc;
+}
+
+.sp-group-toggle .sp-group-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.sp-group-toggle .sp-group-count {
+  padding: 3px 9px;
+  border-radius: 6px;
+  background: #eff6ff;
+  color: #2563eb;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.sp-group-content {
+  padding: 4px 12px 8px;
+  border: 1px solid #e5e7eb;
+  border-top: 0;
+  border-radius: 0 0 8px 8px;
+}
+
+.sp-group-content[hidden] {
+  display: none !important;
+}
+
+/* Riwayat */
+.sp-history {
+  margin-top: 24px;
+}
+
+.sp-history-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.sp-history-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  background: #eff6ff;
+  color: #2563eb;
+  font-size: 18px;
+}
+
+.sp-history-table th,
+.sp-history-table td {
+  vertical-align: middle;
+  padding: 12px;
+}
+
+.sp-history-detail {
+  white-space: nowrap;
+}
+
+@media (max-width: 576px) {
+  .sp-group-content {
+    padding-right: 6px;
+    padding-left: 6px;
+  }
+
+  .sp-history-table th,
+  .sp-history-table td {
+    padding: 8px;
+    font-size: 12px;
+  }
+}
+
+/* Rapikan jarak panel analisis dan riwayat */
+#swotPestleSection {
+  margin-bottom: 0 !important;
+}
+
+#swotPestleHistory {
+  margin-top: 16px !important;
+  padding-top: 0 !important;
+}
+
+#swotPestleHistory .pk-context-panel {
+  margin-top: 0;
+}
+
+
+/* ===== Modal riwayat SWOT & PESTLE ===== */
+.sp-history-modal {
+    --bs-modal-width: 620px;
+}
+
+.sp-history-dialog {
+    margin: 0 16px 0 auto;
+    width: min(620px, calc(100% - 32px));
+    max-width: none;
+    height: calc(100vh - 32px);
+    display: flex;
+    align-items: center;
+}
+
+.sp-history-modal-content {
+    max-height: calc(100vh - 32px);
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 16px 48px rgba(15, 23, 42, .16);
+}
+
+.sp-history-modal-header {
+    padding: 20px 24px 16px;
+    border-bottom: 0;
+}
+
+.sp-history-modal-header .modal-title {
+    font-size: 21px;
+    color: #0f172a;
+}
+
+.sp-readonly-badge {
+    white-space: nowrap;
+    padding: 5px 12px;
+    border-radius: 20px;
+    background: #e9edf3;
+    color: #64748b;
+    font-size: 12px;
+}
+
+.sp-history-modal-body {
+    padding: 0 24px 24px;
+    overflow-y: auto;
+}
+
+.sp-history-tabs {
+    display: flex;
+    width: 100%;
+    padding: 3px;
+    margin-bottom: 18px;
+    border: 1px solid #e2e8f0;
+    border-radius: 7px;
+    background: #f8fafc;
+}
+
+.sp-history-tab {
+    flex: 1;
+    padding: 9px 12px;
+    border: 0;
+    border-radius: 6px;
+    background: transparent;
+    color: #334155;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.sp-history-tab.active {
+    background: #2580f9;
+    color: #fff;
+    box-shadow: 0 2px 5px rgba(37, 128, 249, .2);
+}
+
+.sp-history-category {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    margin-bottom: 18px;
+}
+
+.sp-history-category-icon {
+    display: flex;
+    flex: 0 0 46px;
+    width: 46px;
+    height: 46px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    font-size: 23px;
+    font-weight: 700;
+}
+
+.sp-history-category-icon.blue {
+    color: #1670ef;
+    background: #e1efff;
+}
+
+.sp-history-category-icon.orange {
+    color: #e89500;
+    background: #fff2d4;
+}
+
+.sp-history-category-icon.green {
+    color: #078b45;
+    background: #dcf7e6;
+}
+
+.sp-history-category-icon.red {
+    color: #e33434;
+    background: #ffe3e3;
+}
+
+.sp-history-category-icon.purple {
+    color: #7c3aed;
+    background: #ede9fe;
+}
+
+.sp-history-category-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.sp-history-category-title {
+    margin: 4px 0 5px;
+    color: #0f172a;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.sp-history-category-description {
+    padding: 10px 12px;
+    border: 1px solid #e8edf4;
+    border-radius: 9px;
+    background: #f8fafc;
+    color: #475569;
+    font-size: 12.5px;
+    line-height: 1.65;
+    overflow-wrap: anywhere;
+}
+
+.sp-history-category-description ul {
+    margin: 0;
+    padding-left: 14px;
+}
+
+.sp-history-category-description li + li {
+    margin-top: 3px;
+}
+
+@media (max-width: 767px) {
+    .sp-history-dialog {
+        width: calc(100% - 16px);
+        height: calc(100vh - 16px);
+        margin: 8px;
     }
 
-    .sp-analysis .pk-context-panel {
-        padding: 1rem;
+    .sp-history-modal-content {
+        max-height: calc(100vh - 16px);
     }
 
-    .sp-analysis-heading {
-        font-size: 1rem;
-        font-weight: 700;
-        margin: 0 0 .5rem;
+    .sp-history-modal-header {
+        padding: 16px;
     }
 
-    .sp-category-list {
-        border-top: 1px solid #e5e7eb;
-    }
-
-    .sp-category-row {
-        display: flex;
-        align-items: center;
-        gap: .75rem;
-        width: 100%;
-        padding: .65rem .25rem;
-        text-align: left;
-        color: inherit;
-        background: transparent;
-        border: 0;
-        border-bottom: 1px solid #e5e7eb;
-        transition: background .15s ease;
-    }
-
-    .sp-category-row:hover {
-        background: #f8fafc;
-    }
-
-    .sp-category-letter {
-        flex: 0 0 25px;
-        width: 25px;
-        font-weight: 700;
-        font-size: .95rem;
-    }
-
-    .sp-category-content {
-        flex: 1;
-        min-width: 0;
-    }
-
-    .sp-category-name {
-        display: block;
-        font-size: .9rem;
-        font-weight: 500;
-        line-height: 1.35;
-    }
-
-    .sp-category-meaning,
-    .sp-category-count {
-        display: none;
-    }
-
-    .sp-category-meta {
-        flex: 0 0 auto;
-        display: flex;
-        align-items: center;
-        gap: .75rem;
-        color: #6b7280;
-        font-size: .8rem;
-    }
-
-    .sp-category-action {
-        color: #64748b;
-        font-size: .75rem;
-    }
-
-    .sp-period-info {
-        font-size: .85rem;
-        padding: .6rem .85rem;
-        margin-bottom: 1rem;
-    }
-
-    .sp-analysis-description {
-        display: none;
-    }
-
-    .sp-category-group+.sp-category-group {
-        margin-top: 1.25rem;
-    }
-
-    @media (max-width: 576px) {
-        .sp-analysis .pk-context-panel {
-            padding: .75rem;
-        }
-
-        .sp-category-row {
-            gap: .5rem;
-            padding: .65rem .15rem;
-        }
-
-        .sp-category-meta {
-            gap: .45rem;
-        }
-
-        .sp-category-name {
-            font-size: .85rem;
-        }
-    }
-
-    /* Ringkasan SWOT & PESTLE */
-    .sp-category-group {
-        margin-top: 12px;
-    }
-
-    .sp-group-toggle {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        width: 100%;
-        padding: 12px 14px;
-        border: 1px solid #e5e7eb;
-        border-radius: 8px;
-        background: #fff;
-        color: #1f2937;
-        font-weight: 600;
-        text-align: left;
-        cursor: pointer;
-    }
-
-    .sp-group-toggle:hover {
-        background: #f8fafc;
-    }
-
-    .sp-group-toggle .sp-group-label {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
-
-    .sp-group-toggle .sp-group-count {
-        padding: 3px 9px;
-        border-radius: 6px;
-        background: #eff6ff;
-        color: #2563eb;
-        font-size: 12px;
-        font-weight: 600;
-    }
-
-    .sp-group-content {
-        padding: 4px 12px 8px;
-        border: 1px solid #e5e7eb;
-        border-top: 0;
-        border-radius: 0 0 8px 8px;
-    }
-
-    .sp-group-content[hidden] {
-        display: none !important;
-    }
-
-    /* Riwayat */
-    .sp-history {
-        margin-top: 24px;
-    }
-
-    .sp-history-header {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        margin-bottom: 16px;
-    }
-
-    .sp-history-icon {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 42px;
-        height: 42px;
-        border-radius: 10px;
-        background: #eff6ff;
-        color: #2563eb;
+    .sp-history-modal-header .modal-title {
         font-size: 18px;
     }
 
-    .sp-history-table th,
-    .sp-history-table td {
-        vertical-align: middle;
-        padding: 12px;
+    .sp-history-modal-body {
+        padding: 0 16px 16px;
     }
 
-    .sp-history-detail {
-        white-space: nowrap;
+    .sp-history-category {
+        gap: 10px;
     }
 
-    @media (max-width: 576px) {
-        .sp-group-content {
-            padding-right: 6px;
-            padding-left: 6px;
-        }
-
-        .sp-history-table th,
-        .sp-history-table td {
-            padding: 8px;
-            font-size: 12px;
-        }
+    .sp-history-category-icon {
+        flex-basis: 38px;
+        width: 38px;
+        height: 38px;
+        font-size: 19px;
     }
+}
+
+
+/* Perbaiki jarak berlebihan pada kategori di modal riwayat */
+#spHistoryDetailBody {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+#spHistoryDetailBody .sp-history-category {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    margin: 0 0 18px !important;
+    padding: 0;
+    min-height: 0 !important;
+    height: auto !important;
+}
+
+#spHistoryDetailBody .sp-history-category-content {
+    flex: 1;
+    min-width: 0;
+    height: auto !important;
+}
+
+#spHistoryDetailBody .sp-history-category-description {
+    height: auto !important;
+    min-height: 0 !important;
+    margin: 0;
+}
+
+#spHistoryDetailBody .sp-history-category-description ul {
+    margin: 0;
+}
+
+#spHistoryDetailBody .sp-history-category-description li {
+    margin-bottom: 3px;
+}
+
+#spHistoryDetailBody .sp-history-category-description li:last-child {
+    margin-bottom: 0;
+}
+
+#spHistoryDetailModal .modal-body {
+    padding-top: 12px;
+}
+
+
+/* ===== Compact modal riwayat SWOT & PESTLE ===== */
+
+/* Lebar modal */
+#spHistoryDetailModal .sp-history-dialog {
+    width: min(540px, calc(100% - 28px));
+    margin: 0 14px 0 auto;
+}
+
+/* Header lebih ringkas */
+#spHistoryDetailModal .sp-history-modal-header {
+    padding: 16px 20px 12px;
+}
+
+#spHistoryDetailModal .sp-history-modal-header .modal-title {
+    font-size: 19px;
+}
+
+#spHistoryDetailModal .sp-history-modal-header .small {
+    font-size: 12px;
+}
+
+#spHistoryDetailModal .sp-readonly-badge {
+    padding: 4px 10px;
+    font-size: 11px;
+}
+
+/* Area konten */
+#spHistoryDetailModal .sp-history-modal-body {
+    padding: 0 20px 18px;
+}
+
+#spHistoryDetailModal .sp-history-tabs {
+    margin-bottom: 14px;
+}
+
+#spHistoryDetailModal .sp-history-tab {
+    padding: 7px 10px;
+    font-size: 13px;
+}
+
+/* Jarak antar kategori */
+#spHistoryDetailModal #spHistoryDetailBody {
+    gap: 12px;
+}
+
+#spHistoryDetailModal .sp-history-category {
+    gap: 12px;
+    margin-bottom: 8px !important;
+}
+
+/* Ikon kategori */
+#spHistoryDetailModal .sp-history-category-icon {
+    flex-basis: 38px;
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    font-size: 19px;
+}
+
+/* Judul kategori */
+#spHistoryDetailModal .sp-history-category-title {
+    margin: 3px 0 5px;
+    font-size: 13px;
+}
+
+/* Kotak uraian */
+#spHistoryDetailModal .sp-history-category-description {
+    padding: 8px 10px;
+    border-radius: 8px;
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+#spHistoryDetailModal .sp-history-category-description ul {
+    padding-left: 13px;
+}
+
+#spHistoryDetailModal .sp-history-category-description li + li {
+    margin-top: 2px;
+}
+
+
+/* Modal riwayat: tinggi mengikuti isi, dengan batas maksimum */
+#spHistoryDetailModal .sp-history-dialog {
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: calc(100vh - 64px) !important;
+    align-items: center;
+}
+
+#spHistoryDetailModal .sp-history-modal-content {
+    height: auto !important;
+    max-height: calc(100vh - 64px) !important;
+}
+
+/* Isi modal menyesuaikan jumlah kategori */
+#spHistoryDetailModal .sp-history-modal-body {
+    flex: 0 1 auto;
+    min-height: 0;
+    overflow: hidden;
+}
+
+#spHistoryDetailModal #spHistoryDetailBody {
+    flex: 0 1 auto;
+    min-height: 0;
+    max-height: calc(100vh - 230px);
+    overflow-y: auto;
+}
+
+/* PESTLE tetap bisa scroll jika isinya lebih panjang */
+#spHistoryDetailModal #spHistoryDetailBody .sp-history-category {
+    flex-shrink: 0;
+}
+
+
+/* ===== Riwayat SWOT & PESTLE: side panel tanpa backdrop ===== */
+
+#spHistoryDetailModal.modal {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    padding: 0 !important;
+    overflow: hidden;
+    background: transparent !important;
+    pointer-events: none;
+}
+
+#spHistoryDetailModal .sp-history-dialog {
+    position: absolute;
+    top: 50%;
+    right: 16px;
+    left: auto;
+
+    width: min(540px, calc(100vw - 32px)) !important;
+    max-width: 540px !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: calc(100vh - 48px) !important;
+
+    margin: 0 !important;
+    display: block;
+
+    transform: translateY(-50%) !important;
+    pointer-events: auto;
+}
+
+#spHistoryDetailModal .sp-history-modal-content {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: auto !important;
+    max-height: calc(100vh - 48px) !important;
+    min-height: 0;
+
+    overflow: hidden;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    background: #fff;
+    box-shadow: 0 8px 30px rgba(15, 23, 42, 0.12);
+}
+
+#spHistoryDetailModal .sp-history-modal-header {
+    flex: 0 0 auto;
+}
+
+#spHistoryDetailModal .sp-history-modal-body {
+    flex: 0 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+}
+
+#spHistoryDetailModal #spHistoryDetailBody {
+    max-height: calc(100vh - 230px);
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+@media (max-width: 767px) {
+    #spHistoryDetailModal .sp-history-dialog {
+        right: 8px;
+        width: calc(100vw - 16px) !important;
+        max-width: none !important;
+        max-height: calc(100vh - 24px) !important;
+    }
+
+    #spHistoryDetailModal .sp-history-modal-content {
+        max-height: calc(100vh - 24px) !important;
+        border-radius: 12px;
+    }
+}
+
+
+/* ===== Side panel riwayat: lebih kecil dan sedikit ke bawah ===== */
+#spHistoryDetailModal .sp-history-dialog {
+    top: calc(50% + 24px) !important;
+    right: 16px !important;
+    left: auto !important;
+
+    width: min(460px, calc(100vw - 32px)) !important;
+    max-width: 460px !important;
+
+    max-height: calc(100vh - 100px) !important;
+    transform: translateY(-50%) !important;
+}
+
+#spHistoryDetailModal .sp-history-modal-content {
+    max-height: calc(100vh - 100px) !important;
+    border-radius: 14px;
+}
+
+/* Header lebih ringkas */
+#spHistoryDetailModal .sp-history-modal-header {
+    padding: 14px 16px 10px !important;
+}
+
+#spHistoryDetailModal .sp-history-modal-header .modal-title {
+    font-size: 17px !important;
+}
+
+#spHistoryDetailModal .sp-history-modal-body {
+    padding: 0 16px 14px !important;
+}
+
+/* Tab lebih pendek */
+#spHistoryDetailModal .sp-history-tabs {
+    margin-bottom: 12px !important;
+}
+
+#spHistoryDetailModal .sp-history-tab {
+    padding: 7px 8px !important;
+    font-size: 12px !important;
+}
+
+/* Kategori lebih compact */
+#spHistoryDetailModal .sp-history-category {
+    gap: 9px !important;
+    margin-bottom: 8px !important;
+}
+
+#spHistoryDetailModal .sp-history-category-icon {
+    flex: 0 0 32px !important;
+    width: 32px !important;
+    height: 32px !important;
+    font-size: 16px !important;
+    border-radius: 8px !important;
+}
+
+#spHistoryDetailModal .sp-history-category-title {
+    font-size: 12px !important;
+    margin: 2px 0 4px !important;
+}
+
+#spHistoryDetailModal .sp-history-category-description {
+    padding: 7px 9px !important;
+    font-size: 11.5px !important;
+    line-height: 1.45 !important;
+}
+
+/* Layar kecil */
+@media (max-width: 767px) {
+    #spHistoryDetailModal .sp-history-dialog {
+        top: 50% !important;
+        right: 8px !important;
+        width: calc(100vw - 16px) !important;
+        max-width: none !important;
+        max-height: calc(100vh - 32px) !important;
+    }
+
+    #spHistoryDetailModal .sp-history-modal-content {
+        max-height: calc(100vh - 32px) !important;
+    }
+}
+
+
+/* ===== FIX FINAL: Ukuran panel konsisten saat ganti tab ===== */
+
+#spHistoryDetailModal .sp-history-dialog {
+    position: absolute !important;
+    top: calc(50% + 24px) !important;
+    right: 16px !important;
+    left: auto !important;
+
+    width: min(460px, calc(100vw - 32px)) !important;
+    max-width: 460px !important;
+
+    height: 560px !important;
+    max-height: calc(100vh - 100px) !important;
+    min-height: 0 !important;
+
+    margin: 0 !important;
+    display: block !important;
+    transform: translateY(-50%) !important;
+}
+
+#spHistoryDetailModal .sp-history-modal-content {
+    display: flex !important;
+    flex-direction: column !important;
+
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    max-height: 100% !important;
+
+    overflow: hidden !important;
+}
+
+/* Header dan tab tetap pada posisi yang sama */
+#spHistoryDetailModal .sp-history-modal-header {
+    flex: 0 0 auto !important;
+}
+
+#spHistoryDetailModal .sp-history-modal-body {
+    display: flex !important;
+    flex-direction: column !important;
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+}
+
+#spHistoryDetailModal .sp-history-tabs {
+    flex: 0 0 auto !important;
+}
+
+/* Hanya bagian daftar kategori yang scroll */
+#spHistoryDetailModal #spHistoryDetailBody {
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+}
+
+/* Tampilan layar kecil */
+@media (max-width: 767px) {
+    #spHistoryDetailModal .sp-history-dialog {
+        top: 50% !important;
+        right: 8px !important;
+        width: calc(100vw - 16px) !important;
+        max-width: none !important;
+        height: 560px !important;
+        max-height: calc(100vh - 32px) !important;
+    }
+}

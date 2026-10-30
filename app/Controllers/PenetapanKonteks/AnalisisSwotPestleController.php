@@ -595,6 +595,116 @@ class AnalisisSwotPestleController extends BaseContextController
         ]);
     }
 
+    /**
+ * Daftar periode analisis yang memiliki data untuk tim aktif.
+ * Riwayat dapat mencakup tahun-tahun sebelumnya.
+ */
+public function riwayat()
+{
+    $idTim = (int) $this->request->getGet('id_tim');
+    $globalTim = (int) session('global_id_tim');
+
+    // Riwayat harus mengikuti tim yang dipilih di global context.
+    if (
+        $idTim <= 0 ||
+        ($globalTim > 0 && $idTim !== $globalTim) ||
+        !$this->getAuthorizedTeam($idTim)
+    ) {
+        return $this->forbidden(
+            'Tim kerja tidak dapat diakses.'
+        );
+    }
+
+    $tahun = (int) $this->request->getGet('tahun');
+    $triwulan = (int) $this->request->getGet('triwulan');
+
+    $builder = $this->analisisModel
+        ->builder()
+        ->select('tahun, triwulan, COUNT(*) AS jumlah_poin')
+        ->where('id_tim', $idTim);
+
+    if ($tahun > 0) {
+        $builder->where('tahun', $tahun);
+    }
+
+    if ($triwulan >= 1 && $triwulan <= 4) {
+        $builder->where('triwulan', $triwulan);
+    }
+
+    $data = $builder
+        ->groupBy(['tahun', 'triwulan'])
+        ->orderBy('tahun', 'DESC')
+        ->orderBy('triwulan', 'DESC')
+        ->get()
+        ->getResultArray();
+
+    // Tahun yang tersedia untuk filter.
+    $tahunRows = $this->analisisModel
+        ->builder()
+        ->distinct()
+        ->select('tahun')
+        ->where('id_tim', $idTim)
+        ->orderBy('tahun', 'DESC')
+        ->get()
+        ->getResultArray();
+
+    return $this->response->setJSON([
+        'status' => 'success',
+        'data' => $data,
+        'tahun' => array_map(
+            'intval',
+            array_column($tahunRows, 'tahun')
+        ),
+    ]);
+}
+
+/**
+ * Detail seluruh kategori SWOT dan PESTLE pada satu periode.
+ * Endpoint ini hanya membaca data.
+ */
+public function detailRiwayat()
+{
+    $idTim = (int) $this->request->getGet('id_tim');
+    $tahun = (int) $this->request->getGet('tahun');
+    $triwulan = (int) $this->request->getGet('triwulan');
+
+    $globalTim = (int) session('global_id_tim');
+
+    if (
+        $idTim <= 0 ||
+        $tahun <= 0 ||
+        !$this->isValidQuarter($triwulan) ||
+        ($globalTim > 0 && $idTim !== $globalTim) ||
+        !$this->getAuthorizedTeam($idTim)
+    ) {
+        return $this->forbidden(
+            'Periode riwayat tidak dapat diakses.'
+        );
+    }
+
+    $data = $this->analisisModel
+        ->where('id_tim', $idTim)
+        ->where('tahun', $tahun)
+        ->where('triwulan', $triwulan)
+        ->orderBy('jenis_analisis', 'ASC')
+        ->orderBy('kategori', 'ASC')
+        ->orderBy('id_analisis', 'ASC')
+        ->findAll();
+
+    $namaTim = $this->timModel->find($idTim);
+
+    return $this->response->setJSON([
+        'status' => 'success',
+        'periode' => [
+            'id_tim' => $idTim,
+            'nama_tim' => $namaTim['nama_tim'] ?? '',
+            'tahun' => $tahun,
+            'triwulan' => $triwulan,
+        ],
+        'data' => $data,
+    ]);
+}
+
     private function forbidden(string $message = 'Akses ditolak.')
     {
         return $this->response->setStatusCode(403)->setJSON([

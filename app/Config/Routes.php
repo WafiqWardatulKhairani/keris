@@ -222,6 +222,19 @@ $routes->group('penetapan-konteks', [
         ['filter' => 'role:admin,operator,ketua,pimpinan']
     );
 
+    // Riwayat Analisis SWOT & PESTLE
+    $routes->get(
+        'riwayat',
+        'AnalisisSwotPestleController::riwayat',
+        ['filter' => 'role:admin,operator,ketua,pimpinan']
+    );
+
+    $routes->get(
+        'detail-riwayat',
+        'AnalisisSwotPestleController::detailRiwayat',
+        ['filter' => 'role:admin,operator,ketua,pimpinan']
+    );
+
     $routes->post(
         'analisis-swot-pestle/store',
         'AnalisisSwotPestleController::store',
