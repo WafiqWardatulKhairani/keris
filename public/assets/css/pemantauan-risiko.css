@@ -563,7 +563,6 @@
     transition: width .25s ease;
 }
 
-
 /* RESPONSIVE */
 @media (max-width: 768px) {
     .er-summary-header {
@@ -601,3 +600,4 @@
         gap: 7px;
     }
 }
+

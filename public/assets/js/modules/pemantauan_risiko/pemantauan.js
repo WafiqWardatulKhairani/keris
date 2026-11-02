@@ -285,6 +285,11 @@ function prLoadDetail(idRtp) {
    OPEN ROW
 ====================================================== */
 document.addEventListener("click", function (e) {
+  // Abaikan klik pada dropdown dan input jumlah keterjadian
+  if (e.target.closest(".pr-keterjadian-select, .pr-jumlah-keterjadian")) {
+    return;
+  }
+
   const row = e.target.closest(".rtp-row");
   if (!row) return;
 
@@ -493,7 +498,7 @@ function prCanEdit(data) {
   if (!USER) return false;
 
   if (USER.role === "admin") return true;
-  if (USER.role === "ketua") return false; 
+  if (USER.role === "ketua") return false;
 
   if (USER.role === "operator") {
     return String(USER.id_tim) === String(data.id_tim);
@@ -502,4 +507,181 @@ function prCanEdit(data) {
   return false;
 }
 
+/* ======================================================
+   PAGINATION AJAX PEMANTAUAN RISIKO
+====================================================== */
 
+function prGoToPage(page) {
+  const tableContainer = document.getElementById("prTableCard");
+
+  if (!tableContainer) {
+    console.error("Container tabel tidak ditemukan");
+    return;
+  }
+
+  const perPage = tableContainer.querySelector('[name="perPage"]')?.value || 10;
+
+  const filter =
+    tableContainer.querySelector('[name="filter"]')?.value || "semua";
+
+  const url = new URL(PR_URL.table, window.location.origin);
+
+  url.searchParams.set("page", page);
+  url.searchParams.set("perPage", perPage);
+  url.searchParams.set("filter", filter);
+
+  tableContainer.style.opacity = "0.5";
+
+  fetch(url.toString(), {
+    method: "GET",
+    headers: {
+      "X-Requested-With": "XMLHttpRequest",
+    },
+  })
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error("Gagal mengambil data tabel");
+      }
+
+      return response.text();
+    })
+    .then((html) => {
+      const temp = document.createElement("div");
+      temp.innerHTML = html;
+
+      const newContainer = temp.querySelector("#prTableCard");
+
+      if (!newContainer) {
+        throw new Error("Container tabel tidak ditemukan pada respons");
+      }
+
+      tableContainer.replaceWith(newContainer);
+    })
+    .catch((error) => {
+      console.error("Pagination error:", error);
+
+      tableContainer.style.opacity = "1";
+
+      Swal.fire({
+        icon: "error",
+        title: "Gagal memuat data",
+        text: "Silakan coba kembali.",
+      });
+    });
+}
+
+/* ======================================================
+   UPDATE KETERJADIAN RISIKO
+====================================================== */
+
+// Simpan perubahan keterjadian ke database
+function prSimpanKeterjadian(select, jumlahInput) {
+    const idIdentifikasi = select.dataset.idIdentifikasi;
+
+    if (!idIdentifikasi || !PR_URL.updateKeterjadian) {
+        console.error("ID risiko atau URL update tidak tersedia.");
+        return;
+    }
+
+    const data = new FormData();
+    data.append("id_identifikasi", idIdentifikasi);
+    data.append("keterjadian_risiko", select.value);
+    data.append("jumlah_keterjadian", jumlahInput.value || 0);
+    data.append(prCsrfName, prCsrfToken);
+
+    select.disabled = true;
+    jumlahInput.disabled = true;
+
+    fetch(PR_URL.updateKeterjadian, {
+        method: "POST",
+        headers: {
+            "X-Requested-With": "XMLHttpRequest",
+        },
+        body: data,
+    })
+        .then(async (response) => {
+            const result = await response.json();
+
+            if (!response.ok || !result.success) {
+                throw new Error(
+                    result.message || "Gagal menyimpan keterjadian risiko."
+                );
+            }
+
+            if (result.csrfHash) {
+                prCsrfToken = result.csrfHash;
+            }
+
+            return result;
+        })
+        .then((result) => {
+            jumlahInput.value = result.data.jumlah_keterjadian;
+            console.log("Keterjadian berhasil disimpan:", result.data);
+        })
+        .catch((error) => {
+            console.error("Update keterjadian gagal:", error);
+
+            Swal.fire({
+                icon: "error",
+                title: "Gagal menyimpan",
+                text: error.message,
+            });
+        })
+        .finally(() => {
+            select.disabled = false;
+            jumlahInput.disabled = select.value !== "T";
+        });
+}
+
+
+// Ketika dropdown status berubah
+document.addEventListener("change", function (e) {
+    if (!e.target.matches(".pr-keterjadian-select")) return;
+
+    const select = e.target;
+    const idIdentifikasi = select.dataset.idIdentifikasi;
+    const table = select.closest("table");
+
+    const jumlahInput = table.querySelector(
+        `.pr-jumlah-keterjadian[data-id-identifikasi="${idIdentifikasi}"]`
+    );
+
+    if (!jumlahInput) return;
+
+    if (select.value === "T") {
+        jumlahInput.disabled = false;
+        jumlahInput.focus();
+    } else {
+        jumlahInput.value = 0;
+        jumlahInput.disabled = true;
+    }
+
+    prSimpanKeterjadian(select, jumlahInput);
+});
+
+
+// Ketika jumlah keterjadian diubah
+document.addEventListener("change", function (e) {
+    if (!e.target.matches(".pr-jumlah-keterjadian")) return;
+
+    const jumlahInput = e.target;
+    const idIdentifikasi = jumlahInput.dataset.idIdentifikasi;
+    const table = jumlahInput.closest("table");
+
+    const select = table.querySelector(
+        `.pr-keterjadian-select[data-id-identifikasi="${idIdentifikasi}"]`
+    );
+
+    if (!select || select.value !== "T") return;
+
+    if (jumlahInput.value === "" || Number(jumlahInput.value) < 0) {
+        Swal.fire({
+            icon: "warning",
+            title: "Jumlah tidak valid",
+            text: "Masukkan jumlah minimal 0.",
+        });
+        return;
+    }
+
+    prSimpanKeterjadian(select, jumlahInput);
+});

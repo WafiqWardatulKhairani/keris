@@ -11,6 +11,8 @@
                         <th rowspan="2" class="rtp-th">RTP</th>
                         <th colspan="2" class="rtp-th text-center">Target</th>
                         <th colspan="3" class="rtp-th text-center">Realisasi</th>
+                        <th rowspan="2" class="rtp-th text-center">Keterjadian Risiko</th>
+                        <th rowspan="2" class="rtp-th text-center">Jumlah Keterjadian</th>
                     </tr>
 
                     <tr class="rtp-thead-sub">
@@ -25,14 +27,14 @@
                 <tbody>
                     <?php if (empty($grouped)): ?>
                         <tr>
-                            <td colspan="9" class="text-center py-5 text-muted">
+                            <td colspan="11" class="text-center py-5 text-muted">
                                 <i class="ti ti-inbox fs-3 d-block mb-2 opacity-25"></i>
                                 Belum ada data.
                             </td>
                         </tr>
                     <?php else: ?>
 
-                        <?php $no = 1; ?>
+                        <?php $no = ($from ?? 1); ?>
 
                         <?php foreach ($grouped as $item): ?>
 
@@ -134,6 +136,39 @@
                                             <?= esc($status) ?>
                                         </span>
                                     </td>
+
+                                    <?php if ($isFirst): ?>
+                                        <!-- KETERJADIAN RISIKO -->
+                                        <td rowspan="<?= $rowspan ?>" class="text-center">
+                                            <select
+                                                class="form-select form-select-sm pr-keterjadian-select"
+                                                data-id-identifikasi="<?= esc($item['id_identifikasi']) ?>"
+                                                <?= !in_array(session('user_role'), ['admin', 'operator'], true) ? 'disabled' : '' ?>>
+                                                <option value="T" <?= ($item['keterjadian_risiko'] ?? 'TT') === 'T' ? 'selected' : '' ?>>
+                                                    Terjadi
+                                                </option>
+                                                <option value="TT" <?= ($item['keterjadian_risiko'] ?? 'TT') === 'TT' ? 'selected' : '' ?>>
+                                                    Tidak Terjadi
+                                                </option>
+                                                <option value="BT" <?= ($item['keterjadian_risiko'] ?? 'TT') === 'BT' ? 'selected' : '' ?>>
+                                                    Belum Terjadi
+                                                </option>
+                                            </select>
+                                        </td>
+
+                                        <!-- JUMLAH KETERJADIAN -->
+                                        <td rowspan="<?= $rowspan ?>" class="text-center">
+                                            <input
+                                                type="number"
+                                                min="0"
+                                                class="form-control form-control-sm pr-jumlah-keterjadian"
+                                                data-id-identifikasi="<?= esc($item['id_identifikasi']) ?>"
+                                                value="<?= esc($item['jumlah_keterjadian'] ?? 0) ?>"
+                                                placeholder="0"
+                                                <?= ($item['keterjadian_risiko'] ?? 'TT') !== 'T' ? 'disabled' : '' ?>
+                                                <?= !in_array(session('user_role'), ['admin', 'operator'], true) ? 'disabled' : '' ?>>
+                                        </td>
+                                    <?php endif; ?>
 
                                 </tr>
 

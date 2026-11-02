@@ -8,7 +8,9 @@
             token: '<?= csrf_hash() ?>',
         },
         url: {
+            table: '<?= site_url('pemantauan-risiko/table') ?>',
             store: '<?= site_url('pemantauan-risiko/store') ?>',
+            updateKeterjadian: '<?= site_url('pemantauan-risiko/update-keterjadian') ?>',
             detail: (id) => `<?= site_url('pemantauan-risiko/detail') ?>/${id}`,
             delete: (id) => `<?= site_url('pemantauan-risiko/delete') ?>/${id}`,
             deleteBukti: (id) => `<?= site_url('pemantauan-risiko/bukti') ?>/${id}`,
@@ -78,8 +80,7 @@
     ]) ?>
 
     <!-- Offcanvas Form -->
-    <?= view('pemantauan_risiko/_offcanvas_form', [        
-    ]) ?>
+    <?= view('pemantauan_risiko/_offcanvas_form', []) ?>
 
 </div>
 
@@ -104,7 +105,7 @@
             window.scrollTo(0, parseInt(y));
             sessionStorage.removeItem('prScrollY');
         }
-    }); 
+    });
 </script>
 
 <?= $this->endSection() ?>

@@ -11,6 +11,7 @@ class IdentifikasiRisikoModel extends Model
 
     protected $returnType = 'array';
 
+
     protected $allowedFields = [
         'id_konteks_proses',
         'pernyataan_risiko',
@@ -18,6 +19,8 @@ class IdentifikasiRisikoModel extends Model
         'dampak_risiko',
         'id_kategori_risiko',
         'sumber_risiko',
+        'keterjadian_risiko',
+        'jumlah_keterjadian',
     ];
 
     protected $useTimestamps = true;

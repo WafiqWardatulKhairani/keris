@@ -216,58 +216,19 @@ $routes->group('penetapan-konteks', [
     $routes->get('sasaran-strategis', 'MasterDataController::sasaranStrategis');
 
     // Analisis SWOT dan PESTLE
-    $routes->get(
-        'analisis-swot-pestle/list',
-        'AnalisisSwotPestleController::list',
-        ['filter' => 'role:admin,operator,ketua,pimpinan']
-    );
-
+    $routes->get('analisis-swot-pestle/list', 'AnalisisSwotPestleController::list', ['filter' => 'role:admin,operator,ketua,pimpinan']);
     // Riwayat Analisis SWOT & PESTLE
-    $routes->get(
-        'riwayat',
-        'AnalisisSwotPestleController::riwayat',
-        ['filter' => 'role:admin,operator,ketua,pimpinan']
-    );
-
-    $routes->get(
-        'detail-riwayat',
-        'AnalisisSwotPestleController::detailRiwayat',
-        ['filter' => 'role:admin,operator,ketua,pimpinan']
-    );
-
-    $routes->post(
-        'analisis-swot-pestle/store',
-        'AnalisisSwotPestleController::store',
-        ['filter' => 'role:admin,operator']
-    );
-
-    $routes->post(
-        'analisis-swot-pestle/update/(:num)',
-        'AnalisisSwotPestleController::update/$1',
-        ['filter' => 'role:admin,operator']
-    );
-
-    $routes->post(
-        'analisis-swot-pestle/delete/(:num)',
-        'AnalisisSwotPestleController::delete/$1',
-        ['filter' => 'role:admin,operator']
-    );
-
+    $routes->get('riwayat', 'AnalisisSwotPestleController::riwayat', ['filter' => 'role:admin,operator,ketua,pimpinan']);
+    $routes->get('detail-riwayat', 'AnalisisSwotPestleController::detailRiwayat', ['filter' => 'role:admin,operator,ketua,pimpinan']);
+    $routes->post('analisis-swot-pestle/store', 'AnalisisSwotPestleController::store', ['filter' => 'role:admin,operator']);
+    $routes->post('analisis-swot-pestle/update/(:num)', 'AnalisisSwotPestleController::update/$1', ['filter' => 'role:admin,operator']);
+    $routes->post('analisis-swot-pestle/delete/(:num)', 'AnalisisSwotPestleController::delete/$1', ['filter' => 'role:admin,operator']);
 
     // Pengelolaan Periode Analisis SWOT dan PESTLE
     // Membuka kembali periode hanya dapat dilakukan admin.
-    $routes->post(
-        'analisis-swot-pestle/buka-periode',
-        'AnalisisSwotPestleController::bukaPeriode',
-        ['filter' => 'role:admin']
-    );
-
+    $routes->post('analisis-swot-pestle/buka-periode', 'AnalisisSwotPestleController::bukaPeriode', ['filter' => 'role:admin']);
     // Mengunci kembali periode yang sebelumnya dibuka.
-    $routes->post(
-        'analisis-swot-pestle/tutup-periode',
-        'AnalisisSwotPestleController::tutupPeriode',
-        ['filter' => 'role:admin']
-    );
+    $routes->post('analisis-swot-pestle/tutup-periode', 'AnalisisSwotPestleController::tutupPeriode', ['filter' => 'role:admin']);
 });
 
 // Identifikasi
@@ -365,6 +326,7 @@ $routes->group('pemantauan-risiko', ['filter' => ['auth']], function ($routes) {
     // WRITE ACCESS (terbatas)
     $routes->group('', ['filter' => 'role:admin,operator'], function ($routes) {
         $routes->post('store', 'PemantauanRisikoController::store');
+        $routes->post('update-keterjadian', 'PemantauanRisikoController::updateKeterjadian');
         $routes->post('delete/(:num)', 'PemantauanRisikoController::delete/$1');
 
         $routes->delete('bukti/(:num)', 'PemantauanRisikoController::deleteBukti/$1');
