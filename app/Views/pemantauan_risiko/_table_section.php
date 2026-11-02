@@ -34,7 +34,7 @@
                         </tr>
                     <?php else: ?>
 
-                        <?php $no = ($from ?? 1); ?>
+                        <?php $no = 1; ?>
 
                         <?php foreach ($grouped as $item): ?>
 
@@ -80,7 +80,7 @@
 
                                     <?php if ($isFirst): ?>
                                         <td rowspan="<?= $rowspan ?>" class="text-center">
-                                            <?= $no++ ?>
+                                            <?= esc($item['no_prioritas'] ?? $no++) ?>
                                         </td>
 
                                         <td rowspan="<?= $rowspan ?>" class="text-center">
@@ -219,14 +219,51 @@
                             </a>
                         </li>
 
-                        <?php for ($i = 1; $i <= $pager['totalPages']; $i++): ?>
-                            <li class="page-item <?= $i === $pager['currentPage'] ? 'active' : '' ?>">
+                        <?php
+                        $currentPage = (int) $pager['currentPage'];
+                        $totalPages  = (int) $pager['totalPages'];
+
+                        // Nomor halaman yang ditampilkan
+                        $startPage = max(1, $currentPage - 1);
+                        $endPage   = min($totalPages, $currentPage + 1);
+                        ?>
+
+                        <?php if ($startPage > 1): ?>
+                            <li class="page-item">
+                                <a class="page-link" href="#"
+                                    onclick="prGoToPage(1); return false;">1</a>
+                            </li>
+
+                            <?php if ($startPage > 2): ?>
+                                <li class="page-item disabled">
+                                    <span class="page-link">...</span>
+                                </li>
+                            <?php endif; ?>
+                        <?php endif; ?>
+
+                        <?php for ($i = $startPage; $i <= $endPage; $i++): ?>
+                            <li class="page-item <?= $i === $currentPage ? 'active' : '' ?>">
                                 <a class="page-link" href="#"
                                     onclick="prGoToPage(<?= $i ?>); return false;">
                                     <?= $i ?>
                                 </a>
                             </li>
                         <?php endfor; ?>
+
+                        <?php if ($endPage < $totalPages): ?>
+                            <?php if ($endPage < $totalPages - 1): ?>
+                                <li class="page-item disabled">
+                                    <span class="page-link">...</span>
+                                </li>
+                            <?php endif; ?>
+
+                            <li class="page-item">
+                                <a class="page-link" href="#"
+                                    onclick="prGoToPage(<?= $totalPages ?>); return false;">
+                                    <?= $totalPages ?>
+                                </a>
+                            </li>
+                        <?php endif; ?>
 
                         <li class="page-item <?= $pager['currentPage'] >= $pager['totalPages'] ? 'disabled' : '' ?>">
                             <a class="page-link" href="#"

@@ -594,11 +594,29 @@ class PemantauanRisikoController extends BaseController
     | NOMOR PRIORITAS
     |--------------------------------------------------------------------------
     */
-        foreach ($grouped as $id => &$item) {
-            $item['no_prioritas'] = $riskPositions[$id] ?? '-';
-        }
+        // Penomoran risiko berlanjut antarhalaman
+        /*
+|--------------------------------------------------------------------------
+| NOMOR PRIORITAS BERDASARKAN KELOMPOK RISIKO
+|--------------------------------------------------------------------------
+*/
 
-        unset($item);
+$nomorRisiko = 0;
+
+// Hitung jumlah kelompok risiko pada halaman sebelumnya
+foreach ($pages as $index => $pageIds) {
+    if ($index < $page - 1) {
+        $nomorRisiko += count($pageIds);
+    }
+}
+
+// Lanjutkan nomor berdasarkan kelompok risiko
+foreach ($grouped as &$item) {
+    $nomorRisiko++;
+    $item['no_prioritas'] = $nomorRisiko;
+}
+
+unset($item);
 
         $from       = $total > 0 ? $offset + 1 : 0;
         $to         = min($offset + $perPage, $total);
@@ -1016,11 +1034,28 @@ class PemantauanRisikoController extends BaseController
         }
 
         // Nomor prioritas
-        foreach ($grouped as $id => &$item) {
-            $item['no_prioritas'] = $riskPositions[$id] ?? '-';
-        }
+        /*
+|--------------------------------------------------------------------------
+| NOMOR PRIORITAS BERDASARKAN KELOMPOK RISIKO
+|--------------------------------------------------------------------------
+*/
 
-        unset($item);
+$nomorRisiko = 0;
+
+// Hitung jumlah kelompok risiko pada halaman sebelumnya
+foreach ($pages as $index => $pageIds) {
+    if ($index < $page - 1) {
+        $nomorRisiko += count($pageIds);
+    }
+}
+
+// Lanjutkan nomor berdasarkan kelompok risiko
+foreach ($grouped as &$item) {
+    $nomorRisiko++;
+    $item['no_prioritas'] = $nomorRisiko;
+}
+
+unset($item);
 
         $from = $total > 0 ? $offset + 1 : 0;
         $to   = min($offset + $perPage, $total);

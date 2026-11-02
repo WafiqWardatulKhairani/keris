@@ -5,7 +5,7 @@
             <small>Manajemen Risiko</small>
         </div>
     </div>
- 
+
     <div class="offcanvas-body">
 
         <form id="rtpForm" novalidate>
@@ -190,7 +190,6 @@
                     </div>
 
                     <div class="rtp-grid-2">
-
                         <div class="mb-3">
                             <label class="rtp-form-label">Probability (P)</label>
                             <select name="id_kemungkinan_residu" id="rtpKemungkinanResidu" class="form-select">
