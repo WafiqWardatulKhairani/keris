@@ -123,77 +123,77 @@ class PemantauanRisikoController extends BaseController
     }
 
     public function updateKeterjadian()
-{
-    $idIdentifikasi = $this->request->getPost('id_identifikasi');
-    $keterjadian    = $this->request->getPost('keterjadian_risiko');
-    $jumlah         = $this->request->getPost('jumlah_keterjadian');
+    {
+        $idIdentifikasi = $this->request->getPost('id_identifikasi');
+        $keterjadian    = $this->request->getPost('keterjadian_risiko');
+        $jumlah         = $this->request->getPost('jumlah_keterjadian');
 
-    // Validasi ID risiko
-    if (
-        !$idIdentifikasi ||
-        !ctype_digit((string) $idIdentifikasi)
-    ) {
-        return $this->response->setStatusCode(400)->setJSON([
-            'success' => false,
-            'message' => 'ID risiko tidak valid.'
+        // Validasi ID risiko
+        if (
+            !$idIdentifikasi ||
+            !ctype_digit((string) $idIdentifikasi)
+        ) {
+            return $this->response->setStatusCode(400)->setJSON([
+                'success' => false,
+                'message' => 'ID risiko tidak valid.'
+            ]);
+        }
+
+        // Validasi status keterjadian
+        if (!in_array($keterjadian, ['T', 'TT', 'BT'], true)) {
+            return $this->response->setStatusCode(400)->setJSON([
+                'success' => false,
+                'message' => 'Status keterjadian tidak valid.'
+            ]);
+        }
+
+        // Validasi jumlah
+        if (
+            $jumlah === null ||
+            filter_var($jumlah, FILTER_VALIDATE_INT) === false ||
+            (int) $jumlah < 0
+        ) {
+            return $this->response->setStatusCode(400)->setJSON([
+                'success' => false,
+                'message' => 'Jumlah keterjadian harus berupa bilangan bulat minimal 0.'
+            ]);
+        }
+
+        // Pastikan operator hanya mengubah risiko timnya
+        if (!$this->validateTimAccessByRisiko($idIdentifikasi)) {
+            return $this->response->setStatusCode(403)->setJSON([
+                'success' => false,
+                'message' => 'Kamu tidak memiliki akses untuk mengubah risiko ini.'
+            ]);
+        }
+
+        // Jumlah hanya berlaku jika risiko berstatus Terjadi
+        $jumlah = $keterjadian === 'T' ? (int) $jumlah : 0;
+
+        $updated = $this->db->table('identifikasi_risiko')
+            ->where('id_identifikasi', $idIdentifikasi)
+            ->update([
+                'keterjadian_risiko' => $keterjadian,
+                'jumlah_keterjadian' => $jumlah,
+            ]);
+
+        if (!$updated) {
+            return $this->response->setStatusCode(500)->setJSON([
+                'success' => false,
+                'message' => 'Gagal menyimpan keterjadian risiko.'
+            ]);
+        }
+
+        return $this->response->setJSON([
+            'success' => true,
+            'message' => 'Keterjadian risiko berhasil disimpan.',
+            'data' => [
+                'keterjadian_risiko' => $keterjadian,
+                'jumlah_keterjadian' => $jumlah,
+            ],
+            'csrfHash' => csrf_hash(),
         ]);
     }
-
-    // Validasi status keterjadian
-    if (!in_array($keterjadian, ['T', 'TT', 'BT'], true)) {
-        return $this->response->setStatusCode(400)->setJSON([
-            'success' => false,
-            'message' => 'Status keterjadian tidak valid.'
-        ]);
-    }
-
-    // Validasi jumlah
-    if (
-        $jumlah === null ||
-        filter_var($jumlah, FILTER_VALIDATE_INT) === false ||
-        (int) $jumlah < 0
-    ) {
-        return $this->response->setStatusCode(400)->setJSON([
-            'success' => false,
-            'message' => 'Jumlah keterjadian harus berupa bilangan bulat minimal 0.'
-        ]);
-    }
-
-    // Pastikan operator hanya mengubah risiko timnya
-    if (!$this->validateTimAccessByRisiko($idIdentifikasi)) {
-        return $this->response->setStatusCode(403)->setJSON([
-            'success' => false,
-            'message' => 'Kamu tidak memiliki akses untuk mengubah risiko ini.'
-        ]);
-    }
-
-    // Jumlah hanya berlaku jika risiko berstatus Terjadi
-    $jumlah = $keterjadian === 'T' ? (int) $jumlah : 0;
-
-    $updated = $this->db->table('identifikasi_risiko')
-        ->where('id_identifikasi', $idIdentifikasi)
-        ->update([
-            'keterjadian_risiko' => $keterjadian,
-            'jumlah_keterjadian' => $jumlah,
-        ]);
-
-    if (!$updated) {
-        return $this->response->setStatusCode(500)->setJSON([
-            'success' => false,
-            'message' => 'Gagal menyimpan keterjadian risiko.'
-        ]);
-    }
-
-    return $this->response->setJSON([
-        'success' => true,
-        'message' => 'Keterjadian risiko berhasil disimpan.',
-        'data' => [
-            'keterjadian_risiko' => $keterjadian,
-            'jumlah_keterjadian' => $jumlah,
-        ],
-        'csrfHash' => csrf_hash(),
-    ]);
-}
 
     public function index()
     {
@@ -307,32 +307,24 @@ class PemantauanRisikoController extends BaseController
         };
 
         /*
-    |--------------------------------------------------------------------------
-    | HITUNG TOTAL RISIKO
-    |--------------------------------------------------------------------------
-    */
-        $qCount = $buildQuery()
-            ->select('COUNT(DISTINCT ir.id_identifikasi) AS total');
+    /*
+|--------------------------------------------------------------------------
+| AMBIL DAFTAR RISIKO DAN JUMLAH RTP
+|--------------------------------------------------------------------------
+*/
 
-        if ($filter !== 'semua') {
-            $qCount->where("($statusCase) =", $filter, false);
-        }
-
-        $total = (int) (
-            $qCount->get()->getRowArray()['total'] ?? 0
-        );
-
-        /*
-    |--------------------------------------------------------------------------
-    | AMBIL ID RISIKO UNTUK PAGINATION
-    |--------------------------------------------------------------------------
-    | Pagination berdasarkan risiko, bukan jumlah RTP.
-    */
         $qIds = $buildQuery()
-            ->select('
-            ir.id_identifikasi,
-            MAX(pr.nilai_risiko) AS nilai_risiko
-        ')
+            ->select("
+        ir.id_identifikasi,
+        MAX(pr.nilai_risiko) AS nilai_risiko,
+        (
+            SELECT COUNT(DISTINCT rtp_count.id_rtp)
+            FROM evaluasi_risiko er_count
+            JOIN rencana_penanganan_risiko rtp_count
+                ON rtp_count.id_penilaian_awal = er_count.id_evaluasi
+            WHERE er_count.id_identifikasi = ir.id_identifikasi
+        ) AS jumlah_rtp
+    ")
             ->join(
                 'penilaian_risiko pr',
                 'pr.id_penilaian = er.id_penilaian',
@@ -346,12 +338,81 @@ class PemantauanRisikoController extends BaseController
             $qIds->where("($statusCase) =", $filter, false);
         }
 
-        $idRows = $qIds
-            ->limit($perPage, $offset)
-            ->get()
-            ->getResultArray();
+        $riskRows = $qIds->get()->getResultArray();
 
-        $riskIds = array_column($idRows, 'id_identifikasi');
+        /*
+|--------------------------------------------------------------------------
+| PAGINATION BERDASARKAN JUMLAH RTP
+|--------------------------------------------------------------------------
+*/
+
+        $pages = [];
+        $currentPageIds = [];
+        $currentCount = 0;
+        $total = 0;
+
+        foreach ($riskRows as $risk) {
+            $jumlahRtp = (int) $risk['jumlah_rtp'];
+
+            // Risiko tanpa RTP tetap dihitung satu baris
+            $bobot = max(1, $jumlahRtp);
+
+            // Jangan pisahkan satu risiko ke halaman berbeda
+            if (
+                !empty($currentPageIds) &&
+                ($currentCount + $bobot) > $perPage
+            ) {
+                $pages[] = $currentPageIds;
+                $currentPageIds = [];
+                $currentCount = 0;
+            }
+
+            $currentPageIds[] = $risk['id_identifikasi'];
+            $currentCount += $bobot;
+            $total += $bobot;
+        }
+
+        if (!empty($currentPageIds)) {
+            $pages[] = $currentPageIds;
+        }
+
+        $totalPages = count($pages);
+
+        $page = min($page, max(1, $totalPages));
+
+        $riskIds = $pages[$page - 1] ?? [];
+
+        // Posisi nomor risiko secara keseluruhan
+        $riskPositions = [];
+
+        foreach ($riskRows as $index => $risk) {
+            $riskPositions[$risk['id_identifikasi']] = $index + 1;
+        }
+
+        // Hitung jumlah baris pada halaman sebelumnya
+        $from = 0;
+        $to = 0;
+
+        foreach ($pages as $index => $pageIds) {
+            $jumlahHalaman = 0;
+
+            foreach ($pageIds as $id) {
+                foreach ($riskRows as $risk) {
+                    if ($risk['id_identifikasi'] == $id) {
+                        $jumlahHalaman += max(1, (int) $risk['jumlah_rtp']);
+                        break;
+                    }
+                }
+            }
+
+            if ($index < $page - 1) {
+                $from += $jumlahHalaman;
+            } elseif ($index === $page - 1) {
+                $to = $from + $jumlahHalaman;
+            }
+        }
+
+        $from = $total > 0 ? $from + 1 : 0;
 
         /*
     |--------------------------------------------------------------------------
@@ -533,10 +594,8 @@ class PemantauanRisikoController extends BaseController
     | NOMOR PRIORITAS
     |--------------------------------------------------------------------------
     */
-        $i = $offset + 1;
-
-        foreach ($grouped as &$item) {
-            $item['no_prioritas'] = $i++;
+        foreach ($grouped as $id => &$item) {
+            $item['no_prioritas'] = $riskPositions[$id] ?? '-';
         }
 
         unset($item);
@@ -554,7 +613,7 @@ class PemantauanRisikoController extends BaseController
             'to'                 => $to,
             'perPage'             => $perPage,
             'filter'              => $filter,
-            'pager'               => [
+            'pager' => [
                 'currentPage' => $page,
                 'totalPages'  => $totalPages,
                 'perPage'     => $perPage,
@@ -573,7 +632,6 @@ class PemantauanRisikoController extends BaseController
             'id_tim_user'         => session('id_tim'),
         ]);
     }
-
 
     public function ajaxTable()
     {
@@ -702,22 +760,19 @@ class PemantauanRisikoController extends BaseController
             return $builder;
         };
 
-        // Hitung jumlah risiko
-        $qCount = $buildQuery()
-            ->select('COUNT(DISTINCT ir.id_identifikasi) AS total');
-
-        $applyStatusFilter($qCount);
-
-        $total = (int) (
-            $qCount->get()->getRowArray()['total'] ?? 0
-        );
-
-        // Ambil ID risiko sesuai halaman
+        // Ambil daftar risiko dan jumlah RTP
         $qIds = $buildQuery()
-            ->select('
-            ir.id_identifikasi,
-            MAX(pr.nilai_risiko) AS nilai_risiko
-        ')
+            ->select("
+        ir.id_identifikasi,
+        MAX(pr.nilai_risiko) AS nilai_risiko,
+        (
+            SELECT COUNT(DISTINCT rtp_count.id_rtp)
+            FROM evaluasi_risiko er_count
+            JOIN rencana_penanganan_risiko rtp_count
+                ON rtp_count.id_penilaian_awal = er_count.id_evaluasi
+            WHERE er_count.id_identifikasi = ir.id_identifikasi
+        ) AS jumlah_rtp
+    ")
             ->join(
                 'penilaian_risiko pr',
                 'pr.id_penilaian = er.id_penilaian',
@@ -729,12 +784,70 @@ class PemantauanRisikoController extends BaseController
 
         $applyStatusFilter($qIds);
 
-        $idRows = $qIds
-            ->limit($perPage, $offset)
-            ->get()
-            ->getResultArray();
+        $riskRows = $qIds->get()->getResultArray();
 
-        $riskIds = array_column($idRows, 'id_identifikasi');
+        // Pagination berdasarkan jumlah RTP
+        $pages = [];
+        $currentPageIds = [];
+        $currentCount = 0;
+        $total = 0;
+
+        foreach ($riskRows as $risk) {
+            $bobot = max(1, (int) $risk['jumlah_rtp']);
+
+            if (
+                !empty($currentPageIds) &&
+                ($currentCount + $bobot) > $perPage
+            ) {
+                $pages[] = $currentPageIds;
+                $currentPageIds = [];
+                $currentCount = 0;
+            }
+
+            $currentPageIds[] = $risk['id_identifikasi'];
+            $currentCount += $bobot;
+            $total += $bobot;
+        }
+
+        if (!empty($currentPageIds)) {
+            $pages[] = $currentPageIds;
+        }
+
+        $totalPages = count($pages);
+        $page = min($page, max(1, $totalPages));
+
+        $riskIds = $pages[$page - 1] ?? [];
+
+        $riskPositions = [];
+
+        foreach ($riskRows as $index => $risk) {
+            $riskPositions[$risk['id_identifikasi']] = $index + 1;
+        }
+
+        // Informasi jumlah baris pada halaman
+        $from = 0;
+        $to = 0;
+
+        foreach ($pages as $index => $pageIds) {
+            $jumlahHalaman = 0;
+
+            foreach ($pageIds as $id) {
+                foreach ($riskRows as $risk) {
+                    if ($risk['id_identifikasi'] == $id) {
+                        $jumlahHalaman += max(1, (int) $risk['jumlah_rtp']);
+                        break;
+                    }
+                }
+            }
+
+            if ($index < $page - 1) {
+                $from += $jumlahHalaman;
+            } elseif ($index === $page - 1) {
+                $to = $from + $jumlahHalaman;
+            }
+        }
+
+        $from = $total > 0 ? $from + 1 : 0;
 
         $grouped = [];
 
@@ -903,10 +1016,8 @@ class PemantauanRisikoController extends BaseController
         }
 
         // Nomor prioritas
-        $i = 1;
-
-        foreach ($grouped as &$item) {
-            $item['no_prioritas'] = $offset + $i++;
+        foreach ($grouped as $id => &$item) {
+            $item['no_prioritas'] = $riskPositions[$id] ?? '-';
         }
 
         unset($item);
@@ -920,9 +1031,9 @@ class PemantauanRisikoController extends BaseController
             'from'    => $from,
             'to'      => $to,
             'perPage' => $perPage,
-            'pager'   => [
+            'pager' => [
                 'currentPage' => $page,
-                'totalPages'  => (int) ceil($total / $perPage),
+                'totalPages'  => $totalPages,
                 'perPage'     => $perPage,
                 'total'       => $total,
             ],

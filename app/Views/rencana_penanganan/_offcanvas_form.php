@@ -186,7 +186,7 @@
                 <div class="mb-3">
 
                     <div class="rtp-section-title">
-                        <i class="ti ti-activity me-1"></i>Risiko Residu
+                        <i class="ti ti-activity me-1"></i>Target Risiko Residu
                     </div>
 
                     <div class="rtp-grid-2">
