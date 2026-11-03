@@ -127,7 +127,26 @@
                             class="form-control"
                             rows="2"></textarea>
                     </div>
+                </div>
 
+                <!-- ===== EFEKTIVITAS PENGENDALIAN ===== -->
+                <div class="mb-3">
+                    <div class="rtp-section-title">
+                        <i class="ti ti-shield-check me-1"></i>
+                        Efektivitas Pengendalian
+                    </div>
+
+                    <div id="prEfektivitasView"
+                        class="rtp-info-value small d-none">
+                        -
+                    </div>
+
+                    <textarea
+                        name="efektivitas_pengendalian"
+                        id="prEfektivitasPengendalian"
+                        class="form-control"
+                        rows="3"
+                        placeholder="Tuliskan efektivitas pengendalian..."></textarea>
                 </div>
 
                 <!-- ===== BUKTI ===== -->
@@ -142,7 +161,87 @@
                     <div id="prBuktiPreview" class="mt-1"></div>
                 </div>
 
-            </div><!-- end rtp-input-zone -->
+
+                <!-- ===== RISIKO RESIDU ===== -->
+                <div class="mb-3">
+                    <div class="rtp-section-title">
+                        <i class="ti ti-shield-check me-1"></i>
+                        Risiko Residu
+                    </div>
+
+                    <!-- Tampilan khusus role selain operator -->
+                    <div id="prRisikoResiduView" class="d-none">
+                        <div class="rtp-grid-2 mb-2">
+                            <div>
+                                <div class="rtp-info-label">Kemungkinan (P)</div>
+                                <div class="rtp-info-value" id="prResiduKemungkinanView">-</div>
+                            </div>
+                            <div>
+                                <div class="rtp-info-label">Dampak (D)</div>
+                                <div class="rtp-info-value" id="prResiduDampakView">-</div>
+                            </div>
+                        </div>
+
+                        <div class="rtp-info-panel">
+                            <div class="rtp-info-row">
+                                <span class="rtp-info-label">Nilai Risiko</span>
+                                <span class="rtp-info-value fw-semibold" id="prNilaiRisikoResiduView">-</span>
+                            </div>
+                            <div class="rtp-info-row">
+                                <span class="rtp-info-label">Level Risiko</span>
+                                <span class="rtp-info-value" id="prSeleraRisikoResiduView">-</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Input khusus operator -->
+                    <div id="prRisikoResiduInput">
+                        <div class="rtp-grid-2 mb-2">
+                            <div>
+                                <label class="rtp-form-label">Kemungkinan (P)</label>
+                                <select
+                                    name="id_kemungkinan_residu"
+                                    id="prKemungkinanResidu"
+                                    class="form-select">
+                                    <option value="">Pilih Kemungkinan</option>
+                                    <?php foreach ($kriteriaKemungkinan as $item): ?>
+                                        <option value="<?= esc($item['id_kriteria']) ?>">
+                                            <?= esc($item['level'] . ' - ' . $item['nama_level']) ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="rtp-form-label">Dampak (D)</label>
+                                <select
+                                    name="id_dampak_residu"
+                                    id="prDampakResidu"
+                                    class="form-select">
+                                    <option value="">Pilih Dampak</option>
+                                    <?php foreach ($kriteriaDampak as $item): ?>
+                                        <option value="<?= esc($item['id_kriteria']) ?>">
+                                            <?= esc($item['level'] . ' - ' . $item['nama_level']) ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="rtp-info-panel mt-2">
+                            <div class="rtp-info-row">
+                                <span class="rtp-info-label">Nilai Risiko</span>
+                                <span class="rtp-info-value fw-semibold" id="prNilaiRisikoResidu">-</span>
+                            </div>
+                            <div class="rtp-info-row">
+                                <span class="rtp-info-label">Level Risiko</span>
+                                <span class="rtp-info-value" id="prSeleraRisikoResidu">-</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- end rtp-input-zone -->
 
             <hr class="rtp-divider">
 
@@ -159,7 +258,6 @@
                     <button type="button" id="prBtnTutup" class="btn btn-sm btn-light" data-bs-dismiss="offcanvas">Tutup</button>
                 </div>
             </div>
-
         </form>
     </div>
 </div>

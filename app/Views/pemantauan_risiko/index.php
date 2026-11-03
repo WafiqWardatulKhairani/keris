@@ -11,6 +11,7 @@
             table: '<?= site_url('pemantauan-risiko/table') ?>',
             store: '<?= site_url('pemantauan-risiko/store') ?>',
             updateKeterjadian: '<?= site_url('pemantauan-risiko/update-keterjadian') ?>',
+            preview: '<?= site_url('rencana-penanganan/preview') ?>',
             detail: (id) => `<?= site_url('pemantauan-risiko/detail') ?>/${id}`,
             delete: (id) => `<?= site_url('pemantauan-risiko/delete') ?>/${id}`,
             deleteBukti: (id) => `<?= site_url('pemantauan-risiko/bukti') ?>/${id}`,
@@ -23,7 +24,8 @@
 <script>
     window.APP_USER = {
         role: '<?= session()->get('user_role') ?>',
-        id_tim: '<?= session()->get('id_tim') ?>'
+        id_tim: '<?= session()->get('id_tim') ?>',
+        tim: <?= json_encode(session()->get('user_tim') ?? []) ?>
     };
 </script>
 

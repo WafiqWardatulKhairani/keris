@@ -210,8 +210,12 @@ class PemantauanRisikoController extends BaseController
         $statusCase = "
         CASE
             WHEN pm.realisasi_waktu IS NOT NULL
-                AND DATE_TRUNC('month', pm.realisasi_waktu)
-                    > DATE_TRUNC('month', rtp.target_waktu)
+            AND pm.realisasi_waktu::date >
+                (
+                    DATE_TRUNC('quarter', rtp.target_waktu)
+                    + INTERVAL '3 months'
+                    - INTERVAL '1 day'
+                )::date
             THEN 'Terlambat'
 
             WHEN pm.realisasi_output IS NOT NULL
@@ -223,8 +227,12 @@ class PemantauanRisikoController extends BaseController
                 )
             THEN 'Selesai'
 
-            WHEN DATE_TRUNC('month', CURRENT_DATE)
-                > DATE_TRUNC('month', rtp.target_waktu)
+            WHEN CURRENT_DATE >
+            (
+                DATE_TRUNC('quarter', rtp.target_waktu)
+                + INTERVAL '3 months'
+                - INTERVAL '1 day'
+            )::date
             THEN 'Terlambat'
 
             WHEN pm.realisasi_output IS NULL
@@ -415,10 +423,10 @@ class PemantauanRisikoController extends BaseController
         $from = $total > 0 ? $from + 1 : 0;
 
         /*
-    |--------------------------------------------------------------------------
-    | AMBIL DETAIL RISIKO DAN SELURUH RTP-NYA
-    |--------------------------------------------------------------------------
-    */
+        |--------------------------------------------------------------------------
+        | AMBIL DETAIL RISIKO DAN SELURUH RTP-NYA
+        |--------------------------------------------------------------------------
+        */
         $grouped = [];
 
         if (!empty($riskIds)) {
@@ -601,28 +609,41 @@ class PemantauanRisikoController extends BaseController
 |--------------------------------------------------------------------------
 */
 
-$nomorRisiko = 0;
+        $nomorRisiko = 0;
 
-// Hitung jumlah kelompok risiko pada halaman sebelumnya
-foreach ($pages as $index => $pageIds) {
-    if ($index < $page - 1) {
-        $nomorRisiko += count($pageIds);
-    }
-}
+        // Hitung jumlah kelompok risiko pada halaman sebelumnya
+        foreach ($pages as $index => $pageIds) {
+            if ($index < $page - 1) {
+                $nomorRisiko += count($pageIds);
+            }
+        }
 
-// Lanjutkan nomor berdasarkan kelompok risiko
-foreach ($grouped as &$item) {
-    $nomorRisiko++;
-    $item['no_prioritas'] = $nomorRisiko;
-}
+        // Lanjutkan nomor berdasarkan kelompok risiko
+        foreach ($grouped as &$item) {
+            $nomorRisiko++;
+            $item['no_prioritas'] = $nomorRisiko;
+        }
 
-unset($item);
+        unset($item);
 
         $from       = $total > 0 ? $offset + 1 : 0;
         $to         = min($offset + $perPage, $total);
         $totalPages = (int) ceil($total / $perPage);
 
         $summary = $this->getSummary();
+
+        // Daftar kriteria Risiko Residu
+        $kriteriaKemungkinan = $this->db->table('kriteria_kemungkinan')
+            ->select('id_kriteria, level, nama_level')
+            ->orderBy('level', 'ASC')
+            ->get()
+            ->getResultArray();
+
+        $kriteriaDampak = $this->db->table('kriteria_dampak')
+            ->select('id_kriteria, level, nama_level')
+            ->orderBy('level', 'ASC')
+            ->get()
+            ->getResultArray();
 
         return view('pemantauan_risiko/index', [
             'grouped'            => $grouped,
@@ -646,6 +667,8 @@ unset($item);
                 'Selesai',
                 'Terlambat'
             ],
+            'kriteriaKemungkinan' => $kriteriaKemungkinan,
+            'kriteriaDampak'      => $kriteriaDampak,
             'role'                => session('user_role'),
             'id_tim_user'         => session('id_tim'),
         ]);
@@ -686,8 +709,12 @@ unset($item);
         $statusCase = "
         CASE
             WHEN pm.realisasi_waktu IS NOT NULL
-                AND DATE_TRUNC('month', pm.realisasi_waktu)
-                    > DATE_TRUNC('month', rtp.target_waktu)
+                AND pm.realisasi_waktu::date >
+                    (
+                        DATE_TRUNC('quarter', rtp.target_waktu)
+                        + INTERVAL '3 months'
+                        - INTERVAL '1 day'
+                    )::date
             THEN 'Terlambat'
 
             WHEN pm.realisasi_output IS NOT NULL
@@ -699,8 +726,12 @@ unset($item);
                 )
             THEN 'Selesai'
 
-            WHEN DATE_TRUNC('month', CURRENT_DATE)
-                > DATE_TRUNC('month', rtp.target_waktu)
+            WHEN CURRENT_DATE >
+                (
+                    DATE_TRUNC('quarter', rtp.target_waktu)
+                    + INTERVAL '3 months'
+                    - INTERVAL '1 day'
+                )::date
             THEN 'Terlambat'
 
             WHEN pm.realisasi_output IS NULL
@@ -1040,22 +1071,22 @@ unset($item);
 |--------------------------------------------------------------------------
 */
 
-$nomorRisiko = 0;
+        $nomorRisiko = 0;
 
-// Hitung jumlah kelompok risiko pada halaman sebelumnya
-foreach ($pages as $index => $pageIds) {
-    if ($index < $page - 1) {
-        $nomorRisiko += count($pageIds);
-    }
-}
+        // Hitung jumlah kelompok risiko pada halaman sebelumnya
+        foreach ($pages as $index => $pageIds) {
+            if ($index < $page - 1) {
+                $nomorRisiko += count($pageIds);
+            }
+        }
 
-// Lanjutkan nomor berdasarkan kelompok risiko
-foreach ($grouped as &$item) {
-    $nomorRisiko++;
-    $item['no_prioritas'] = $nomorRisiko;
-}
+        // Lanjutkan nomor berdasarkan kelompok risiko
+        foreach ($grouped as &$item) {
+            $nomorRisiko++;
+            $item['no_prioritas'] = $nomorRisiko;
+        }
 
-unset($item);
+        unset($item);
 
         $from = $total > 0 ? $offset + 1 : 0;
         $to   = min($offset + $perPage, $total);
@@ -1130,6 +1161,51 @@ unset($item);
                 $data['status']                = 'Belum Dilaksanakan';
                 $data['catatan']               = null;
                 $data['pemantauan_updated_at'] = null;
+                $data['efektivitas_pengendalian'] = null;
+                $data['id_kemungkinan_residu'] = null;
+                $data['id_dampak_residu'] = null;
+            }
+
+            // Hitung Risiko Residu berdasarkan kemungkinan dan dampak
+            $data['nilai_risiko_residu'] = null;
+            $data['nama_selera_residu'] = null;
+            $data['warna_selera_residu'] = null;
+
+            if (
+                !empty($data['id_kemungkinan_residu']) &&
+                !empty($data['id_dampak_residu'])
+            ) {
+                $residu = $this->db->table('kriteria_kemungkinan km')
+                    ->select('
+                        mr.nilai_risiko,
+                        sr.nama_level,
+                        sr.warna
+                    ')
+                    ->join(
+                        'matriks_risiko mr',
+                        'mr.level_kemungkinan = km.level',
+                        'inner'
+                    )
+                    ->join(
+                        'kriteria_dampak kd',
+                        'kd.level = mr.level_dampak',
+                        'inner'
+                    )
+                    ->join(
+                        'selera_risiko sr',
+                        'mr.nilai_risiko BETWEEN sr.nilai_min AND sr.nilai_max',
+                        'left'
+                    )
+                    ->where('km.id_kriteria', $data['id_kemungkinan_residu'])
+                    ->where('kd.id_kriteria', $data['id_dampak_residu'])
+                    ->get()
+                    ->getRowArray();
+
+                if ($residu) {
+                    $data['nilai_risiko_residu'] = $residu['nilai_risiko'];
+                    $data['nama_selera_residu'] = $residu['nama_level'];
+                    $data['warna_selera_residu'] = $residu['warna'];
+                }
             }
 
             $data['bukti_list'] = !empty($data['id_pemantauan'])
@@ -1157,7 +1233,10 @@ unset($item);
                 // convert YYYY-MM → YYYY-MM-01 00:00:00
                 $realisasiWaktu = $realisasiWaktuInput . '-01 00:00:00';
             }
-            $catatan         = $this->request->getPost('catatan') ?: null;
+            $catatan = $this->request->getPost('catatan') ?: null;
+            $efektivitasPengendalian = $this->request->getPost('efektivitas_pengendalian') ?: null;
+            $idKemungkinanResidu = $this->request->getPost('id_kemungkinan_residu') ?: null;
+            $idDampakResidu      = $this->request->getPost('id_dampak_residu') ?: null;
 
             if (empty($idRtp)) {
                 return $this->response->setStatusCode(400)->setJSON([
@@ -1188,6 +1267,9 @@ unset($item);
                 'realisasi_output' => $realisasiOutput,
                 'realisasi_waktu'  => $realisasiWaktu,
                 'catatan'          => $catatan,
+                'efektivitas_pengendalian' => $efektivitasPengendalian,
+                'id_kemungkinan_residu' => $idKemungkinanResidu,
+                'id_dampak_residu'      => $idDampakResidu,
             ]);
 
             if (!$idPemantauan) {

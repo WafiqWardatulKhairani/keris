@@ -21,8 +21,11 @@ class PemantauanRisikoModel extends Model
         'catatan_validasi',
         'validated_by',
         'validated_at',
+        'efektivitas_pengendalian',
+        'id_kemungkinan_residu',
+        'id_dampak_residu',
         'created_at',
-        'updated_at',        
+        'updated_at',
     ];
 
     protected $useTimestamps = true;
@@ -160,6 +163,19 @@ class PemantauanRisikoModel extends Model
     {
         $existing = $this->where('id_rtp', $idRtp)->first();
 
+        // Khusus field efektivitas pengendalian:
+        // hanya operator yang boleh mengubahnya.
+        // Khusus field yang hanya boleh diubah operator.
+        $role = session()->get('user_role');
+
+        if ($role !== 'operator') {
+            unset(
+                $data['efektivitas_pengendalian'],
+                $data['id_kemungkinan_residu'],
+                $data['id_dampak_residu']
+            );
+        }
+
         if ($existing) {
             $this->skipValidation(true)->update($existing['id_pemantauan'], $data);
             return (int) $existing['id_pemantauan'];
@@ -167,30 +183,29 @@ class PemantauanRisikoModel extends Model
 
         // INSERT BARU
         $data['id_rtp'] = $idRtp;
-
-        // TAMBAHAN BENAR DI SINI
         $data['status_validasi'] = 'Draft';
 
         $this->skipValidation(true)->insert($data);
+
         return (int) $this->getInsertID();
     }
 
     /* DISTRIBUSI STATUS*/
     public function getDistribusiStatus(
-    $tahun = null,
-    $idTim = null,
-    $idKegiatan = null
-): array {
-    $statusList = [
-        'Belum Dilaksanakan',
-        'Dalam Proses',
-        'Selesai',
-        'Terlambat'
-    ];
+        $tahun = null,
+        $idTim = null,
+        $idKegiatan = null
+    ): array {
+        $statusList = [
+            'Belum Dilaksanakan',
+            'Dalam Proses',
+            'Selesai',
+            'Terlambat'
+        ];
 
-    $result = array_fill_keys($statusList, 0);
+        $result = array_fill_keys($statusList, 0);
 
-    $statusCase = "
+        $statusCase = "
         CASE
             WHEN pm.realisasi_waktu IS NOT NULL
                 AND DATE_TRUNC('month', pm.realisasi_waktu)
@@ -218,59 +233,59 @@ class PemantauanRisikoModel extends Model
         END
     ";
 
-    $builder = $this->db
-        ->table('rencana_penanganan_risiko rtp')
-        ->select("
+        $builder = $this->db
+            ->table('rencana_penanganan_risiko rtp')
+            ->select("
             {$statusCase} AS status,
             COUNT(DISTINCT rtp.id_rtp) AS total
         ")
-        ->join(
-            'evaluasi_risiko er',
-            'er.id_evaluasi = rtp.id_penilaian_awal'
-        )
-        ->join(
-            'identifikasi_risiko ir',
-            'ir.id_identifikasi = er.id_identifikasi'
-        )
-        ->join(
-            'konteks_proses_bisnis kpb',
-            'kpb.id_konteks_proses = ir.id_konteks_proses'
-        )
-        ->join(
-            'konteks k',
-            'k.id_konteks = kpb.id_konteks'
-        )
-        ->join(
-            'pemantauan_risiko pm',
-            'pm.id_rtp = rtp.id_rtp',
-            'left'
-        );
+            ->join(
+                'evaluasi_risiko er',
+                'er.id_evaluasi = rtp.id_penilaian_awal'
+            )
+            ->join(
+                'identifikasi_risiko ir',
+                'ir.id_identifikasi = er.id_identifikasi'
+            )
+            ->join(
+                'konteks_proses_bisnis kpb',
+                'kpb.id_konteks_proses = ir.id_konteks_proses'
+            )
+            ->join(
+                'konteks k',
+                'k.id_konteks = kpb.id_konteks'
+            )
+            ->join(
+                'pemantauan_risiko pm',
+                'pm.id_rtp = rtp.id_rtp',
+                'left'
+            );
 
-    // GLOBAL FILTER
-    if (!empty($tahun)) {
-        $builder->where('k.tahun', $tahun);
-    }
-
-    if (!empty($idTim)) {
-        $builder->where('k.id_tim', $idTim);
-    }
-
-    if (!empty($idKegiatan)) {
-        $builder->where('k.id_kegiatan', $idKegiatan);
-    }
-
-    $builder->groupBy($statusCase, false);
-
-    $rows = $builder->get()->getResultArray();
-
-    foreach ($rows as $row) {
-        if (array_key_exists($row['status'], $result)) {
-            $result[$row['status']] = (int) $row['total'];
+        // GLOBAL FILTER
+        if (!empty($tahun)) {
+            $builder->where('k.tahun', $tahun);
         }
-    }
 
-    return $result;
-}
+        if (!empty($idTim)) {
+            $builder->where('k.id_tim', $idTim);
+        }
+
+        if (!empty($idKegiatan)) {
+            $builder->where('k.id_kegiatan', $idKegiatan);
+        }
+
+        $builder->groupBy($statusCase, false);
+
+        $rows = $builder->get()->getResultArray();
+
+        foreach ($rows as $row) {
+            if (array_key_exists($row['status'], $result)) {
+                $result[$row['status']] = (int) $row['total'];
+            }
+        }
+
+        return $result;
+    }
     public function validasi(int $idPemantauan, string $status, ?string $catatan = null): bool
     {
         return $this->update($idPemantauan, [

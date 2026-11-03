@@ -182,11 +182,11 @@
 
                 <hr class="rtp-divider">
 
-                <!-- ===== RISIKO RESIDU ===== -->
+                <!-- ===== RISIKO TARGET ===== -->
                 <div class="mb-3">
 
                     <div class="rtp-section-title">
-                        <i class="ti ti-activity me-1"></i>Target Risiko Residu
+                        <i class="ti ti-activity me-1"></i>Risiko Target
                     </div>
 
                     <div class="rtp-grid-2">

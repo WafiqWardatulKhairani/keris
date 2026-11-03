@@ -1,4 +1,3 @@
-
 console.log("Rencana.js loaded");
 /* URL & CSRF */
 let RTP_CAN_EDIT = false;
@@ -15,7 +14,9 @@ function rtpCanEdit(data) {
   if (USER.role === "ketua") return false;
 
   if (USER.role === "operator") {
-    return String(USER.id_tim) === String(data.id_tim);
+    const userTeams = (USER.tim || []).map(String);
+
+    return userTeams.includes(String(data.id_tim));
   }
 
   return false;
@@ -382,7 +383,6 @@ function rtpBatal() {
   }
 }
 
-
 /* ================= CLICK ROW ================= */
 document.addEventListener("click", function (e) {
   if (e.target.closest("a, button")) return;
@@ -418,7 +418,7 @@ document.addEventListener("click", function (e) {
         console.log("DATA (CREATE)", d);
         console.log("CAN EDIT?", rtpCanEdit(d));
         console.log("ID EVALUASI DIKIRIM:", d.id_evaluasi);
-          
+
         rtpPopulateInfo(d);
         rtpSetMode("create");
         rtpAddCard();
@@ -487,6 +487,5 @@ document.addEventListener("DOMContentLoaded", function () {
       .catch((err) => {
         console.error("ERROR SIMPAN:", err);
       });
-  });  
+  });
 });
-

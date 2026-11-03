@@ -66,6 +66,26 @@ function prSetMode(mode) {
     }
   }
 
+  // Efektivitas Pengendalian
+  const efektivitasView = document.getElementById("prEfektivitasView");
+  const efektivitasEdit = document.getElementById("prEfektivitasPengendalian");
+
+  // Hanya operator yang boleh mengubah efektivitas pengendalian
+  const canEditEfektivitas = PR_ROLE === "operator";
+
+  if (efektivitasView && efektivitasEdit) {
+    if (isView || !canEditEfektivitas) {
+      efektivitasView.textContent = efektivitasEdit.value || "-";
+      efektivitasView.classList.remove("d-none");
+      efektivitasEdit.classList.add("d-none");
+      efektivitasEdit.disabled = true;
+    } else {
+      efektivitasView.classList.add("d-none");
+      efektivitasEdit.classList.remove("d-none");
+      efektivitasEdit.disabled = false;
+    }
+  }
+
   const toggle = (id, show) => {
     const el = document.getElementById(id);
     if (el) el.classList.toggle("d-none", !show);
@@ -576,112 +596,110 @@ function prGoToPage(page) {
 
 // Simpan perubahan keterjadian ke database
 function prSimpanKeterjadian(select, jumlahInput) {
-    const idIdentifikasi = select.dataset.idIdentifikasi;
+  const idIdentifikasi = select.dataset.idIdentifikasi;
 
-    if (!idIdentifikasi || !PR_URL.updateKeterjadian) {
-        console.error("ID risiko atau URL update tidak tersedia.");
-        return;
-    }
+  if (!idIdentifikasi || !PR_URL.updateKeterjadian) {
+    console.error("ID risiko atau URL update tidak tersedia.");
+    return;
+  }
 
-    const data = new FormData();
-    data.append("id_identifikasi", idIdentifikasi);
-    data.append("keterjadian_risiko", select.value);
-    data.append("jumlah_keterjadian", jumlahInput.value || 0);
-    data.append(prCsrfName, prCsrfToken);
+  const data = new FormData();
+  data.append("id_identifikasi", idIdentifikasi);
+  data.append("keterjadian_risiko", select.value);
+  data.append("jumlah_keterjadian", jumlahInput.value || 0);
+  data.append(prCsrfName, prCsrfToken);
 
-    select.disabled = true;
-    jumlahInput.disabled = true;
+  select.disabled = true;
+  jumlahInput.disabled = true;
 
-    fetch(PR_URL.updateKeterjadian, {
-        method: "POST",
-        headers: {
-            "X-Requested-With": "XMLHttpRequest",
-        },
-        body: data,
+  fetch(PR_URL.updateKeterjadian, {
+    method: "POST",
+    headers: {
+      "X-Requested-With": "XMLHttpRequest",
+    },
+    body: data,
+  })
+    .then(async (response) => {
+      const result = await response.json();
+
+      if (!response.ok || !result.success) {
+        throw new Error(
+          result.message || "Gagal menyimpan keterjadian risiko.",
+        );
+      }
+
+      if (result.csrfHash) {
+        prCsrfToken = result.csrfHash;
+      }
+
+      return result;
     })
-        .then(async (response) => {
-            const result = await response.json();
+    .then((result) => {
+      jumlahInput.value = result.data.jumlah_keterjadian;
+      console.log("Keterjadian berhasil disimpan:", result.data);
+    })
+    .catch((error) => {
+      console.error("Update keterjadian gagal:", error);
 
-            if (!response.ok || !result.success) {
-                throw new Error(
-                    result.message || "Gagal menyimpan keterjadian risiko."
-                );
-            }
-
-            if (result.csrfHash) {
-                prCsrfToken = result.csrfHash;
-            }
-
-            return result;
-        })
-        .then((result) => {
-            jumlahInput.value = result.data.jumlah_keterjadian;
-            console.log("Keterjadian berhasil disimpan:", result.data);
-        })
-        .catch((error) => {
-            console.error("Update keterjadian gagal:", error);
-
-            Swal.fire({
-                icon: "error",
-                title: "Gagal menyimpan",
-                text: error.message,
-            });
-        })
-        .finally(() => {
-            select.disabled = false;
-            jumlahInput.disabled = select.value !== "T";
-        });
+      Swal.fire({
+        icon: "error",
+        title: "Gagal menyimpan",
+        text: error.message,
+      });
+    })
+    .finally(() => {
+      select.disabled = false;
+      jumlahInput.disabled = select.value !== "T";
+    });
 }
-
 
 // Ketika dropdown status berubah
 document.addEventListener("change", function (e) {
-    if (!e.target.matches(".pr-keterjadian-select")) return;
+  if (!e.target.matches(".pr-keterjadian-select")) return;
 
-    const select = e.target;
-    const idIdentifikasi = select.dataset.idIdentifikasi;
-    const table = select.closest("table");
+  const select = e.target;
+  const idIdentifikasi = select.dataset.idIdentifikasi;
+  const table = select.closest("table");
 
-    const jumlahInput = table.querySelector(
-        `.pr-jumlah-keterjadian[data-id-identifikasi="${idIdentifikasi}"]`
-    );
+  const jumlahInput = table.querySelector(
+    `.pr-jumlah-keterjadian[data-id-identifikasi="${idIdentifikasi}"]`,
+  );
 
-    if (!jumlahInput) return;
+  if (!jumlahInput) return;
 
-    if (select.value === "T") {
-        jumlahInput.disabled = false;
-        jumlahInput.focus();
-    } else {
-        jumlahInput.value = 0;
-        jumlahInput.disabled = true;
-    }
+  if (select.value === "T") {
+    jumlahInput.disabled = false;
+    jumlahInput.focus();
+  } else {
+    jumlahInput.value = 0;
+    jumlahInput.disabled = true;
+  }
 
-    prSimpanKeterjadian(select, jumlahInput);
+  prSimpanKeterjadian(select, jumlahInput);
 });
-
 
 // Ketika jumlah keterjadian diubah
 document.addEventListener("change", function (e) {
-    if (!e.target.matches(".pr-jumlah-keterjadian")) return;
+  if (!e.target.matches(".pr-jumlah-keterjadian")) return;
 
-    const jumlahInput = e.target;
-    const idIdentifikasi = jumlahInput.dataset.idIdentifikasi;
-    const table = jumlahInput.closest("table");
+  const jumlahInput = e.target;
+  const idIdentifikasi = jumlahInput.dataset.idIdentifikasi;
+  const table = jumlahInput.closest("table");
 
-    const select = table.querySelector(
-        `.pr-keterjadian-select[data-id-identifikasi="${idIdentifikasi}"]`
-    );
+  const select = table.querySelector(
+    `.pr-keterjadian-select[data-id-identifikasi="${idIdentifikasi}"]`,
+  );
 
-    if (!select || select.value !== "T") return;
+  if (!select || select.value !== "T") return;
 
-    if (jumlahInput.value === "" || Number(jumlahInput.value) < 0) {
-        Swal.fire({
-            icon: "warning",
-            title: "Jumlah tidak valid",
-            text: "Masukkan jumlah minimal 0.",
-        });
-        return;
-    }
+  if (jumlahInput.value === "" || Number(jumlahInput.value) < 0) {
+    Swal.fire({
+      icon: "warning",
+      title: "Jumlah tidak valid",
+      text: "Masukkan jumlah minimal 0.",
+    });
+    return;
+  }
 
-    prSimpanKeterjadian(select, jumlahInput);
+  prSimpanKeterjadian(select, jumlahInput);
 });

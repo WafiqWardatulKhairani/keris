@@ -1,0 +1,7 @@
+BEGIN;
+
+ALTER TABLE pemantauan_risiko
+ADD COLUMN IF NOT EXISTS id_kemungkinan_residu INTEGER NULL,
+ADD COLUMN IF NOT EXISTS id_dampak_residu INTEGER NULL;
+
+COMMIT;

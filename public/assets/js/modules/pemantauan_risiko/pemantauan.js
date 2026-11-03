@@ -66,6 +66,49 @@ function prSetMode(mode) {
     }
   }
 
+  // Efektivitas Pengendalian
+  const efektivitasView = document.getElementById("prEfektivitasView");
+  const efektivitasEdit = document.getElementById("prEfektivitasPengendalian");
+
+  const canEditEfektivitas = USER.role === "operator";
+
+  if (efektivitasView && efektivitasEdit) {
+    if (isView || !canEditEfektivitas) {
+      efektivitasView.textContent = efektivitasEdit.value || "-";
+      efektivitasView.classList.remove("d-none");
+      efektivitasEdit.classList.add("d-none");
+      efektivitasEdit.disabled = true;
+    } else {
+      efektivitasView.classList.add("d-none");
+      efektivitasEdit.classList.remove("d-none");
+      efektivitasEdit.disabled = false;
+    }
+  }
+
+  // Risiko Residu — hanya operator yang berhak mengubah
+  const residuView = document.getElementById("prRisikoResiduView");
+  const residuInput = document.getElementById("prRisikoResiduInput");
+  const kemungkinanResidu = document.getElementById("prKemungkinanResidu");
+  const dampakResidu = document.getElementById("prDampakResidu");
+
+  const canEditResidu = USER.role === "operator" && PR_CAN_EDIT;
+
+  if (residuView && residuInput) {
+    if (isView || !canEditResidu) {
+      residuView.classList.remove("d-none");
+      residuInput.classList.add("d-none");
+
+      if (kemungkinanResidu) kemungkinanResidu.disabled = true;
+      if (dampakResidu) dampakResidu.disabled = true;
+    } else {
+      residuView.classList.add("d-none");
+      residuInput.classList.remove("d-none");
+
+      if (kemungkinanResidu) kemungkinanResidu.disabled = false;
+      if (dampakResidu) dampakResidu.disabled = false;
+    }
+  }
+
   const toggle = (id, show) => {
     const el = document.getElementById(id);
     if (el) el.classList.toggle("d-none", !show);
@@ -137,7 +180,6 @@ function prReRenderBuktiMode(isView) {
     // Abaikan jika data tidak valid
   }
 }
-
 document.addEventListener("DOMContentLoaded", function () {
   const outputEl = document.getElementById("prRealisasiOutput");
 
@@ -145,6 +187,16 @@ document.addEventListener("DOMContentLoaded", function () {
     //outputEl.addEventListener("input", prAutoSetStatus);
   }
 
+  // ===== RISIKO RESIDU =====
+  document
+    .getElementById("prKemungkinanResidu")
+    ?.addEventListener("change", prHitungResidu);
+
+  document
+    .getElementById("prDampakResidu")
+    ?.addEventListener("change", prHitungResidu);
+
+  // ===== BUKTI DUKUNG =====
   const input = document.getElementById("prBuktiLinkInput");
   const preview = document.getElementById("prBuktiPreview");
 
@@ -178,6 +230,12 @@ function prResetForm() {
   document.getElementById("prForm").classList.remove("was-validated");
   document.getElementById("prIdRtp").value = "";
 
+  const efektivitasView = document.getElementById("prEfektivitasView");
+  if (efektivitasView) {
+    efektivitasView.textContent = "-";
+    efektivitasView.classList.add("d-none");
+  }
+
   [
     "prInfoTahun",
     "prInfoTimKerja",
@@ -192,6 +250,12 @@ function prResetForm() {
     "prInfoRtp",
     "prInfoTargetOutput",
     "prInfoTargetWaktu",
+    "prResiduKemungkinanView",
+    "prResiduDampakView",
+    "prNilaiRisikoResiduView",
+    "prSeleraRisikoResiduView",
+    "prNilaiRisikoResidu",
+    "prSeleraRisikoResidu",
   ].forEach((id) => {
     const el = document.getElementById(id);
     if (el) el.textContent = "-";
@@ -245,6 +309,32 @@ function prPopulateInfo(d) {
   setVal("prRealisasiOutput", d.realisasi_output);
   prRenderStatusBadge(d.status);
   setVal("prCatatan", d.catatan);
+  setVal("prEfektivitasPengendalian", d.efektivitas_pengendalian);
+  setVal("prKemungkinanResidu", d.id_kemungkinan_residu);
+  setVal("prDampakResidu", d.id_dampak_residu);
+  setVal("prKemungkinanResidu", d.id_kemungkinan_residu);
+  setVal("prDampakResidu", d.id_dampak_residu);
+
+  prHitungResidu();
+
+  const kemungkinanSelect = document.getElementById("prKemungkinanResidu");
+  const dampakSelect = document.getElementById("prDampakResidu");
+
+  const kemungkinanText = kemungkinanSelect?.selectedOptions[0]?.text;
+  const dampakText = dampakSelect?.selectedOptions[0]?.text;
+
+  const residuSet = (id, value) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = value || "-";
+  };
+
+  residuSet("prResiduKemungkinanView", kemungkinanText);
+  residuSet("prResiduDampakView", dampakText);
+  residuSet("prNilaiRisikoResiduView", d.nilai_risiko_residu);
+  residuSet("prSeleraRisikoResiduView", d.nama_selera_residu);
+
+  residuSet("prNilaiRisikoResidu", d.nilai_risiko_residu);
+  residuSet("prSeleraRisikoResidu", d.nama_selera_residu);
 
   const rwEl = document.getElementById("prRealisasiWaktu");
   if (rwEl) {
@@ -262,6 +352,99 @@ function prPopulateInfo(d) {
   // Sementara render dulu dengan showDelete = true, nanti prSetMode akan re-render
   prRenderBuktiPreview(d.bukti_list || [], true);
   prAutoSetStatus();
+}
+
+function prHitungResidu() {
+  const kemungkinan = document.getElementById("prKemungkinanResidu")?.value;
+  const dampak = document.getElementById("prDampakResidu")?.value;
+
+  if (!kemungkinan || !dampak) {
+    return prResetResidu();
+  }
+
+  const body = new URLSearchParams({
+    id_kemungkinan: kemungkinan,
+    id_dampak: dampak,
+    [prCsrfName]: prCsrfToken,
+  });
+
+  fetch(PR_URL.preview, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+      "X-Requested-With": "XMLHttpRequest",
+    },
+    body,
+  })
+    .then((response) => response.json())
+    .then((res) => {
+      if (res.status !== "success") {
+        return prResetResidu();
+      }
+
+      const warnaMap = {
+        biru: "#0d6efd",
+        hijau: "#198754",
+        kuning: "#ffc107",
+        oranye: "#fd7e14",
+        merah: "#dc3545",
+      };
+
+      const warna =
+        warnaMap[(res.warna_selera || "").toLowerCase()] ||
+        res.warna_selera ||
+        "#6c757d";
+
+      const setText = (id, value) => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = value ?? "-";
+      };
+
+      setText("prNilaiRisikoResidu", res.nilai_risiko);
+      setText("prSeleraRisikoResidu", res.nama_selera);
+      setText("prNilaiRisikoResiduView", res.nilai_risiko);
+      setText("prSeleraRisikoResiduView", res.nama_selera);
+
+      const nilai = document.getElementById("prNilaiRisikoResidu");
+      const nilaiView = document.getElementById("prNilaiRisikoResiduView");
+
+      if (nilai) nilai.style.color = res.warna || "";
+      if (nilaiView) nilaiView.style.color = res.warna || "";
+
+      const level = document.getElementById("prSeleraRisikoResidu");
+      const levelView = document.getElementById("prSeleraRisikoResiduView");
+
+      [level, levelView].forEach((el) => {
+        if (el) {
+          el.style.backgroundColor = warna;
+          el.style.color = "#fff";
+          el.style.padding = "3px 8px";
+          el.style.borderRadius = "6px";
+        }
+      });
+    })
+    .catch((error) => {
+      console.error("Gagal menghitung Risiko Residu:", error);
+      prResetResidu();
+    });
+}
+
+function prResetResidu() {
+  const ids = [
+    "prNilaiRisikoResidu",
+    "prSeleraRisikoResidu",
+    "prNilaiRisikoResiduView",
+    "prSeleraRisikoResiduView",
+  ];
+
+  ids.forEach((id) => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.textContent = "-";
+      el.style.color = "";
+      el.style.backgroundColor = "";
+    }
+  });
 }
 
 /* ======================================================
@@ -501,7 +684,9 @@ function prCanEdit(data) {
   if (USER.role === "ketua") return false;
 
   if (USER.role === "operator") {
-    return String(USER.id_tim) === String(data.id_tim);
+    const userTeams = (USER.tim || []).map(String);
+
+    return userTeams.includes(String(data.id_tim));
   }
 
   return false;
@@ -576,112 +761,110 @@ function prGoToPage(page) {
 
 // Simpan perubahan keterjadian ke database
 function prSimpanKeterjadian(select, jumlahInput) {
-    const idIdentifikasi = select.dataset.idIdentifikasi;
+  const idIdentifikasi = select.dataset.idIdentifikasi;
 
-    if (!idIdentifikasi || !PR_URL.updateKeterjadian) {
-        console.error("ID risiko atau URL update tidak tersedia.");
-        return;
-    }
+  if (!idIdentifikasi || !PR_URL.updateKeterjadian) {
+    console.error("ID risiko atau URL update tidak tersedia.");
+    return;
+  }
 
-    const data = new FormData();
-    data.append("id_identifikasi", idIdentifikasi);
-    data.append("keterjadian_risiko", select.value);
-    data.append("jumlah_keterjadian", jumlahInput.value || 0);
-    data.append(prCsrfName, prCsrfToken);
+  const data = new FormData();
+  data.append("id_identifikasi", idIdentifikasi);
+  data.append("keterjadian_risiko", select.value);
+  data.append("jumlah_keterjadian", jumlahInput.value || 0);
+  data.append(prCsrfName, prCsrfToken);
 
-    select.disabled = true;
-    jumlahInput.disabled = true;
+  select.disabled = true;
+  jumlahInput.disabled = true;
 
-    fetch(PR_URL.updateKeterjadian, {
-        method: "POST",
-        headers: {
-            "X-Requested-With": "XMLHttpRequest",
-        },
-        body: data,
+  fetch(PR_URL.updateKeterjadian, {
+    method: "POST",
+    headers: {
+      "X-Requested-With": "XMLHttpRequest",
+    },
+    body: data,
+  })
+    .then(async (response) => {
+      const result = await response.json();
+
+      if (!response.ok || !result.success) {
+        throw new Error(
+          result.message || "Gagal menyimpan keterjadian risiko.",
+        );
+      }
+
+      if (result.csrfHash) {
+        prCsrfToken = result.csrfHash;
+      }
+
+      return result;
     })
-        .then(async (response) => {
-            const result = await response.json();
+    .then((result) => {
+      jumlahInput.value = result.data.jumlah_keterjadian;
+      console.log("Keterjadian berhasil disimpan:", result.data);
+    })
+    .catch((error) => {
+      console.error("Update keterjadian gagal:", error);
 
-            if (!response.ok || !result.success) {
-                throw new Error(
-                    result.message || "Gagal menyimpan keterjadian risiko."
-                );
-            }
-
-            if (result.csrfHash) {
-                prCsrfToken = result.csrfHash;
-            }
-
-            return result;
-        })
-        .then((result) => {
-            jumlahInput.value = result.data.jumlah_keterjadian;
-            console.log("Keterjadian berhasil disimpan:", result.data);
-        })
-        .catch((error) => {
-            console.error("Update keterjadian gagal:", error);
-
-            Swal.fire({
-                icon: "error",
-                title: "Gagal menyimpan",
-                text: error.message,
-            });
-        })
-        .finally(() => {
-            select.disabled = false;
-            jumlahInput.disabled = select.value !== "T";
-        });
+      Swal.fire({
+        icon: "error",
+        title: "Gagal menyimpan",
+        text: error.message,
+      });
+    })
+    .finally(() => {
+      select.disabled = false;
+      jumlahInput.disabled = select.value !== "T";
+    });
 }
-
 
 // Ketika dropdown status berubah
 document.addEventListener("change", function (e) {
-    if (!e.target.matches(".pr-keterjadian-select")) return;
+  if (!e.target.matches(".pr-keterjadian-select")) return;
 
-    const select = e.target;
-    const idIdentifikasi = select.dataset.idIdentifikasi;
-    const table = select.closest("table");
+  const select = e.target;
+  const idIdentifikasi = select.dataset.idIdentifikasi;
+  const table = select.closest("table");
 
-    const jumlahInput = table.querySelector(
-        `.pr-jumlah-keterjadian[data-id-identifikasi="${idIdentifikasi}"]`
-    );
+  const jumlahInput = table.querySelector(
+    `.pr-jumlah-keterjadian[data-id-identifikasi="${idIdentifikasi}"]`,
+  );
 
-    if (!jumlahInput) return;
+  if (!jumlahInput) return;
 
-    if (select.value === "T") {
-        jumlahInput.disabled = false;
-        jumlahInput.focus();
-    } else {
-        jumlahInput.value = 0;
-        jumlahInput.disabled = true;
-    }
+  if (select.value === "T") {
+    jumlahInput.disabled = false;
+    jumlahInput.focus();
+  } else {
+    jumlahInput.value = 0;
+    jumlahInput.disabled = true;
+  }
 
-    prSimpanKeterjadian(select, jumlahInput);
+  prSimpanKeterjadian(select, jumlahInput);
 });
-
 
 // Ketika jumlah keterjadian diubah
 document.addEventListener("change", function (e) {
-    if (!e.target.matches(".pr-jumlah-keterjadian")) return;
+  if (!e.target.matches(".pr-jumlah-keterjadian")) return;
 
-    const jumlahInput = e.target;
-    const idIdentifikasi = jumlahInput.dataset.idIdentifikasi;
-    const table = jumlahInput.closest("table");
+  const jumlahInput = e.target;
+  const idIdentifikasi = jumlahInput.dataset.idIdentifikasi;
+  const table = jumlahInput.closest("table");
 
-    const select = table.querySelector(
-        `.pr-keterjadian-select[data-id-identifikasi="${idIdentifikasi}"]`
-    );
+  const select = table.querySelector(
+    `.pr-keterjadian-select[data-id-identifikasi="${idIdentifikasi}"]`,
+  );
 
-    if (!select || select.value !== "T") return;
+  if (!select || select.value !== "T") return;
 
-    if (jumlahInput.value === "" || Number(jumlahInput.value) < 0) {
-        Swal.fire({
-            icon: "warning",
-            title: "Jumlah tidak valid",
-            text: "Masukkan jumlah minimal 0.",
-        });
-        return;
-    }
+  if (jumlahInput.value === "" || Number(jumlahInput.value) < 0) {
+    Swal.fire({
+      icon: "warning",
+      title: "Jumlah tidak valid",
+      text: "Masukkan jumlah minimal 0.",
+    });
+    return;
+  }
 
-    prSimpanKeterjadian(select, jumlahInput);
+  prSimpanKeterjadian(select, jumlahInput);
 });

@@ -20,7 +20,8 @@
 <script>
     window.APP_USER = {
         role: '<?= session()->get('user_role') ?>',
-        id_tim: '<?= session()->get('id_tim') ?>'
+        id_tim: '<?= session()->get('id_tim') ?>',
+        tim: <?= json_encode(session()->get('user_tim') ?? []) ?>
     };
 </script>
 
