@@ -807,13 +807,14 @@ class RencanaPenangananController extends BaseController
 
     public function update($id)
     {
-        try {
-            $db = $this->db;
+        $db = $this->db;
 
-            // Ambil id_evaluasi dari RTP yang diedit
+        try {
+            // Ambil RTP yang menjadi acuan edit
             $existing = $db->table('rencana_penanganan_risiko')
                 ->where('id_rtp', $id)
-                ->get()->getRowArray();
+                ->get()
+                ->getRowArray();
 
             if (!$existing) {
                 return $this->response->setStatusCode(404)->setJSON([
@@ -822,60 +823,139 @@ class RencanaPenangananController extends BaseController
                 ]);
             }
 
-            $idEvaluasi          = $existing['id_penilaian_awal'];
-            $kemungkinanResidu   = $this->request->getPost('id_kemungkinan_residu') ?: null;
-            $dampakResidu        = $this->request->getPost('id_dampak_residu') ?: null;
+            $idEvaluasi = $existing['id_penilaian_awal'];
 
-            $uraianList  = $this->request->getPost('uraian_rtp');
-            $outputList  = $this->request->getPost('target_output');
-            $waktuList   = $this->request->getPost('target_waktu');
-
-            if (!is_array($uraianList)) $uraianList = [$uraianList];
-            if (!is_array($outputList)) $outputList = [$outputList];
-            if (!is_array($waktuList))  $waktuList  = [$waktuList];
-
-            $db->transStart();
-
-            // Hapus semua RTP lama milik evaluasi ini
-            $db->table('rencana_penanganan_risiko')
+            // Ambil seluruh RTP milik evaluasi tersebut
+            $existingRows = $db->table('rencana_penanganan_risiko')
                 ->where('id_penilaian_awal', $idEvaluasi)
-                ->delete();
+                ->get()
+                ->getResultArray();
 
-            // Insert ulang semua RTP dari form
-            foreach ($outputList as $i => $output) {
-                if (!$output) continue;
-
-                $targetWaktu = $waktuList[$i] ?? null;
-                if ($targetWaktu && strlen($targetWaktu) === 7) {
-                    $targetWaktu = $targetWaktu . '-01';
-                }
-
-                $db->table('rencana_penanganan_risiko')->insert([
-                    'id_penilaian_awal'     => $idEvaluasi,
-                    'uraian_rtp'            => $uraianList[$i] ?? null,
-                    'target_output'         => $output,
-                    'target_waktu'          => $targetWaktu,
-                    'id_kemungkinan_residu' => $kemungkinanResidu,
-                    'id_dampak_residu'      => $dampakResidu,
-                ]);
+            $existingById = [];
+            foreach ($existingRows as $row) {
+                $existingById[(string) $row['id_rtp']] = $row;
             }
 
-            $db->transComplete();
+            // Ambil data dari form
+            $idRtpList  = $this->request->getPost('id_rtp') ?? [];
+            $uraianList = $this->request->getPost('uraian_rtp') ?? [];
+            $outputList = $this->request->getPost('target_output') ?? [];
+            $waktuList  = $this->request->getPost('target_waktu') ?? [];
+
+            $idRtpList  = is_array($idRtpList) ? $idRtpList : [$idRtpList];
+            $uraianList = is_array($uraianList) ? $uraianList : [$uraianList];
+            $outputList = is_array($outputList) ? $outputList : [$outputList];
+            $waktuList  = is_array($waktuList) ? $waktuList : [$waktuList];
+
+            $kemungkinanResidu = $this->request->getPost('id_kemungkinan_residu') ?: null;
+            $dampakResidu      = $this->request->getPost('id_dampak_residu') ?: null;
+
+            // Pastikan ID yang dikirim memang milik evaluasi ini
+            foreach ($idRtpList as $idRtp) {
+                if ($idRtp !== '' && $idRtp !== null) {
+                    if (!isset($existingById[(string) $idRtp])) {
+                        return $this->response->setStatusCode(400)->setJSON([
+                            'status'  => 'error',
+                            'message' => 'Terdapat ID RTP yang tidak valid.',
+                        ]);
+                    }
+                }
+            }
+
+            $db->transBegin();
+
+            $idDipertahankan = [];
+
+            // Update RTP lama atau insert RTP baru
+            foreach ($outputList as $i => $output) {
+                $output = trim((string) $output);
+                $idRtp  = $idRtpList[$i] ?? '';
+
+                // Abaikan kartu yang kosong
+                if ($output === '') {
+                    continue;
+                }
+
+                $targetWaktu = $waktuList[$i] ?? null;
+
+                if ($targetWaktu && strlen($targetWaktu) === 7) {
+                    $targetWaktu .= '-01';
+                }
+
+                $data = [
+                    'uraian_rtp'            => $uraianList[$i] ?? null,
+                    'target_output'         => $output,
+                    'target_waktu'          => $targetWaktu ?: null,
+                    'id_kemungkinan_residu' => $kemungkinanResidu,
+                    'id_dampak_residu'      => $dampakResidu,
+                ];
+
+                if ($idRtp !== '' && $idRtp !== null) {
+                    // RTP lama: pertahankan ID, cukup update datanya
+                    $db->table('rencana_penanganan_risiko')
+                        ->where('id_rtp', $idRtp)
+                        ->where('id_penilaian_awal', $idEvaluasi)
+                        ->update($data);
+
+                    $idDipertahankan[] = (string) $idRtp;
+                } else {
+                    // RTP baru: buat record baru
+                    $data['id_penilaian_awal'] = $idEvaluasi;
+
+                    $db->table('rencana_penanganan_risiko')
+                        ->insert($data);
+                }
+            }
+
+            // Hapus RTP lama yang memang sudah dihapus dari form,
+            // tetapi jangan hapus jika sudah memiliki data pemantauan.
+            foreach ($existingRows as $oldRtp) {
+                $oldId = (string) $oldRtp['id_rtp'];
+
+                if (in_array($oldId, $idDipertahankan, true)) {
+                    continue;
+                }
+
+                $jumlahPemantauan = $db->table('pemantauan_risiko')
+                    ->where('id_rtp', $oldId)
+                    ->countAllResults();
+
+                if ($jumlahPemantauan > 0) {
+                    $db->transRollback();
+
+                    return $this->response->setStatusCode(409)->setJSON([
+                        'status'  => 'error',
+                        'message' => 'RTP "' . $oldRtp['uraian_rtp'] .
+                            '" sudah memiliki data pemantauan sehingga tidak dapat dihapus.',
+                    ]);
+                }
+
+                $db->table('rencana_penanganan_risiko')
+                    ->where('id_rtp', $oldId)
+                    ->where('id_penilaian_awal', $idEvaluasi)
+                    ->delete();
+            }
 
             if ($db->transStatus() === false) {
+                $db->transRollback();
                 throw new \RuntimeException('Transaksi gagal.');
             }
 
+            $db->transCommit();
+
             return $this->response->setJSON([
                 'status'     => 'success',
-                'message'    => 'RTP berhasil diperbarui',
+                'message'    => 'RTP berhasil diperbarui.',
                 'csrf_token' => csrf_hash(),
             ]);
         } catch (\Throwable $e) {
+            $db->transRollback();
+
             log_message('error', 'RTP Update Error: ' . $e->getMessage());
+
             return $this->response->setStatusCode(500)->setJSON([
                 'status'  => 'error',
-                'message' => $e->getMessage(),
+                'message' => 'Gagal memperbarui RTP: ' . $e->getMessage(),
             ]);
         }
     }

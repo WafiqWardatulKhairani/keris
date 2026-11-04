@@ -145,6 +145,7 @@
                     <!-- TEMPLATE CARD -->
                     <template id="rtpCardTemplate">
                         <div class="rtp-card">
+                            <input type="hidden" name="id_rtp[]" value="">
                             <div class="rtp-card-header">
                                 <span class="rtp-card-title">RTP</span>
                                 <button type="button" class="rtp-card-remove">
@@ -158,8 +159,9 @@
                             <div class="rtp-target-grid">
                                 <div>
                                     <label class="rtp-form-label rtp-sub-label">Output</label>
-                                    <input type="text" name="target_output[]" class="form-control">
+                                    <textarea name="target_output[]" class="form-control" rows="2"></textarea>
                                 </div>
+
                                 <div>
                                     <label class="rtp-form-label rtp-sub-label">Waktu</label>
                                     <input type="month" name="target_waktu[]" class="form-control">

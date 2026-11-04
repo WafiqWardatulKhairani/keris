@@ -211,8 +211,11 @@ function rtpAddCard(data = {}) {
 
   const node = tpl.content.cloneNode(true);
 
+  const idRtp = node.querySelector('input[name="id_rtp[]"]');
+  if (idRtp) idRtp.value = data.id_rtp || "";
+
   const textarea = node.querySelector("textarea[name='uraian_rtp[]']");
-  const output = node.querySelector('input[name="target_output[]"]');
+  const output = node.querySelector('textarea[name="target_output[]"]');
   const waktu = node.querySelector('input[name="target_waktu[]"]');
 
   if (textarea) textarea.value = data.uraian_rtp || "";
