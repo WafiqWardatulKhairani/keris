@@ -451,19 +451,23 @@ function prResetResidu() {
    LOAD DETAIL
 ====================================================== */
 function prLoadDetail(idRtp) {
-  return fetch(PR_URL.detail(idRtp))
-    .then((r) => r.json())
-    .then((d) => {
-      console.log("USER", USER);
-      console.log("DATA", d);
-      PR_CAN_EDIT = prCanEdit(d);
-      console.log("CAN EDIT?", prCanEdit(d));
-      document.getElementById("prIdRtp").value = d.id_rtp;
-      prPopulateInfo(d);
-      return d;
-    });
-}
+    console.log("ID RTP YANG DIKLIK:", idRtp);
 
+    return fetch(PR_URL.detail(idRtp))
+        .then((r) => r.json())
+        .then((d) => {
+            console.log("HASIL DETAIL:", d);
+            console.log("ID PEMANTAUAN:", d.id_pemantauan);
+
+            PR_CAN_EDIT = prCanEdit(d);
+            console.log("CAN EDIT:", PR_CAN_EDIT);
+
+            document.getElementById("prIdRtp").value = d.id_rtp;
+            prPopulateInfo(d);
+
+            return d;
+        });
+}
 /* ======================================================
    OPEN ROW
 ====================================================== */
@@ -486,7 +490,9 @@ document.addEventListener("click", function (e) {
   ).show();
 
   prLoadDetail(idRtp).then((d) => {
-    const canEdit = prCanEdit(d);
+    console.log("DATA SETELAH LOAD:", d);
+    console.log("PR_CAN_EDIT:", PR_CAN_EDIT);
+    console.log("ID PEMANTAUAN:", d.id_pemantauan);
 
     if (d.id_pemantauan) {
       prSetMode("view");
@@ -494,10 +500,10 @@ document.addEventListener("click", function (e) {
       prSetMode("create");
     }
 
-    // 🔥 kalau tidak boleh edit → paksa view
-    if (!canEdit) {
-      prSetMode("view");
-    }
+    console.log(
+      "CLASS TOMBOL SETELAH MODE:",
+      document.getElementById("prBtnEdit").className
+    );
   });
 });
 
