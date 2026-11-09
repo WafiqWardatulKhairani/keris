@@ -2,7 +2,6 @@
     <div class="card-body">
         <div class="table-responsive">
             <table class="table rtp-table align-middle mb-0">
-
                 <thead>
                     <tr class="rtp-thead-main">
                         <th rowspan="2" class="rtp-th text-center">#</th>
@@ -100,10 +99,19 @@
                                     <?php endif; ?>
 
                                     <!-- RTP -->
-                                    <td><?= esc($rtp['uraian_rtp']) ?></td>
+<td>
+    <div title="<?= esc($rtp['uraian_rtp'], 'attr') ?>"
+         style="max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+        <?= esc($rtp['uraian_rtp']) ?>
+    </div>
+</td>
 
-                                    <!-- TARGET OUTPUT -->
-                                    <td><?= esc($rtp['target_output'] ?? '—') ?></td>
+                                    <td>
+    <div title="<?= esc($rtp['target_output'] ?? '—', 'attr') ?>"
+         style="max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+        <?= esc($rtp['target_output'] ?? '—') ?>
+    </div>
+</td>
 
                                     <!-- TARGET WAKTU -->
                                     <td class="text-center">
@@ -115,10 +123,13 @@
                                         <?php endif; ?>
                                     </td>
 
-                                    <!-- REALISASI OUTPUT -->
-                                    <td class="<?= !empty($rtp['realisasi_output']) ? 'fw-semibold' : '' ?>">
-                                        <?= esc($rtp['realisasi_output'] ?? '—') ?>
-                                    </td>
+                                    <td>
+    <div class="<?= !empty($rtp['realisasi_output']) ? 'fw-semibold' : '' ?>"
+         title="<?= esc($rtp['realisasi_output'] ?? '—', 'attr') ?>"
+         style="max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+        <?= esc($rtp['realisasi_output'] ?? '—') ?>
+    </div>
+</td>
 
                                     <!-- REALISASI WAKTU -->
                                     <td class="text-center <?= !empty($rtp['realisasi_waktu']) ? 'fw-semibold' : '' ?>">
