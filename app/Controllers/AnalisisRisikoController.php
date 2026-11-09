@@ -11,26 +11,30 @@ use App\Models\SeleraRisikoModel;
 
 class AnalisisRisikoController extends BaseController
 {
-    private function validateTimAccessByIdentifikasi($idIdentifikasi): bool
-    {
-        $db = \Config\Database::connect();
+   private function validateTimAccessByIdentifikasi($idIdentifikasi): bool
+{
+    $db = \Config\Database::connect();
 
-        $row = $db->table('identifikasi_risiko ir')
-            ->select('k.id_tim')
-            ->join('konteks_proses_bisnis kpb', 'kpb.id_konteks_proses = ir.id_konteks_proses')
-            ->join('konteks k', 'k.id_konteks = kpb.id_konteks')
-            ->where('ir.id_identifikasi', $idIdentifikasi)
-            ->get()
-            ->getRow();
+    $row = $db->table('identifikasi_risiko ir')
+        ->select('k.id_tim')
+        ->join('konteks_proses_bisnis kpb', 'kpb.id_konteks_proses = ir.id_konteks_proses')
+        ->join('konteks k', 'k.id_konteks = kpb.id_konteks')
+        ->where('ir.id_identifikasi', $idIdentifikasi)
+        ->get()
+        ->getRow();
 
-        if (!$row) return false;
+    if (!$row) return false;
 
-        $role = session('role');
-        if ($role === 'admin') return true;
-        if ($role === 'ketua') return true;
+    $role = session('role');
 
-        return (string)session('id_tim') === (string)$row->id_tim;
-    }
+    if ($role === 'admin') return true;
+    if ($role === 'ketua') return true;
+
+    $idTimAktif = session('global_id_tim');
+
+    return $idTimAktif !== null
+        && (string)$idTimAktif === (string)$row->id_tim;
+}
 
     public function index()
     {

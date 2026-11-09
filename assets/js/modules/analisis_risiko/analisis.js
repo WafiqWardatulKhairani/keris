@@ -3,6 +3,20 @@ const AR_URL = window.AR_CONFIG?.url || {};
 let arCsrfToken = window.AR_CONFIG?.csrf?.token || "";
 const arCsrfName = window.AR_CONFIG?.csrf?.name || "";
 
+function arGetUserTeamIds(user) {
+  const teams = Array.isArray(user.tim) ? user.tim : [];
+
+  const ids = teams.map((team) =>
+    typeof team === "object" ? (team.id_tim ?? team.id) : team,
+  );
+
+  if (user.id_tim != null) {
+    ids.push(user.id_tim);
+  }
+
+  return [...new Set(ids.filter((id) => id != null && id !== "").map(String))];
+}
+
 /* MODE MANAGEMENT */
 function arSetMode(mode) {
   const isView = mode === "view";
@@ -12,6 +26,10 @@ function arSetMode(mode) {
   document.getElementById("arMode").value = mode;
 
   const role = USER.role || "guest";
+  console.log("ROLE:", role);
+console.log("MODE:", mode);
+console.log("READONLY:", isReadonly);
+console.log("BEDA TIM:", window.AR_IS_BEDA_TIM);
 
   let isReadonly = false;
 
@@ -189,20 +207,35 @@ function arLoadDetail(idPenilaian) {
     .then((d) => {
       console.log("USER:", window.APP_USER);
       console.log("DATA:", d);
+
       const currentUser = window.APP_USER || {};
-
       const isOperator = currentUser.role === "operator";
-      const bedaTim = String(currentUser.id_tim) !== String(d.id_tim);
 
-      window.AR_IS_BEDA_TIM = isOperator && bedaTim;
+      // Cek seluruh tim yang dimiliki pengguna
+      const userTeamIds = arGetUserTeamIds(currentUser);
+      const bolehAksesTim = userTeamIds.includes(String(d.id_tim));
+
+      window.AR_IS_BEDA_TIM = isOperator && !bolehAksesTim;
+
+      console.log("CEK AKSES TIM:", {
+    userTeamIds,
+    idTimData: d.id_tim,
+    bolehAksesTim,
+    isOperator,
+    hasil: window.AR_IS_BEDA_TIM
+});
+
       document.getElementById("arId").value = d.id_penilaian;
       document.getElementById("arIdIdentifikasi").value = d.id_identifikasi;
       document.getElementById("arKemungkinan").value = d.id_kemungkinan ?? "";
       document.getElementById("arDampak").value = d.id_dampak ?? "";
-      document.getElementById("arUraianPengendalian").value = d.uraian_pengendalian ?? "";
+      document.getElementById("arUraianPengendalian").value =
+        d.uraian_pengendalian ?? "";
       document.getElementById("arEfektivitas").value = d.efektivitas ?? "";
+
       arPopulateInfo(d);
       arLoadPreview();
+
       return d;
     });
 }
@@ -229,20 +262,33 @@ document.addEventListener("click", function (e) {
   const idPenilaian = row.dataset.penilaian;
 
   arResetForm();
-  bootstrap.Offcanvas.getOrCreateInstance(document.getElementById("arOffcanvas"),).show();
+  bootstrap.Offcanvas.getOrCreateInstance(
+    document.getElementById("arOffcanvas"),
+  ).show();
 
   if (idPenilaian) {
-    arLoadDetail(idPenilaian).then(() => arSetMode("view"));
-  } else {
+    arLoadDetail(idPenilaian).then(() => {
+        arSetMode("view");
+
+        console.log("ROLE:", USER.role);
+        console.log("BEDA TIM:", window.AR_IS_BEDA_TIM);
+        console.log("EDIT CLASS:", document.getElementById("arBtnEdit").className);
+        console.log("DELETE CLASS:", document.getElementById("arBtnDelete").className);
+    });
+} else {
     document.getElementById("arIdIdentifikasi").value = idIdentifikasi;
     fetch(AR_URL.detailIdentifikasi(idIdentifikasi))
       .then((r) => r.json())
       .then((d) => {
         const currentUser = window.APP_USER || {};
         const isOperator = currentUser.role === "operator";
-        const bedaTim = String(currentUser.id_tim) !== String(d.id_tim);
-        window.AR_IS_BEDA_TIM = isOperator && bedaTim;
-        arPopulateInfo(d);        
+
+        const userTeamIds = arGetUserTeamIds(currentUser);
+
+        const bolehAksesTim = userTeamIds.includes(String(d.id_tim));
+
+        window.AR_IS_BEDA_TIM = isOperator && !bolehAksesTim;
+        arPopulateInfo(d);
 
         arSetMode("create");
       });
@@ -262,8 +308,10 @@ function arLoadPreview() {
 
   const selK = document.getElementById("arKemungkinan");
   const selD = document.getElementById("arDampak");
-  document.getElementById("arDescKemungkinan").textContent = selK.options[selK.selectedIndex]?.dataset.desc ?? "";
-  document.getElementById("arDescDampak").textContent = selD.options[selD.selectedIndex]?.dataset.desc ?? "";
+  document.getElementById("arDescKemungkinan").textContent =
+    selK.options[selK.selectedIndex]?.dataset.desc ?? "";
+  document.getElementById("arDescDampak").textContent =
+    selD.options[selD.selectedIndex]?.dataset.desc ?? "";
 
   fetch(AR_URL.preview, {
     method: "POST",
@@ -286,7 +334,9 @@ function arLoadPreview() {
     });
 }
 
-document.getElementById("arKemungkinan")?.addEventListener("change", arLoadPreview);
+document
+  .getElementById("arKemungkinan")
+  ?.addEventListener("change", arLoadPreview);
 document.getElementById("arDampak")?.addEventListener("change", arLoadPreview);
 
 /* HAPUS */
@@ -428,4 +478,3 @@ document.addEventListener("click", function (e) {
     arHapus();
   }
 });
- 

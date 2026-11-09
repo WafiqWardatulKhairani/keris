@@ -17,12 +17,34 @@
         }
     };
 </script>
+
+<?php
+$user = session('user') ?? [];
+
+$activeRole = session('user_role')
+    ?? ($user['role'] ?? 'guest');
+
+$userRoles = session('user_roles')
+    ?? ($user['roles'] ?? [$activeRole]);
+
+$userTim = session('user_tim')
+    ?? ($user['tim'] ?? []);
+
+$idTim = session('id_tim')
+    ?? ($user['id_tim'] ?? null);
+?>
+
 <script>
-    window.APP_USER = {
-        role: '<?= session()->get('user_role') ?>',
-        id_tim: '<?= session()->get('id_tim') ?>'
-    };
+    window.APP_USER = <?= json_encode([
+        'id'     => session('user_id') ?? ($user['id'] ?? null),
+        'name'   => session('user_name') ?? ($user['name'] ?? ''),
+        'role'   => $activeRole,
+        'roles'  => $userRoles,
+        'id_tim' => $idTim,
+        'tim'    => $userTim,
+    ], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT) ?>;
 </script>
+
 
 <div class="pk-page">
 

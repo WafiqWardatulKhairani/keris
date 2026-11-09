@@ -1,8 +1,21 @@
-
 const USER = window.APP_USER || {};
 const AR_URL = window.AR_CONFIG?.url || {};
 let arCsrfToken = window.AR_CONFIG?.csrf?.token || "";
 const arCsrfName = window.AR_CONFIG?.csrf?.name || "";
+
+function arGetUserTeamIds(user) {
+  const teams = Array.isArray(user.tim) ? user.tim : [];
+
+  const ids = teams.map((team) =>
+    typeof team === "object" ? (team.id_tim ?? team.id) : team,
+  );
+
+  if (user.id_tim != null) {
+    ids.push(user.id_tim);
+  }
+
+  return [...new Set(ids.filter((id) => id != null && id !== "").map(String))];
+}
 
 /* MODE MANAGEMENT */
 function arSetMode(mode) {
@@ -190,20 +203,26 @@ function arLoadDetail(idPenilaian) {
     .then((d) => {
       console.log("USER:", window.APP_USER);
       console.log("DATA:", d);
+
       const currentUser = window.APP_USER || {};
-
       const isOperator = currentUser.role === "operator";
-      const bedaTim = String(currentUser.id_tim) !== String(d.id_tim);
 
-      window.AR_IS_BEDA_TIM = isOperator && bedaTim;
+      const userTeamIds = arGetUserTeamIds(currentUser);
+      const bolehAksesTim = userTeamIds.includes(String(d.id_tim));
+
+      window.AR_IS_BEDA_TIM = isOperator && !bolehAksesTim;
+
       document.getElementById("arId").value = d.id_penilaian;
       document.getElementById("arIdIdentifikasi").value = d.id_identifikasi;
       document.getElementById("arKemungkinan").value = d.id_kemungkinan ?? "";
       document.getElementById("arDampak").value = d.id_dampak ?? "";
-      document.getElementById("arUraianPengendalian").value = d.uraian_pengendalian ?? "";
+      document.getElementById("arUraianPengendalian").value =
+        d.uraian_pengendalian ?? "";
       document.getElementById("arEfektivitas").value = d.efektivitas ?? "";
+
       arPopulateInfo(d);
       arLoadPreview();
+
       return d;
     });
 }
@@ -230,10 +249,14 @@ document.addEventListener("click", function (e) {
   const idPenilaian = row.dataset.penilaian;
 
   arResetForm();
-  bootstrap.Offcanvas.getOrCreateInstance(document.getElementById("arOffcanvas"),).show();
+  bootstrap.Offcanvas.getOrCreateInstance(
+    document.getElementById("arOffcanvas"),
+  ).show();
 
   if (idPenilaian) {
-    arLoadDetail(idPenilaian).then(() => arSetMode("view"));
+    arLoadDetail(idPenilaian).then(() => {
+      arSetMode("view");
+    });
   } else {
     document.getElementById("arIdIdentifikasi").value = idIdentifikasi;
     fetch(AR_URL.detailIdentifikasi(idIdentifikasi))
@@ -241,9 +264,13 @@ document.addEventListener("click", function (e) {
       .then((d) => {
         const currentUser = window.APP_USER || {};
         const isOperator = currentUser.role === "operator";
-        const bedaTim = String(currentUser.id_tim) !== String(d.id_tim);
-        window.AR_IS_BEDA_TIM = isOperator && bedaTim;
-        arPopulateInfo(d);        
+
+        const userTeamIds = arGetUserTeamIds(currentUser);
+
+        const bolehAksesTim = userTeamIds.includes(String(d.id_tim));
+
+        window.AR_IS_BEDA_TIM = isOperator && !bolehAksesTim;
+        arPopulateInfo(d);
 
         arSetMode("create");
       });
@@ -263,8 +290,10 @@ function arLoadPreview() {
 
   const selK = document.getElementById("arKemungkinan");
   const selD = document.getElementById("arDampak");
-  document.getElementById("arDescKemungkinan").textContent = selK.options[selK.selectedIndex]?.dataset.desc ?? "";
-  document.getElementById("arDescDampak").textContent = selD.options[selD.selectedIndex]?.dataset.desc ?? "";
+  document.getElementById("arDescKemungkinan").textContent =
+    selK.options[selK.selectedIndex]?.dataset.desc ?? "";
+  document.getElementById("arDescDampak").textContent =
+    selD.options[selD.selectedIndex]?.dataset.desc ?? "";
 
   fetch(AR_URL.preview, {
     method: "POST",
@@ -287,7 +316,9 @@ function arLoadPreview() {
     });
 }
 
-document.getElementById("arKemungkinan")?.addEventListener("change", arLoadPreview);
+document
+  .getElementById("arKemungkinan")
+  ?.addEventListener("change", arLoadPreview);
 document.getElementById("arDampak")?.addEventListener("change", arLoadPreview);
 
 /* HAPUS */
