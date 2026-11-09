@@ -150,7 +150,7 @@ class IdentifikasiRisikoController extends BaseController
             'currentPage' => $page,
             'totalPages'  => $totalPages,
             'perPage'     => $perPage,
-            'total'       => $total, 
+            'total'       => $total,
         ];
 
         /* LIST PROSES BISNIS UNTUK KONTEKS AKTIF (untuk dropdown di form tambah risiko) */
@@ -214,10 +214,41 @@ class IdentifikasiRisikoController extends BaseController
         ]);
     }
 
-    /* VALIDASI AKSES TIM */
+   
+/* VALIDASI AKSES TIM */
+
+    /**
+     * Memeriksa apakah user memiliki akses ke tim tertentu.
+     */
+    private function userCanAccessTeam($idTim): bool
+    {
+        $user = session('user') ?? [];
+
+        $role = $user['role'] ?? null;
+        $userId = $user['id'] ?? null;
+
+        // Pertahankan hak akses admin dan ketua
+        if (in_array($role, ['admin', 'ketua'], true)) {
+            return true;
+        }
+
+        if (!$userId || !$idTim) {
+            return false;
+        }
+
+        $db = \Config\Database::connect();
+
+        // Periksa seluruh tim yang terdaftar untuk user
+        return $db->table('user_tim_kerja')
+            ->where('user_id', $userId)
+            ->where('id_tim', $idTim)
+            ->countAllResults() > 0;
+    }
+
     private function validateTimAccess($idKonteksProses): bool
     {
         $db = \Config\Database::connect();
+
         $row = $db->table('konteks_proses_bisnis kpb')
             ->select('k.id_tim')
             ->join('konteks k', 'k.id_konteks = kpb.id_konteks')
@@ -225,14 +256,13 @@ class IdentifikasiRisikoController extends BaseController
             ->get()
             ->getRow();
 
-        if (!$row) return false;
-        $role = session('role');
-        $idTimUser = session('id_tim');
-        if ($role === 'admin') return true;
-        if ($role === 'ketua') return true;
+        if (!$row) {
+            return false;
+        }
 
-        return (string)$idTimUser === (string)$row->id_tim;
+        return $this->userCanAccessTeam($row->id_tim);
     }
+
     private function validateKonteksAccess($idKonteks): bool
     {
         $db = \Config\Database::connect();
@@ -243,13 +273,11 @@ class IdentifikasiRisikoController extends BaseController
             ->get()
             ->getRow();
 
-        if (!$row) return false;
+        if (!$row) {
+            return false;
+        }
 
-        $role = session('role');
-        if ($role === 'admin') return true;
-        if ($role === 'ketua') return true;
-
-        return (string)session('id_tim') === (string)$row->id_tim;
+        return $this->userCanAccessTeam($row->id_tim);
     }
 
     /* STORE */

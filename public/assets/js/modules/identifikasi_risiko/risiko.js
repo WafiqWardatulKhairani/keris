@@ -3,6 +3,27 @@ let IR_URL = {};
 let irBankCache = [];
 let irSuggestIndex = -1;
 
+function irGetUserTeamIds(user) {
+  const teams = Array.isArray(user.tim) ? user.tim : [];
+
+  const ids = teams.map((team) => {
+    return typeof team === "object" ? (team.id_tim ?? team.id) : team;
+  });
+
+  // Fallback untuk tim utama
+  if (user.id_tim != null) {
+    ids.push(user.id_tim);
+  }
+
+  return [
+    ...new Set(
+      ids
+        .filter((id) => id !== null && id !== undefined && id !== "")
+        .map(String),
+    ),
+  ];
+}
+
 document.addEventListener("DOMContentLoaded", function () {
   IR_URL = {
     store: baseUrl + "identifikasi-risiko/store",
@@ -37,9 +58,11 @@ document.addEventListener("DOMContentLoaded", function () {
       return;
     }
 
-    const bedaTim = String(user.id_tim) !== String(konteks.id_tim);
+    const userTeamIds = irGetUserTeamIds(user);
 
-    if (isOperator && bedaTim) {
+    const bolehAksesTim = userTeamIds.includes(String(konteks.id_tim));
+
+    if (isOperator && !bolehAksesTim) {
       PkAlert.notAllowed({
         text: "Tidak dapat menambahkan risiko milik tim lain.",
       });
@@ -52,10 +75,11 @@ document.addEventListener("DOMContentLoaded", function () {
     ).show();
   });
 
-  document.getElementById("offcanvasRisiko")?.addEventListener("hidden.bs.offcanvas", irResetForm);
+  document
+    .getElementById("offcanvasRisiko")
+    ?.addEventListener("hidden.bs.offcanvas", irResetForm);
   enableAutoNumbering("irPenyebab");
   enableAutoNumbering("irDampak");
-  
 });
 
 /* LOAD BANK RISIKO */
@@ -262,10 +286,12 @@ function irLoadDetail(id, row) {
       }
 
       select.value = data.id_konteks_proses ?? "";
-      document.getElementById("irPernyataan").value =data.pernyataan_risiko ?? "";
+      document.getElementById("irPernyataan").value =
+        data.pernyataan_risiko ?? "";
       document.getElementById("irDampak").value = data.dampak_risiko ?? "";
       document.getElementById("irPenyebab").value = data.penyebab_risiko ?? "";
-      document.getElementById("irKategori").value = data.id_kategori_risiko ?? "";
+      document.getElementById("irKategori").value =
+        data.id_kategori_risiko ?? "";
 
       document.querySelectorAll('input[name="sumber_risiko"]').forEach((r) => {
         r.checked = r.value === data.sumber_risiko;
@@ -278,18 +304,23 @@ function irLoadDetail(id, row) {
       irHideSuggest();
       const currentUser = window.APP_USER || {};
 
+      const userTeamIds = irGetUserTeamIds(currentUser);
+
+      const bolehAksesTim = userTeamIds.includes(String(row.id_tim));
+
       const isOperator = currentUser.role === "operator";
-      const bedaTim = String(currentUser.id_tim) !== String(row.id_tim);
       const isKetua = currentUser.role === "ketua";
 
-      const isReadonlyMode = isKetua || (isOperator && bedaTim);
+      const isReadonlyMode = isKetua || (isOperator && !bolehAksesTim);
 
       irSetMode("view");
 
       // APPLY READONLY MODE (COPY DARI KONTEKS)
       const btnDelete = document.getElementById("irBtnDelete");
       const btnEdit = document.getElementById("irBtnSwitchEdit");
-      const btnClose = document.querySelector("#irBtnView button[data-bs-dismiss='offcanvas']");
+      const btnClose = document.querySelector(
+        "#irBtnView button[data-bs-dismiss='offcanvas']",
+      );
 
       // DEFAULT
       if (btnDelete) btnDelete.style.display = "";

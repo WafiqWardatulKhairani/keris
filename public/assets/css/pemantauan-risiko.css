@@ -601,3 +601,12 @@
     }
 }
 
+/* Lebarkan kolom Risiko */
+.rtp-table tbody td:nth-child(3) {
+    width: 200px;
+    min-width: 200px;
+    max-width: 200px;
+    white-space: normal;
+    word-break: normal;
+    overflow-wrap: break-word;
+}
