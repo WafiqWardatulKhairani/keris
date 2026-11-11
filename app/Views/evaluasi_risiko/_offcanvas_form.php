@@ -176,6 +176,17 @@
                             Opsi Tindakan <span class="text-danger">*</span>
                         </label>
 
+                        <div id="erWarningBatas"
+                            class="alert alert-warning py-2 px-3 mb-2 d-none"
+                            role="alert">
+                            <i class="ti ti-alert-triangle me-1"></i>
+                            <strong>Peringatan Risiko!</strong>
+                            <div class="small mt-1">
+                                Skor risiko melebihi batas penerimaan (11).
+                                Respons risiko tidak boleh menggunakan pilihan Menerima.
+                            </div>
+                        </div>
+
                         <select name="opsi_tindakan"
                             id="erOpsiTindakan"
                             class="form-select"

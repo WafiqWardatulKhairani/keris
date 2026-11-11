@@ -205,7 +205,7 @@ if (session('global_id_kegiatan')) {
         <div class="pk-context-panel">
             <div class="pk-field-vertical">
                 <div class="pk-field-label">
-                    Sasaran Strategis
+                    Indikator
                 </div>
 
                 <div class="pk-combobox" id="pkSasaranBox">

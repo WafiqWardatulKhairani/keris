@@ -20,7 +20,7 @@
 <script>
     window.APP_USER = {
         role: '<?= session()->get('user_role') ?>',
-        id_tim: '<?= session()->get('id_tim') ?>'
+        id_tim: '<?= session()->get('global_id_tim') ?>'
     };
 </script>
 

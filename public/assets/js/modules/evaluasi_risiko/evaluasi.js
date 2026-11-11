@@ -4,12 +4,24 @@ const USER = window.APP_USER || {};
 const ER_URL = window.ER_CONFIG?.url || {};
 let erCsrfToken = window.ER_CONFIG?.csrf?.token || "";
 const erCsrfName = window.ER_CONFIG?.csrf?.name || "";
+let erCurrentRiskScore = 0;
 
 /* MODE MANAGEMENT */
 function erSetMode(mode) {
   const isView = mode === "view";
   const isEdit = mode === "edit";
   const isCreate = mode === "create";
+
+  const opsiTindakan = document.getElementById("erOpsiTindakan");
+
+  // Jika skor > 11, pilihan Menerima tidak boleh dipertahankan saat edit
+  if (
+    (isCreate || isEdit) &&
+    erCurrentRiskScore > 11 &&
+    opsiTindakan?.value === "Menerima"
+  ) {
+    opsiTindakan.value = "";
+  }
 
   document.getElementById("erMode").value = mode;
 
@@ -55,6 +67,8 @@ function erSetMode(mode) {
 
 function erResetForm() {
   document.getElementById("erForm").reset();
+  erCurrentRiskScore = 0;
+  erApplyResponseRule(0);
   document.getElementById("erForm").classList.remove("was-validated");
 
   document.getElementById("erId").value = "";
@@ -102,22 +116,55 @@ function erFormatNumberedText(text) {
   return lines.map((line) => `<div>${line}</div>`).join("");
 }
 
+function erGetUserTeamIds(user) {
+  const teams = Array.isArray(user.tim) ? user.tim : [];
+
+  const ids = teams.map((team) =>
+    typeof team === "object" ? (team.id_tim ?? team.id) : team,
+  );
+
+  if (user.id_tim != null) {
+    ids.push(user.id_tim);
+  }
+
+  return [...new Set(ids.filter((id) => id != null && id !== "").map(String))];
+}
+
 function erCanEdit(data) {
-  const user = window.APP_USER;
-  if (!user) return false;
+  const user = window.APP_USER || {};
 
   // Admin bebas
   if (user.role === "admin") return true;
 
-  // Ketua TIDAK BOLEH edit
-  if (user.role === "ketua") return false;
+  // Hanya operator yang boleh mengedit selain admin
+  if (user.role !== "operator") return false;
 
-  // Operator → hanya tim sendiri
-  if (user.role === "operator") {
-    return String(user.id_tim) === String(data.id_tim);
+  const userTeamIds = erGetUserTeamIds(user);
+
+  return userTeamIds.includes(String(data.id_tim));
+}
+
+/* VALIDASI BATAS PENERIMAAN RISIKO */
+function erApplyResponseRule(score) {
+  const select = document.getElementById("erOpsiTindakan");
+  const warning = document.getElementById("erWarningBatas");
+
+  if (!select) return;
+
+  const melewatiBatas = Number(score) > 11;
+
+  // Menerima tetap tampil, tetapi tidak bisa dipilih
+  const opsiMenerima = Array.from(select.options).find(
+    (option) => option.value.trim().toLowerCase() === "menerima",
+  );
+
+  if (opsiMenerima) {
+    opsiMenerima.disabled = melewatiBatas;
   }
 
-  return false;
+  if (warning) {
+    warning.classList.toggle("d-none", !melewatiBatas);
+  }
 }
 
 /* POPULATE INFO */
@@ -149,6 +196,9 @@ function erPopulateInfo(d) {
   document.getElementById("erInfoPengendalian").innerHTML =
     erFormatNumberedText(d.uraian_pengendalian);
   set("erInfoEfektivitas", d.efektivitas);
+
+  erCurrentRiskScore = Number(d.nilai_risiko) || 0;
+  erApplyResponseRule(erCurrentRiskScore);
 
   // Preview skor risiko
   const warnaMap = {

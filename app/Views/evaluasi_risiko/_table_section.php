@@ -12,7 +12,7 @@
                         <th class="py-2" style="width:150px">Respon Risiko</th>
                         <th class="py-2" style="width:100px">Prioritas</th>
                         <th class="py-2" style="width:150px">Status</th>
-                    </tr> 
+                    </tr>
                 </thead>
                 <tbody>
                     <?php if (empty($data)): ?>
@@ -52,6 +52,7 @@
                         $no = $from ?? 1;
                         foreach ($data as $row):
                             $sudah     = !empty($row['id_evaluasi']);
+                            $melewatiBatas = (float)($row['nilai_risiko'] ?? 0) > 11;
                             $warna     = $row['warna_risiko'] ?? null;
                             $prefix    = strtoupper(substr($row['kode_proses'] ?? '', 0, 1));
                             $kodeBadge = match ($prefix) {
@@ -103,6 +104,13 @@
                                             style="font-size:0.72rem;color:<?= esc($warnaCell) ?>">
                                             <?= esc($row['nama_selera'] ?? '') ?>
                                         </div>
+                                        <?php if ($melewatiBatas): ?>
+                                            <div class="text-danger fw-semibold mt-1"
+                                                style="font-size:0.68rem;">
+                                                <i class="ti ti-alert-triangle"></i>
+                                                Melebihi batas
+                                            </div>
+                                        <?php endif; ?>
                                     <?php else: ?>
                                         <span class="text-muted">—</span>
                                     <?php endif; ?>
@@ -199,7 +207,7 @@
                     endforeach;
                     ?>
                     <select name="perPage" class="ar-perpage pk-perpage-select"
-                            onchange="document.getElementById('erPerPageForm').submit();">
+                        onchange="document.getElementById('erPerPageForm').submit();">
                         <?php foreach ([5, 10, 25, 50] as $size): ?>
                             <option value="<?= $size ?>" <?= ($perPage ?? 10) == $size ? 'selected' : '' ?>>
                                 <?= $size ?>
@@ -225,7 +233,7 @@
                         <li class="page-item disabled"><span class="page-link">&laquo;</span></li>
                     <?php else:
                         $queryString['page'] = $currentPage - 1;
-                        ?>
+                    ?>
                         <li class="page-item"><a class="page-link" href="?<?= http_build_query($queryString) ?>">&laquo;</a></li>
                     <?php endif; ?>
 
@@ -236,7 +244,7 @@
                                 <li class="page-item active"><span class="page-link"><?= $i ?></span></li>
                             <?php else:
                                 $queryString['page'] = $i;
-                                ?>
+                            ?>
                                 <li class="page-item"><a class="page-link" href="?<?= http_build_query($queryString) ?>"><?= $i ?></a></li>
                             <?php endif; ?>
                         <?php elseif ($i == 2 || $i == $totalPages - 1): ?>
@@ -249,7 +257,7 @@
                         <li class="page-item disabled"><span class="page-link">&raquo;</span></li>
                     <?php else:
                         $queryString['page'] = $currentPage + 1;
-                        ?>
+                    ?>
                         <li class="page-item"><a class="page-link" href="?<?= http_build_query($queryString) ?>">&raquo;</a></li>
                     <?php endif; ?>
                 </ul>
@@ -277,7 +285,9 @@
                 if (newCard && wrapper) {
                     wrapper.outerHTML = newCard.outerHTML;
                     window.history.pushState({}, '', url.toString());
-                    window.scrollTo({ top: scrollY });
+                    window.scrollTo({
+                        top: scrollY
+                    });
                 }
             });
     }

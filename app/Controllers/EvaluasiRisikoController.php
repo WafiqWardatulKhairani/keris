@@ -23,19 +23,36 @@ class EvaluasiRisikoController extends BaseController
 
         $row = $db->table('identifikasi_risiko ir')
             ->select('k.id_tim')
-            ->join('konteks_proses_bisnis kpb', 'kpb.id_konteks_proses = ir.id_konteks_proses')
+            ->join(
+                'konteks_proses_bisnis kpb',
+                'kpb.id_konteks_proses = ir.id_konteks_proses'
+            )
             ->join('konteks k', 'k.id_konteks = kpb.id_konteks')
             ->where('ir.id_identifikasi', $idIdentifikasi)
             ->get()
             ->getRow();
 
-        if (!$row) return false;
+        if (!$row) {
+            return false;
+        }
 
-        $role = session('role');
-        if ($role === 'admin') return true;
-        if ($role === 'ketua') return true;
+        $role = session('user_role');
 
-        return (string)session('id_tim') === (string)$row->id_tim;
+        // Admin boleh mengakses semua tim
+        if ($role === 'admin') {
+            return true;
+        }
+
+        // Hanya operator yang boleh melakukan perubahan
+        if ($role !== 'operator') {
+            return false;
+        }
+
+        // Gunakan tim yang sedang aktif pada global context
+        $globalTim = session('global_id_tim');
+
+        return $globalTim !== null
+            && (string) $globalTim === (string) $row->id_tim;
     }
 
     public function index()
@@ -438,7 +455,7 @@ class EvaluasiRisikoController extends BaseController
         $summaryBuilder = $db->table('identifikasi_risiko ir')
             ->join('konteks_proses_bisnis kpb', 'kpb.id_konteks_proses = ir.id_konteks_proses')
             ->join('konteks k', 'k.id_konteks = kpb.id_konteks');
-    
+
         if ($idTim) $summaryBuilder->where('k.id_tim', $idTim);
         if ($idPengelola) $summaryBuilder->where('k.pengelola_risiko_id', $idPengelola);
         if ($idKegiatan) $summaryBuilder->where('k.id_kegiatan', $idKegiatan);
@@ -515,6 +532,32 @@ class EvaluasiRisikoController extends BaseController
             'filter'        => $filter,
         ]);
     }
+    /* VALIDASI BATAS PENERIMAAN RISIKO */
+    private function validateResponseRisk(
+        $idPenilaian,
+        $idIdentifikasi,
+        $opsiTindakan
+    ): ?string {
+
+        $penilaian = $this->db->table('penilaian_risiko')
+            ->select('nilai_risiko')
+            ->where('id_penilaian', $idPenilaian)
+            ->where('id_identifikasi', $idIdentifikasi)
+            ->get()
+            ->getRowArray();
+
+        if (!$penilaian) {
+            return 'Data penilaian risiko tidak ditemukan.';
+        }
+
+        $skorRisiko = (float) $penilaian['nilai_risiko'];
+
+        if ($skorRisiko > 11 && $opsiTindakan === 'Menerima') {
+            return 'Skor risiko melebihi batas penerimaan (11). Silakan pilih respons risiko selain Menerima.';
+        }
+
+        return null;
+    }
 
     public function store()
     {
@@ -528,6 +571,19 @@ class EvaluasiRisikoController extends BaseController
         }
         try {
             $opsiTindakan = $this->request->getPost('opsi_tindakan');
+
+            $pesanValidasi = $this->validateResponseRisk(
+                $this->request->getPost('id_penilaian'),
+                $idIdentifikasi,
+                $opsiTindakan
+            );
+
+            if ($pesanValidasi !== null) {
+                return $this->response->setStatusCode(422)->setJSON([
+                    'status'  => 'error',
+                    'message' => $pesanValidasi,
+                ]);
+            }
 
             $this->evaluasiModel->insert([
                 'id_identifikasi' => $this->request->getPost('id_identifikasi'),
@@ -565,7 +621,19 @@ class EvaluasiRisikoController extends BaseController
                     'message' => 'Tidak punya akses'
                 ]);
             }
-            $opsiTindakan = $this->request->getPost('opsi_tindakan');
+
+            $pesanValidasi = $this->validateResponseRisk(
+                $this->request->getPost('id_penilaian'),
+                $this->request->getPost('id_identifikasi'),
+                $opsiTindakan
+            );
+
+            if ($pesanValidasi !== null) {
+                return $this->response->setStatusCode(422)->setJSON([
+                    'status'  => 'error',
+                    'message' => $pesanValidasi,
+                ]);
+            }
 
             $this->evaluasiModel->update($id, [
                 'id_identifikasi' => $this->request->getPost('id_identifikasi'),
