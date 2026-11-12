@@ -590,6 +590,65 @@ class KonteksController extends BaseContextController
         return $this->response->setJSON(['status' => 'success', 'message' => 'Data berhasil dihapus']);
     }
 
+    /**
+     * Mengambil seluruh data Tujuan
+     */
+    public function getTujuan()
+    {
+        $db = \Config\Database::connect();
+
+        $data = $db->table('tujuan')
+            ->orderBy('id_tujuan', 'ASC')
+            ->get()
+            ->getResultArray();
+
+        return $this->response->setJSON($data);
+    }
+
+    /**
+     * Mengambil Sasaran berdasarkan Tujuan
+     */
+    public function getSasaran($idTujuan)
+    {
+        $idTujuan = (int) $idTujuan;
+
+        if ($idTujuan <= 0) {
+            return $this->response->setJSON([]);
+        }
+
+        $db = \Config\Database::connect();
+
+        $data = $db->table('sasaran')
+            ->where('id_tujuan', $idTujuan)
+            ->orderBy('id_sasaran', 'ASC')
+            ->get()
+            ->getResultArray();
+
+        return $this->response->setJSON($data);
+    }
+
+    /**
+     * Mengambil Indikator berdasarkan Sasaran
+     */
+    public function getIndikator($idSasaran)
+    {
+        $idSasaran = (int) $idSasaran;
+
+        if ($idSasaran <= 0) {
+            return $this->response->setJSON([]);
+        }
+
+        $db = \Config\Database::connect();
+
+        $data = $db->table('sasaran_strategis')
+            ->where('id_sasaran', $idSasaran)
+            ->orderBy('id_sasaran_strategis', 'ASC')
+            ->get()
+            ->getResultArray();
+
+        return $this->response->setJSON($data);
+    }
+
     /* AJAX TABLE REFRESH */
     public function ajaxTable()
     {

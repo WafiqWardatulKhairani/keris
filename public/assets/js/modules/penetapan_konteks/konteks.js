@@ -35,7 +35,7 @@ const KonteksModule = {
     console.log("Konteks module loaded");
 
     this.initSelect2();
-    this.initSasaranCombobox();
+    this.initCascadingSasaran();
     this.initPeraturanCombobox();
     this.initPemangkuCombobox();
     this.initQuickCreatePemangku();
@@ -93,21 +93,115 @@ const KonteksModule = {
     document.getElementById("pkPemilikJabatan").innerText = "-";
   },
 
-  // SASARAN STRATEGIS
-  initSasaranCombobox() {
-    const box = document.getElementById("pkSasaranBox");
+  // SASARAN STRATEGIS - CASCADING DROPDOWN
+  async initCascadingSasaran() {
+    const tujuanSelect = document.getElementById("pkTujuanSelect");
+    const sasaranSelect = document.getElementById("pkSasaranSelect");
+    const indikatorSelect = document.getElementById("pkIndikatorSelect");
+    const indikatorValue = document.getElementById("pkSasaranValue");
 
-    if (!box) return;
+    if (!tujuanSelect || !sasaranSelect || !indikatorSelect) return;
 
-    const dropdown = box.querySelector(".pk-combobox-dropdown");
+    const fillSelect = (select, data, placeholder, idField, textField) => {
+      select.innerHTML = `<option value="">${placeholder}</option>`;
 
-    if (!dropdown) return;
+      data.forEach((item) => {
+        const option = document.createElement("option");
+        option.value = item[idField];
+        option.textContent = item[textField];
+        select.appendChild(option);
+      });
+    };
 
-    Combobox.init({
-      boxId: "pkSasaranBox",
-      inputId: "pkSasaranInput",
-      hiddenId: "pkSasaranValue",
-      optionsSelector: ".pk-option",
+    const loadSasaran = async (idTujuan) => {
+      sasaranSelect.disabled = true;
+      indikatorSelect.disabled = true;
+
+      fillSelect(sasaranSelect, [], "Pilih Sasaran");
+      fillSelect(indikatorSelect, [], "Pilih Indikator");
+      indikatorValue.value = "";
+
+      if (!idTujuan) return;
+
+      try {
+        const response = await fetch(KONTEKS_URL.getSasaran(idTujuan));
+        if (!response.ok) throw new Error("Gagal mengambil data sasaran");
+
+        const data = await response.json();
+
+        fillSelect(
+          sasaranSelect,
+          data,
+          "Pilih Sasaran",
+          "id_sasaran",
+          "uraian_sasaran",
+        );
+
+        sasaranSelect.disabled = false;
+      } catch (error) {
+        console.error("Gagal memuat sasaran:", error);
+      }
+    };
+
+    const loadIndikator = async (idSasaran) => {
+      indikatorSelect.disabled = true;
+
+      fillSelect(indikatorSelect, [], "Pilih Indikator");
+      indikatorValue.value = "";
+
+      if (!idSasaran) return;
+
+      try {
+        const response = await fetch(KONTEKS_URL.getIndikator(idSasaran));
+        if (!response.ok) throw new Error("Gagal mengambil data indikator");
+
+        const data = await response.json();
+
+        fillSelect(
+          indikatorSelect,
+          data,
+          "Pilih Indikator",
+          "id_sasaran_strategis",
+          "uraian_sasaran",
+        );
+
+        indikatorSelect.disabled = false;
+      } catch (error) {
+        console.error("Gagal memuat indikator:", error);
+      }
+    };
+
+    // Ambil daftar tujuan saat halaman dibuka
+    try {
+      const response = await fetch(KONTEKS_URL.getTujuan);
+      if (!response.ok) throw new Error("Gagal mengambil data tujuan");
+
+      const data = await response.json();
+
+      fillSelect(
+        tujuanSelect,
+        data,
+        "Pilih Tujuan",
+        "id_tujuan",
+        "uraian_tujuan",
+      );
+    } catch (error) {
+      console.error("Gagal memuat tujuan:", error);
+    }
+
+    // Saat tujuan berubah
+    tujuanSelect.addEventListener("change", async function () {
+      await loadSasaran(this.value);
+    });
+
+    // Saat sasaran berubah
+    sasaranSelect.addEventListener("change", async function () {
+      await loadIndikator(this.value);
+    });
+
+    // Saat indikator dipilih
+    indikatorSelect.addEventListener("change", function () {
+      indikatorValue.value = this.value;
     });
   },
 
@@ -579,4 +673,3 @@ const KonteksModule = {
 $(document).ready(function () {
   KonteksModule.init();
 });
-

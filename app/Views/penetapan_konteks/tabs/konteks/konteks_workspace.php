@@ -177,24 +177,9 @@ if (session('global_id_kegiatan')) {
         </div>
     </div>
 
+
     <?php
-
-    $selectedSasaran = null;
-
-    if (!empty($activeKonteks['id_sasaran_strategis'])) {
-
-        foreach ($listSasaran as $ss) {
-
-            if (
-                (int)$ss['id_sasaran_strategis']
-                ===
-                (int)$activeKonteks['id_sasaran_strategis']
-            ) {
-                $selectedSasaran = $ss;
-                break;
-            }
-        }
-    }
+    $selectedIndikatorId = $activeKonteks['id_sasaran_strategis'] ?? '';
     ?>
 
     <div class="pk-section">
@@ -203,42 +188,53 @@ if (session('global_id_kegiatan')) {
         </div>
 
         <div class="pk-context-panel">
+
+            <!-- TUJUAN -->
             <div class="pk-field-vertical">
-                <div class="pk-field-label">
-                    Indikator
-                </div>
+                <div class="pk-field-label">Tujuan</div>
 
-                <div class="pk-combobox" id="pkSasaranBox">
-                    <input type="hidden"
-                        name="id_sasaran_strategis"
-                        id="pkSasaranValue"
-                        value="<?= esc($selectedSasaran['id_sasaran_strategis'] ?? '') ?>">
-
-                    <input
-                        type="text"
-                        class="pk-combobox-input"
-                        id="pkSasaranInput"
-                        value="<?= esc($selectedSasaran['uraian_sasaran'] ?? '') ?>"
-                        placeholder="Pilih Sasaran Strategis"
-                        autocomplete="off"
-                        <?= $isViewMode ? 'readonly' : '' ?>>
-
-                    <?php if (!$isViewMode): ?>
-                        <div class="pk-combobox-dropdown">
-                            <div class="pk-combobox-options">
-                                <?php foreach ($listSasaran as $ss): ?>
-                                    <div class="pk-option"
-                                        data-value="<?= $ss['id_sasaran_strategis'] ?>">
-                                        <?= esc($ss['uraian_sasaran']) ?>
-                                    </div>
-                                <?php endforeach; ?>
-                            </div>
-                        </div>
-                    <?php endif; ?>
-                </div>
+                <select
+                    class="form-select"
+                    id="pkTujuanSelect"
+                    <?= $isViewMode ? 'disabled' : '' ?>>
+                    <option value="">Pilih Tujuan</option>
+                </select>
             </div>
+
+            <!-- SASARAN -->
+            <div class="pk-field-vertical">
+                <div class="pk-field-label">Sasaran</div>
+
+                <select
+                    class="form-select"
+                    id="pkSasaranSelect"
+                    disabled>
+                    <option value="">Pilih Sasaran</option>
+                </select>
+            </div>
+
+            <!-- INDIKATOR -->
+            <div class="pk-field-vertical">
+                <div class="pk-field-label">Indikator</div>
+
+                <select
+                    class="form-select"
+                    id="pkIndikatorSelect"
+                    disabled>
+                    <option value="">Pilih Indikator</option>
+                </select>
+            </div>
+
+            <!-- ID INDIKATOR UNTUK DATABASE -->
+            <input
+                type="hidden"
+                name="id_sasaran_strategis"
+                id="pkSasaranValue"
+                value="<?= esc($selectedIndikatorId) ?>">
+
         </div>
     </div>
+
 
     <div class="pk-section">
         <div class="d-flex justify-content-between align-items-center mb-3">

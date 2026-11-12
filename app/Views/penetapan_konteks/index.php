@@ -54,6 +54,7 @@
                 name: '<?= csrf_token() ?>',
                 token: '<?= csrf_hash() ?>',
             },
+
             url: {
                 store: '<?= site_url('penetapan-konteks/konteks/store') ?>',
                 update: '<?= site_url('penetapan-konteks/konteks/update') ?>',
@@ -66,8 +67,17 @@
 
                 getPemilik: '<?= site_url('penetapan-konteks/konteks/get-pemilik-provinsi') ?>',
 
-                getPengelola: '<?= site_url('penetapan-konteks/konteks/get-pengelola-list') ?>'
+                getPengelola: '<?= site_url('penetapan-konteks/konteks/get-pengelola-list') ?>',
+
+                getTujuan: '<?= site_url('penetapan-konteks/konteks/get-tujuan') ?>',
+
+                getSasaran: (id) =>
+                    `<?= site_url('penetapan-konteks/konteks/get-sasaran') ?>/${id}`,
+
+                getIndikator: (id) =>
+                    `<?= site_url('penetapan-konteks/konteks/get-indikator') ?>/${id}`
             }
+
         };
     </script>
 

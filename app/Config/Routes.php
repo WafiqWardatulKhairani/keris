@@ -215,6 +215,10 @@ $routes->group('penetapan-konteks', [
     $routes->get('selera', 'MasterDataController::selera');
     $routes->get('sasaran-strategis', 'MasterDataController::sasaranStrategis');
 
+    $routes->get('konteks/get-tujuan', 'KonteksController::getTujuan');
+    $routes->get('konteks/get-sasaran/(:num)', 'KonteksController::getSasaran/$1');
+    $routes->get('konteks/get-indikator/(:num)', 'KonteksController::getIndikator/$1');
+
     // Analisis SWOT dan PESTLE
     $routes->get('analisis-swot-pestle/list', 'AnalisisSwotPestleController::list', ['filter' => 'role:admin,operator,ketua,pimpinan']);
     // Riwayat Analisis SWOT & PESTLE
