@@ -100,13 +100,18 @@ const KonteksModule = {
     const indikatorSelect = document.getElementById("pkIndikatorSelect");
     const indikatorValue = document.getElementById("pkSasaranValue");
 
-    if (!tujuanSelect || !sasaranSelect || !indikatorSelect || !indikatorValue)
+    if (
+      !tujuanSelect ||
+      !sasaranSelect ||
+      !indikatorSelect ||
+      !indikatorValue
+    ) {
       return;
+    }
 
     const mode = document.getElementById("pkMode")?.value || "create";
     const isViewMode = mode === "view";
 
-    // Ambil ID yang sudah tersimpan dari database
     const selectedTujuan = tujuanSelect.dataset.selectedId || "";
     const selectedSasaran = sasaranSelect.dataset.selectedId || "";
     const selectedIndikator =
@@ -131,12 +136,12 @@ const KonteksModule = {
     // Muat indikator berdasarkan sasaran
     const loadIndikator = async (idSasaran, selectedId = "") => {
       indikatorSelect.disabled = true;
-
       fillSelect(indikatorSelect, [], "Pilih Indikator");
 
-      indikatorValue.value = "";
-
-      if (!idSasaran) return;
+      if (!idSasaran) {
+        indikatorValue.value = "";
+        return;
+      }
 
       try {
         const response = await fetch(KONTEKS_URL.getIndikator(idSasaran));
@@ -155,16 +160,15 @@ const KonteksModule = {
           "uraian_sasaran",
         );
 
-        // Pulihkan pilihan indikator saat edit
         if (selectedId) {
           indikatorSelect.value = String(selectedId);
         }
 
         indikatorValue.value = indikatorSelect.value;
-
         indikatorSelect.disabled = isViewMode;
       } catch (error) {
         console.error("Gagal memuat indikator:", error);
+        indikatorValue.value = "";
       }
     };
 
@@ -179,10 +183,11 @@ const KonteksModule = {
 
       fillSelect(sasaranSelect, [], "Pilih Sasaran");
       fillSelect(indikatorSelect, [], "Pilih Indikator");
-
       indikatorValue.value = "";
 
-      if (!idTujuan) return;
+      if (!idTujuan) {
+        return;
+      }
 
       try {
         const response = await fetch(KONTEKS_URL.getSasaran(idTujuan));
@@ -201,14 +206,12 @@ const KonteksModule = {
           "uraian_sasaran",
         );
 
-        // Pulihkan pilihan sasaran saat edit
         if (selectedSasaranId) {
           sasaranSelect.value = String(selectedSasaranId);
         }
 
         sasaranSelect.disabled = isViewMode;
 
-        // Jika sasaran sudah ditemukan, muat indikatornya
         if (sasaranSelect.value) {
           await loadIndikator(sasaranSelect.value, selectedIndikatorId);
         }
@@ -235,12 +238,13 @@ const KonteksModule = {
         "uraian_tujuan",
       );
 
-      // Pulihkan pilihan tujuan saat edit
       if (selectedTujuan) {
         tujuanSelect.value = String(selectedTujuan);
 
         await loadSasaran(selectedTujuan, selectedSasaran, selectedIndikator);
       }
+
+      tujuanSelect.disabled = isViewMode;
     } catch (error) {
       console.error("Gagal memuat tujuan:", error);
     }

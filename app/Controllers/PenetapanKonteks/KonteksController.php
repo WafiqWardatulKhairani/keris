@@ -136,51 +136,31 @@ class KonteksController extends BaseContextController
         $listTimKerja = (new TimKerjaModel())->findAll();
         $listSasaran = (new SasaranStrategisModel())->findAll();
 
-        $idIndikator = (int) ($activeKonteks['id_sasaran_strategis'] ?? 0);
-
-        $selectedSasaranStrategis = null;
-
-        if ($idIndikator > 0) {
-            $selectedSasaranStrategis = \Config\Database::connect()
-                ->table('sasaran_strategis ss')
-                ->select('
-            ss.id_sasaran_strategis,
-            ss.id_sasaran,
-            s.id_tujuan
-        ')
-                ->join('sasaran s', 's.id_sasaran = ss.id_sasaran')
-                ->where('ss.id_sasaran_strategis', $idIndikator)
-                ->get()
-                ->getRowArray();
-        }
-
         $db = \Config\Database::connect();
 
-        $selectedHierarki = $db->table('konteks k')
+        $idTimAktif = (int) $activeKonteks['id_tim'];
+
+        // Ambil indikator yang dipilih oleh Tim Kerja
+        $selectedSasaranStrategis = $db->table('tim_sasaran_strategis tss')
             ->select('
-        t.id_tujuan,
-        s.id_sasaran,
-        ss.id_sasaran_strategis
+        ss.id_sasaran_strategis,
+        ss.id_sasaran,
+        s.id_tujuan
     ')
             ->join(
                 'sasaran_strategis ss',
-                'ss.id_sasaran_strategis = k.id_sasaran_strategis',
-                'left'
+                'ss.id_sasaran_strategis = tss.id_sasaran_strategis'
             )
             ->join(
                 'sasaran s',
-                's.id_sasaran = ss.id_sasaran',
-                'left'
+                's.id_sasaran = ss.id_sasaran'
             )
-            ->join(
-                'tujuan t',
-                't.id_tujuan = s.id_tujuan',
-                'left'
-            )
-            ->where('k.id_konteks', $id)
+            ->where('tss.id_tim', $idTimAktif)
+            ->orderBy('ss.id_sasaran_strategis', 'ASC')
             ->get()
-            ->getRowArray() ?? [];
+            ->getRowArray();
 
+        $selectedHierarki = $selectedSasaranStrategis ?? [];
         $listWilayah = (new WilayahModel())
             ->orderBy('nama_wilayah', 'ASC')
             ->findAll();
@@ -277,7 +257,6 @@ class KonteksController extends BaseContextController
             )
         );
     }
-
 
     public function redirectToActive()
     {
@@ -508,22 +487,70 @@ class KonteksController extends BaseContextController
             return redirect()->back();
         }
 
-        $toInt = fn($v) => $v !== '' && $v !== null ? (int) $v : null;
+        $db = \Config\Database::connect();
 
         $idKonteks = (int) $this->request->getPost('id_konteks');
 
-        $data = [
-            'id_sasaran_strategis' => $toInt(
-                $this->request->getPost('id_sasaran_strategis')
-            ),
-            'status' => 'lengkap',
-        ];
+        $idIndikator = $this->request->getPost('id_sasaran_strategis');
+        $idIndikator = ($idIndikator !== '' && $idIndikator !== null)
+            ? (int) $idIndikator
+            : null;
 
-        $db = \Config\Database::connect();
+        // Validasi indikator jika dipilih
+        if ($idIndikator !== null) {
+            $indikatorValid = $db->table('sasaran_strategis')
+                ->where('id_sasaran_strategis', $idIndikator)
+                ->countAllResults();
 
+            if (!$indikatorValid) {
+                return $this->response
+                    ->setStatusCode(422)
+                    ->setJSON([
+                        'status' => 'error',
+                        'message' => 'Indikator Sasaran Strategis tidak valid.'
+                    ]);
+            }
+        }
+
+        // Ambil Tim Kerja dari konteks
+        $konteks = $db->table('konteks')
+            ->select('id_tim')
+            ->where('id_konteks', $idKonteks)
+            ->get()
+            ->getRowArray();
+
+        if (!$konteks) {
+            return $this->response
+                ->setStatusCode(404)
+                ->setJSON([
+                    'status' => 'error',
+                    'message' => 'Konteks tidak ditemukan.'
+                ]);
+        }
+
+        $idTim = (int) $konteks['id_tim'];
+
+        $db->transStart();
+
+        // Update status konteks saja.
+        // Indikator tidak lagi disimpan di tabel konteks.
         $db->table('konteks')
             ->where('id_konteks', $idKonteks)
-            ->update($data);
+            ->update([
+                'status' => 'lengkap'
+            ]);
+
+        // Ganti pilihan indikator milik Tim Kerja.
+        $db->table('tim_sasaran_strategis')
+            ->where('id_tim', $idTim)
+            ->delete();
+
+        if ($idIndikator !== null) {
+            $db->table('tim_sasaran_strategis')->insert([
+                'id_tim' => $idTim,
+                'id_sasaran_strategis' => $idIndikator
+            ]);
+        }
 
         // Simpan pemangku
         $pemangkuModel = new KonteksPemangkuModel();
@@ -539,7 +566,7 @@ class KonteksController extends BaseContextController
             ]);
         }
 
-        // simpan peraturan
+        // Simpan peraturan
         $peraturanModel = new KonteksPeraturanModel();
 
         $peraturanModel
@@ -553,12 +580,21 @@ class KonteksController extends BaseContextController
             ]);
         }
 
+        $db->transComplete();
+
+        if ($db->transStatus() === false) {
+            return $this->response
+                ->setStatusCode(500)
+                ->setJSON([
+                    'status' => 'error',
+                    'message' => 'Gagal menyimpan data.'
+                ]);
+        }
+
         return $this->response->setJSON([
             'status'   => 'success',
             'message'  => 'Data berhasil disimpan',
-            'redirect' => site_url(
-                'identifikasi-risiko'
-            )
+            'redirect' => site_url('identifikasi-risiko')
         ]);
     }
 
@@ -569,7 +605,8 @@ class KonteksController extends BaseContextController
             return redirect()->back();
         }
 
-        $id    = $this->request->getPost('id_konteks');
+        $id = (int) $this->request->getPost('id_konteks');
+
         if (!$this->validateKonteksAccess($id)) {
             return $this->response
                 ->setStatusCode(403)
@@ -579,29 +616,98 @@ class KonteksController extends BaseContextController
                 ]);
         }
 
-        $toInt = fn($v) => $v !== '' && $v !== null ? (int) $v : null;
-
-        $data = [
-            'id_sasaran_strategis' => $toInt(
-                $this->request->getPost('id_sasaran_strategis')
-            ),
-        ];
-
         $db = \Config\Database::connect();
-        $db->table('konteks')->where('id_konteks', (int) $id)->update($data);
+
+        $idIndikator = $this->request->getPost('id_sasaran_strategis');
+        $idIndikator = ($idIndikator !== '' && $idIndikator !== null)
+            ? (int) $idIndikator
+            : null;
+
+        // Validasi indikator jika dipilih
+        if ($idIndikator !== null) {
+            $indikatorValid = $db->table('sasaran_strategis')
+                ->where('id_sasaran_strategis', $idIndikator)
+                ->countAllResults();
+
+            if (!$indikatorValid) {
+                return $this->response
+                    ->setStatusCode(422)
+                    ->setJSON([
+                        'status' => 'error',
+                        'message' => 'Indikator Sasaran Strategis tidak valid.'
+                    ]);
+            }
+        }
+
+        // Ambil Tim Kerja dari konteks
+        $konteks = $db->table('konteks')
+            ->select('id_tim')
+            ->where('id_konteks', $id)
+            ->get()
+            ->getRowArray();
+
+        if (!$konteks) {
+            return $this->response
+                ->setStatusCode(404)
+                ->setJSON([
+                    'status' => 'error',
+                    'message' => 'Konteks tidak ditemukan.'
+                ]);
+        }
+
+        $idTim = (int) $konteks['id_tim'];
+
+        $db->transStart();
+
+        // Ganti pilihan indikator milik Tim Kerja.
+        $db->table('tim_sasaran_strategis')
+            ->where('id_tim', $idTim)
+            ->delete();
+
+        if ($idIndikator !== null) {
+            $db->table('tim_sasaran_strategis')->insert([
+                'id_tim' => $idTim,
+                'id_sasaran_strategis' => $idIndikator
+            ]);
+        }
 
         // UPDATE PEMANGKU
         $pemangkuModel = new KonteksPemangkuModel();
-        $pemangkuModel->where('id_konteks', $id)->delete();
+
+        $pemangkuModel
+            ->where('id_konteks', $id)
+            ->delete();
+
         foreach ($this->request->getPost('pemangku') ?? [] as $idPemangku) {
-            $pemangkuModel->insert(['id_konteks' => $id, 'id_pemangku' => $idPemangku]);
+            $pemangkuModel->insert([
+                'id_konteks' => $id,
+                'id_pemangku' => $idPemangku
+            ]);
         }
 
         // UPDATE PERATURAN
         $peraturanModel = new KonteksPeraturanModel();
-        $peraturanModel->where('id_konteks', $id)->delete();
+
+        $peraturanModel
+            ->where('id_konteks', $id)
+            ->delete();
+
         foreach ($this->request->getPost('peraturan') ?? [] as $idPeraturan) {
-            $peraturanModel->insert(['id_konteks' => $id, 'id_peraturan' => $idPeraturan]);
+            $peraturanModel->insert([
+                'id_konteks' => $id,
+                'id_peraturan' => $idPeraturan
+            ]);
+        }
+
+        $db->transComplete();
+
+        if ($db->transStatus() === false) {
+            return $this->response
+                ->setStatusCode(500)
+                ->setJSON([
+                    'status' => 'error',
+                    'message' => 'Gagal memperbarui data.'
+                ]);
         }
 
         return $this->response->setJSON([
