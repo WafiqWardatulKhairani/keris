@@ -177,9 +177,10 @@ if (session('global_id_kegiatan')) {
         </div>
     </div>
 
-
     <?php
-    $selectedIndikatorId = $activeKonteks['id_sasaran_strategis'] ?? '';
+    $selectedIndikatorId = $selectedHierarki['id_sasaran_strategis'] ?? '';
+    $selectedTujuanId    = $selectedHierarki['id_tujuan'] ?? '';
+    $selectedSasaranId   = $selectedHierarki['id_sasaran'] ?? '';
     ?>
 
     <div class="pk-section">
@@ -196,6 +197,7 @@ if (session('global_id_kegiatan')) {
                 <select
                     class="form-select"
                     id="pkTujuanSelect"
+                    data-selected-id="<?= esc($selectedSasaranStrategis['id_tujuan'] ?? '') ?>"
                     <?= $isViewMode ? 'disabled' : '' ?>>
                     <option value="">Pilih Tujuan</option>
                 </select>
@@ -208,6 +210,7 @@ if (session('global_id_kegiatan')) {
                 <select
                     class="form-select"
                     id="pkSasaranSelect"
+                    data-selected-id="<?= esc($selectedSasaranStrategis['id_sasaran'] ?? '') ?>"
                     disabled>
                     <option value="">Pilih Sasaran</option>
                 </select>
@@ -220,6 +223,7 @@ if (session('global_id_kegiatan')) {
                 <select
                     class="form-select"
                     id="pkIndikatorSelect"
+                    data-selected-id="<?= esc($selectedSasaranStrategis['id_sasaran_strategis'] ?? '') ?>"
                     disabled>
                     <option value="">Pilih Indikator</option>
                 </select>

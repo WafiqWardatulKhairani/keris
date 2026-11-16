@@ -229,7 +229,6 @@ $routes->group('penetapan-konteks', [
     $routes->post('analisis-swot-pestle/delete/(:num)', 'AnalisisSwotPestleController::delete/$1', ['filter' => 'role:admin,operator']);
 
     // Pengelolaan Periode Analisis SWOT dan PESTLE
-    // Membuka kembali periode hanya dapat dilakukan admin.
     $routes->post('analisis-swot-pestle/buka-periode', 'AnalisisSwotPestleController::bukaPeriode', ['filter' => 'role:admin']);
     // Mengunci kembali periode yang sebelumnya dibuka.
     $routes->post('analisis-swot-pestle/tutup-periode', 'AnalisisSwotPestleController::tutupPeriode', ['filter' => 'role:admin']);
@@ -242,7 +241,7 @@ $routes->group('identifikasi-risiko', ['namespace' => 'App\Controllers', 'filter
     $routes->get('detail-area/(:num)', 'IdentifikasiRisikoController::detailArea/$1', ['filter' => 'role:admin,operator,ketua']);
     $routes->get('table', 'IdentifikasiRisikoController::ajaxTable');
     $routes->get('bank-risiko', 'IdentifikasiRisikoController::getBankRisiko');
-    $routes->post('set-active', 'IdentifikasiRisikoController::setActive', ['filter' => 'role:admin,operator,ketua']);
+    $routes->post('set-Factive', 'IdentifikasiRisikoController::setActive', ['filter' => 'role:admin,operator,ketua']);
     $routes->post('reset-active', 'IdentifikasiRisikoController::resetActive', ['filter' => 'role:admin,operator,ketua']);
     $routes->group('', ['filter' => 'role:admin,operator'], function ($routes) {
         $routes->post('store', 'IdentifikasiRisikoController::store');

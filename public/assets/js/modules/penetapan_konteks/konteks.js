@@ -100,10 +100,25 @@ const KonteksModule = {
     const indikatorSelect = document.getElementById("pkIndikatorSelect");
     const indikatorValue = document.getElementById("pkSasaranValue");
 
-    if (!tujuanSelect || !sasaranSelect || !indikatorSelect) return;
+    if (!tujuanSelect || !sasaranSelect || !indikatorSelect || !indikatorValue)
+      return;
+
+    const mode = document.getElementById("pkMode")?.value || "create";
+    const isViewMode = mode === "view";
+
+    // Ambil ID yang sudah tersimpan dari database
+    const selectedTujuan = tujuanSelect.dataset.selectedId || "";
+    const selectedSasaran = sasaranSelect.dataset.selectedId || "";
+    const selectedIndikator =
+      indikatorValue.value || indikatorSelect.dataset.selectedId || "";
 
     const fillSelect = (select, data, placeholder, idField, textField) => {
-      select.innerHTML = `<option value="">${placeholder}</option>`;
+      select.innerHTML = "";
+
+      const optionDefault = document.createElement("option");
+      optionDefault.value = "";
+      optionDefault.textContent = placeholder;
+      select.appendChild(optionDefault);
 
       data.forEach((item) => {
         const option = document.createElement("option");
@@ -113,47 +128,22 @@ const KonteksModule = {
       });
     };
 
-    const loadSasaran = async (idTujuan) => {
-      sasaranSelect.disabled = true;
-      indikatorSelect.disabled = true;
-
-      fillSelect(sasaranSelect, [], "Pilih Sasaran");
-      fillSelect(indikatorSelect, [], "Pilih Indikator");
-      indikatorValue.value = "";
-
-      if (!idTujuan) return;
-
-      try {
-        const response = await fetch(KONTEKS_URL.getSasaran(idTujuan));
-        if (!response.ok) throw new Error("Gagal mengambil data sasaran");
-
-        const data = await response.json();
-
-        fillSelect(
-          sasaranSelect,
-          data,
-          "Pilih Sasaran",
-          "id_sasaran",
-          "uraian_sasaran",
-        );
-
-        sasaranSelect.disabled = false;
-      } catch (error) {
-        console.error("Gagal memuat sasaran:", error);
-      }
-    };
-
-    const loadIndikator = async (idSasaran) => {
+    // Muat indikator berdasarkan sasaran
+    const loadIndikator = async (idSasaran, selectedId = "") => {
       indikatorSelect.disabled = true;
 
       fillSelect(indikatorSelect, [], "Pilih Indikator");
+
       indikatorValue.value = "";
 
       if (!idSasaran) return;
 
       try {
         const response = await fetch(KONTEKS_URL.getIndikator(idSasaran));
-        if (!response.ok) throw new Error("Gagal mengambil data indikator");
+
+        if (!response.ok) {
+          throw new Error("Gagal mengambil data indikator");
+        }
 
         const data = await response.json();
 
@@ -165,16 +155,75 @@ const KonteksModule = {
           "uraian_sasaran",
         );
 
-        indikatorSelect.disabled = false;
+        // Pulihkan pilihan indikator saat edit
+        if (selectedId) {
+          indikatorSelect.value = String(selectedId);
+        }
+
+        indikatorValue.value = indikatorSelect.value;
+
+        indikatorSelect.disabled = isViewMode;
       } catch (error) {
         console.error("Gagal memuat indikator:", error);
       }
     };
 
-    // Ambil daftar tujuan saat halaman dibuka
+    // Muat sasaran berdasarkan tujuan
+    const loadSasaran = async (
+      idTujuan,
+      selectedSasaranId = "",
+      selectedIndikatorId = "",
+    ) => {
+      sasaranSelect.disabled = true;
+      indikatorSelect.disabled = true;
+
+      fillSelect(sasaranSelect, [], "Pilih Sasaran");
+      fillSelect(indikatorSelect, [], "Pilih Indikator");
+
+      indikatorValue.value = "";
+
+      if (!idTujuan) return;
+
+      try {
+        const response = await fetch(KONTEKS_URL.getSasaran(idTujuan));
+
+        if (!response.ok) {
+          throw new Error("Gagal mengambil data sasaran");
+        }
+
+        const data = await response.json();
+
+        fillSelect(
+          sasaranSelect,
+          data,
+          "Pilih Sasaran",
+          "id_sasaran",
+          "uraian_sasaran",
+        );
+
+        // Pulihkan pilihan sasaran saat edit
+        if (selectedSasaranId) {
+          sasaranSelect.value = String(selectedSasaranId);
+        }
+
+        sasaranSelect.disabled = isViewMode;
+
+        // Jika sasaran sudah ditemukan, muat indikatornya
+        if (sasaranSelect.value) {
+          await loadIndikator(sasaranSelect.value, selectedIndikatorId);
+        }
+      } catch (error) {
+        console.error("Gagal memuat sasaran:", error);
+      }
+    };
+
+    // Ambil seluruh tujuan
     try {
       const response = await fetch(KONTEKS_URL.getTujuan);
-      if (!response.ok) throw new Error("Gagal mengambil data tujuan");
+
+      if (!response.ok) {
+        throw new Error("Gagal mengambil data tujuan");
+      }
 
       const data = await response.json();
 
@@ -185,21 +234,28 @@ const KonteksModule = {
         "id_tujuan",
         "uraian_tujuan",
       );
+
+      // Pulihkan pilihan tujuan saat edit
+      if (selectedTujuan) {
+        tujuanSelect.value = String(selectedTujuan);
+
+        await loadSasaran(selectedTujuan, selectedSasaran, selectedIndikator);
+      }
     } catch (error) {
       console.error("Gagal memuat tujuan:", error);
     }
 
-    // Saat tujuan berubah
+    // Ketika tujuan diganti
     tujuanSelect.addEventListener("change", async function () {
       await loadSasaran(this.value);
     });
 
-    // Saat sasaran berubah
+    // Ketika sasaran diganti
     sasaranSelect.addEventListener("change", async function () {
       await loadIndikator(this.value);
     });
 
-    // Saat indikator dipilih
+    // Ketika indikator dipilih
     indikatorSelect.addEventListener("change", function () {
       indikatorValue.value = this.value;
     });

@@ -54,7 +54,7 @@ class BaseContextController extends BaseController
             $builder->where('konteks.id_tim', $idTim);
         }
 
-        if ($idKegiatan) {
+        if (!empty($idKegiatan) && $idKegiatan !== 'all') {
             $builder->where('konteks.id_kegiatan', $idKegiatan);
         }
 

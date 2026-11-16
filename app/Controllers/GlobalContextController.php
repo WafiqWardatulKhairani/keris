@@ -8,8 +8,6 @@ use App\Models\KegiatanModel;
 
 class GlobalContextController extends BaseController
 {
-
-
     private function isExcludedTeam($idTim): bool
     {
         $tim = (new TimKerjaModel())
@@ -21,65 +19,75 @@ class GlobalContextController extends BaseController
     }
 
     public function set()
-    {
-        $tahun      = $this->request->getPost('tahun');
-        $idTim      = $this->request->getPost('id_tim');
-        $idKegiatan = $this->request->getPost('id_kegiatan');
+{
+    $tahun      = $this->request->getPost('tahun');
+    $idTim      = $this->request->getPost('id_tim');
+    $idKegiatan = $this->request->getPost('id_kegiatan');
 
-        $userRole = session('user_role');
-        $userTim  = session('user_tim') ?? [];
+    $userRole = session('user_role');
+    $userTim  = session('user_tim') ?? [];
 
-        // Bagian Umum tidak boleh dipilih sebagai konteks dashboard.
-        if ($this->isExcludedTeam($idTim)) {
+    // Validasi Tim Kerja yang dikecualikan
+    if ($this->isExcludedTeam($idTim)) {
+        return $this->response
+            ->setStatusCode(403)
+            ->setJSON([
+                'status'  => 'error',
+                'message' => 'Tim Bagian Umum tidak tersedia pada dashboard.'
+            ]);
+    }
+
+    // Validasi akses Tim Kerja
+    if ($userRole !== 'admin') {
+        $allowedTim = array_map('strval', $userTim);
+
+        if (!in_array((string) $idTim, $allowedTim, true)) {
             return $this->response
                 ->setStatusCode(403)
                 ->setJSON([
                     'status'  => 'error',
-                    'message' => 'Tim Bagian Umum tidak tersedia pada dashboard.'
+                    'message' => 'Tim kerja tidak dapat diakses.'
                 ]);
         }
-
-        // User non-admin hanya boleh memilih tim yang dimilikinya
-        if ($userRole !== 'admin') {
-            $allowedTim = array_map('strval', $userTim);
-
-            if (!in_array((string) $idTim, $allowedTim, true)) {
-                return $this->response
-                    ->setStatusCode(403)
-                    ->setJSON([
-                        'status'  => 'error',
-                        'message' => 'Tim kerja tidak dapat diakses.'
-                    ]);
-            }
-        }
-
-        // Pastikan kegiatan memang milik tim yang dipilih
-        if (!empty($idKegiatan)) {
-            $kegiatan = (new KegiatanModel())
-                ->where('id_kegiatan', $idKegiatan)
-                ->where('id_tim', $idTim)
-                ->first();
-
-            if (!$kegiatan) {
-                return $this->response
-                    ->setStatusCode(403)
-                    ->setJSON([
-                        'status'  => 'error',
-                        'message' => 'Kegiatan tidak sesuai dengan tim kerja.'
-                    ]);
-            }
-        }
-
-        session()->set([
-            'global_tahun'       => $tahun,
-            'global_id_tim'      => $idTim,
-            'global_id_kegiatan' => $idKegiatan,
-        ]);
-
-        return $this->response->setJSON([
-            'status' => 'success'
-        ]);
     }
+
+    // Normalisasi pilihan Semua Kegiatan
+    if (
+        $idKegiatan === 'all' ||
+        $idKegiatan === '' ||
+        $idKegiatan === null
+    ) {
+        $idKegiatan = null;
+    }
+
+    // Validasi kegiatan jika pengguna memilih kegiatan tertentu
+    if ($idKegiatan !== null) {
+        $kegiatan = (new KegiatanModel())
+            ->where('id_kegiatan', $idKegiatan)
+            ->where('id_tim', $idTim)
+            ->first();
+
+        if (!$kegiatan) {
+            return $this->response
+                ->setStatusCode(403)
+                ->setJSON([
+                    'status'  => 'error',
+                    'message' => 'Kegiatan tidak sesuai dengan tim kerja.'
+                ]);
+        }
+    }
+
+    // Simpan pilihan ke session
+    session()->set([
+        'global_tahun'       => $tahun,
+        'global_id_tim'      => $idTim,
+        'global_id_kegiatan' => $idKegiatan,
+    ]);
+
+    return $this->response->setJSON([
+        'status' => 'success'
+    ]);
+}
 
     public function getKegiatanByTim()
     {

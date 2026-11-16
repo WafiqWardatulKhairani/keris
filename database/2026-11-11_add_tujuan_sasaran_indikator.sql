@@ -231,3 +231,9 @@ CREATE INDEX IF NOT EXISTS idx_indikator_id_sasaran
 ON public.sasaran_strategis(id_sasaran);
 
 COMMIT;
+
+-- =========================================================
+-- 9. UPDATE SASARAN YANG SALAH
+UPDATE sasaran
+SET id_tujuan = 1
+WHERE id_sasaran = 15;

@@ -97,21 +97,26 @@ class KonteksController extends BaseContextController
         $requestedTim      = session('global_id_tim');
         $requestedKegiatan = session('global_id_kegiatan');
 
-        $hasKegiatan = !empty($requestedKegiatan);
+        $hasTim = !empty($requestedTim);
+
+        $hasSpecificKegiatan = !empty($requestedKegiatan)
+            && $requestedKegiatan !== 'all';
+
+        $hasKegiatan = $hasTim;
 
         // Kalau user memilih kegiatan tertentu
-        if ($hasKegiatan) {
-
+        if ($hasTim) {
             $isMatch =
-                (int)$activeKonteks['tahun'] === (int)$requestedTahun
-                && (int)$activeKonteks['id_tim'] === (int)$requestedTim
-                && (int)$activeKonteks['id_kegiatan'] === (int)$requestedKegiatan;
+                (int) $activeKonteks['tahun'] === (int) $requestedTahun
+                && (int) $activeKonteks['id_tim'] === (int) $requestedTim;
 
-            // URL masih menunjuk ke konteks lama
+            if ($hasSpecificKegiatan) {
+                $isMatch = $isMatch
+                    && (int) $activeKonteks['id_kegiatan'] === (int) $requestedKegiatan;
+            }
+
             if (!$isMatch) {
-                return redirect()->to(
-                    site_url('penetapan-konteks/konteks')
-                );
+                return redirect()->to(site_url('penetapan-konteks/konteks'));
             }
         }
 
@@ -130,6 +135,51 @@ class KonteksController extends BaseContextController
         $listPeraturan = (new PeraturanTerkaitModel())->findAll();
         $listTimKerja = (new TimKerjaModel())->findAll();
         $listSasaran = (new SasaranStrategisModel())->findAll();
+
+        $idIndikator = (int) ($activeKonteks['id_sasaran_strategis'] ?? 0);
+
+        $selectedSasaranStrategis = null;
+
+        if ($idIndikator > 0) {
+            $selectedSasaranStrategis = \Config\Database::connect()
+                ->table('sasaran_strategis ss')
+                ->select('
+            ss.id_sasaran_strategis,
+            ss.id_sasaran,
+            s.id_tujuan
+        ')
+                ->join('sasaran s', 's.id_sasaran = ss.id_sasaran')
+                ->where('ss.id_sasaran_strategis', $idIndikator)
+                ->get()
+                ->getRowArray();
+        }
+
+        $db = \Config\Database::connect();
+
+        $selectedHierarki = $db->table('konteks k')
+            ->select('
+        t.id_tujuan,
+        s.id_sasaran,
+        ss.id_sasaran_strategis
+    ')
+            ->join(
+                'sasaran_strategis ss',
+                'ss.id_sasaran_strategis = k.id_sasaran_strategis',
+                'left'
+            )
+            ->join(
+                'sasaran s',
+                's.id_sasaran = ss.id_sasaran',
+                'left'
+            )
+            ->join(
+                'tujuan t',
+                't.id_tujuan = s.id_tujuan',
+                'left'
+            )
+            ->where('k.id_konteks', $id)
+            ->get()
+            ->getRowArray() ?? [];
 
         $listWilayah = (new WilayahModel())
             ->orderBy('nama_wilayah', 'ASC')
@@ -167,16 +217,11 @@ class KonteksController extends BaseContextController
             ['admin', 'operator']
         );
 
-        $mode =
-            (
-                $activeKonteks['status'] === 'draft'
-                &&
-                $canManageContext
-            )
-            ? 'create'
-            : 'view';
+        // Saat membuka konteks yang sudah ada, tampilkan mode view terlebih dahulu
+        $mode = 'view';
 
-        if (session('konteks_mode') === 'edit') {
+        // Berubah ke mode edit hanya jika user menekan tombol Edit
+        if (session('konteks_mode') === 'edit' && $canManageContext) {
             $mode = 'edit';
             session()->remove('konteks_mode');
         }
@@ -187,7 +232,7 @@ class KonteksController extends BaseContextController
                 'pemangku_kepentingan',
                 'pemangku_kepentingan.id_pemangku = konteks_pemangku.id_pemangku'
             )
-            ->where('id_konteks', $id)
+            ->where('konteks_pemangku.id_konteks', $id)
             ->findAll();
 
         $selectedPeraturan = (new KonteksPeraturanModel())
@@ -196,8 +241,14 @@ class KonteksController extends BaseContextController
                 'peraturan_terkait',
                 'peraturan_terkait.id_peraturan = konteks_peraturan.id_peraturan'
             )
-            ->where('id_konteks', $id)
+            ->where('konteks_peraturan.id_konteks', $id)
             ->findAll();
+
+        log_message('error', 'JUMLAH PEMANGKU: ' . count($selectedPemangku));
+        log_message('error', 'JUMLAH PERATURAN: ' . count($selectedPeraturan));
+
+        log_message('error', 'DATA PEMANGKU: ' . json_encode($selectedPemangku));
+        log_message('error', 'DATA PERATURAN: ' . json_encode($selectedPeraturan));
 
         return view(
             'penetapan_konteks/index',
@@ -206,13 +257,15 @@ class KonteksController extends BaseContextController
                 [
                     'activeTab'         => 'konteks',
                     'mode' => $mode,
-                    'hasKegiatan' => !empty(session('global_id_kegiatan')),
+                    'hasKegiatan' => $hasTim,
                     'hasScope' => $hasScope,
                     'hideGlobalContext' => false,
                     'listPemangku'      => $listPemangku,
                     'listPeraturan'     => $listPeraturan,
                     'listTimKerja'      => $listTimKerja,
                     'listSasaran'       => $listSasaran,
+                    'selectedSasaranStrategis' => $selectedSasaranStrategis,
+                    'selectedHierarki' => $selectedHierarki,
                     'listWilayah'       => $listWilayah,
                     'pemilikRisiko'   => $pemilikRisiko,
                     'pengelolaRisiko' => $pengelolaRisiko,
@@ -225,40 +278,34 @@ class KonteksController extends BaseContextController
         );
     }
 
+
     public function redirectToActive()
     {
         $tahun      = session('global_tahun') ?? date('Y');
         $idTim      = session('global_id_tim') ?? session('id_tim');
         $idKegiatan = session('global_id_kegiatan');
 
-        $builder = $this->model;
-
-        // PRIORITAS 1
-        // Jika selector sudah memilih kegiatan tertentu
+        // PRIORITAS 1: Kegiatan tertentu dipilih
         if (!empty($idKegiatan)) {
-
-            $konteks = $builder
+            $konteks = $this->model
                 ->where('tahun', $tahun)
                 ->where('id_tim', $idTim)
                 ->where('id_kegiatan', $idKegiatan)
                 ->first();
 
-            // ruang lingkup ditemukan
             if ($konteks) {
                 return redirect()->to(
                     site_url('penetapan-konteks/konteks/' . $konteks['id_konteks'])
                 );
             }
 
-            // kegiatan dipilih tetapi ruang lingkup belum ada
             return redirect()->to(
                 site_url('penetapan-konteks/konteks/0')
             );
         }
 
-        // PRIORITAS 2
-        // Cari ruang lingkup pertama yang tersedia
-        $konteks = $builder
+        // PRIORITAS 2: Semua Kegiatan
+        $konteks = $this->model
             ->where('tahun', $tahun)
             ->where('id_tim', $idTim)
             ->orderBy('id_kegiatan', 'ASC')
@@ -270,17 +317,15 @@ class KonteksController extends BaseContextController
             );
         }
 
-        // Sinkronkan Global Context Selector
-        session()->set([
-            'global_tahun'       => $konteks['tahun'],
-            'global_id_tim'      => $konteks['id_tim'],
-            'global_id_kegiatan' => $konteks['id_kegiatan'],
-        ]);
+        // PENTING:
+        // Jangan mengubah global_id_kegiatan menjadi kegiatan pertama.
+        // Biarkan tetap NULL agar Semua Kegiatan tetap terpilih.
 
         return redirect()->to(
             site_url('penetapan-konteks/konteks/' . $konteks['id_konteks'])
         );
     }
+
 
     public function edit($id)
     {
@@ -647,6 +692,31 @@ class KonteksController extends BaseContextController
             ->getResultArray();
 
         return $this->response->setJSON($data);
+    }
+
+    /**
+     * Mengambil hierarki Tujuan, Sasaran, dan Indikator
+     * berdasarkan ID indikator yang sudah tersimpan.
+     */
+    public function getHierarkiIndikator($idIndikator)
+    {
+        $db = \Config\Database::connect();
+
+        $data = $db->table('sasaran_strategis ss')
+            ->select('
+            ss.id_sasaran_strategis,
+            s.id_sasaran,
+            s.uraian_sasaran,
+            t.id_tujuan,
+            t.uraian_tujuan
+        ')
+            ->join('sasaran s', 's.id_sasaran = ss.id_sasaran')
+            ->join('tujuan t', 't.id_tujuan = s.id_tujuan')
+            ->where('ss.id_sasaran_strategis', (int) $idIndikator)
+            ->get()
+            ->getRowArray();
+
+        return $this->response->setJSON($data ?? []);
     }
 
     /* AJAX TABLE REFRESH */
