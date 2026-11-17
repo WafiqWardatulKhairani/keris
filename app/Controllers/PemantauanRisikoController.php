@@ -682,7 +682,7 @@ class PemantauanRisikoController extends BaseController
 
         $db = $this->db;
 
-        // Konteks aktif
+        // Konteks aktif 
         $globalTahun    = session('global_tahun');
         $globalTim      = session('global_id_tim');
         $globalKegiatan = session('global_id_kegiatan');

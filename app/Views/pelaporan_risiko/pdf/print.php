@@ -23,10 +23,9 @@
         default => 'LAPORAN RISIKO',
     };
     ?>
-    <div class="report-wrapper">
-        <?= view('pelaporan_risiko/pdf/header', [
-            'formTitle' => $formTitle
-        ]) ?>
+    <div class="report-wrapper <?= in_array($form, ['form1', 'form2', 'form3', 'form4']) ? $form . '-print' : '' ?>"> <?= view('pelaporan_risiko/pdf/header', [
+                                                                                                                            'formTitle' => $formTitle
+                                                                                                                        ]) ?>
         <?= view('pelaporan_risiko/pdf/report_info') ?>
         <?php if ($form === 'form1'): ?>
             <?= view('pelaporan_risiko/pdf/sections/form1_konteks') ?>

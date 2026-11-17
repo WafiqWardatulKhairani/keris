@@ -120,7 +120,7 @@ class PelaporanRisikoController extends BaseController
                 );
             }
         }
-        
+
         $idKegiatan = $this->request->getGet('id_kegiatan');
         $statusValidasi = $this->request->getGet('status_validasi');
 
@@ -925,9 +925,9 @@ class PelaporanRisikoController extends BaseController
         er.opsi_tindakan,
         er.prioritas,
 
-        pr.nilai_risiko,
-        pr.efektivitas,
-        pr.uraian_pengendalian,
+      pr.nilai_risiko,
+pr.uraian_pengendalian,
+pr.efektivitas,
 
         kk.level AS kemungkinan,
         kd.level AS dampak,
@@ -1177,8 +1177,10 @@ class PelaporanRisikoController extends BaseController
             ) AS area_dampak_list,
 
             pr.nilai_risiko,
-            pr.uraian_pengendalian,
-            pr.efektivitas,
+pr.uraian_pengendalian,
+pr.efektivitas,
+sl.level AS nilai_selera,
+sl.nama_level AS nama_selera,
 
             kk.level AS kemungkinan,
             kd.level AS dampak,
@@ -1251,6 +1253,11 @@ class PelaporanRisikoController extends BaseController
                     'evaluasi_risiko er',
                     'er.id_penilaian = pr.id_penilaian',
                     'left'
+                )
+                ->join(
+                    'selera_risiko sl',
+                    'sl.id_selera = pr.id_selera',
+                    'left'
                 );
 
             // FILTER TIM LOGIN
@@ -1293,13 +1300,19 @@ class PelaporanRisikoController extends BaseController
 
             $form2Builder->groupBy('
         ir.id_identifikasi,
-        pb.kode_proses,
+        ir.pernyataan_risiko,
+        ir.penyebab_risiko,
+        ir.dampak_risiko,
+        ir.sumber_risiko,
+        sl.level,
+sl.nama_level,
+pb.kode_proses,
         pb.uraian_proses,
         kr.nama_kategori,
         pr.id_penilaian,
         pr.nilai_risiko,
-        pr.uraian_pengendalian,
-        pr.efektivitas,
+pr.uraian_pengendalian,
+pr.efektivitas,
         kk.level,
         kd.level,
         er.id_evaluasi,
@@ -1448,7 +1461,7 @@ class PelaporanRisikoController extends BaseController
                 }
             }
 
-            
+
             // FILTER KEGIATAN
             if (!empty($idKegiatan)) {
                 $form3Builder->where(
@@ -1525,13 +1538,17 @@ class PelaporanRisikoController extends BaseController
 
         if ($form === 'form4' || $form === 'all') {
 
-
             $form4Builder = $this->db->table('pemantauan_risiko pm')
                 ->select('
             pm.id_pemantauan,
             pm.realisasi_output,
             pm.realisasi_waktu,
+            pm.status,
             pm.status_validasi,
+            pm.catatan,
+            pm.efektivitas_pengendalian,
+            pm.id_kemungkinan_residu,
+            pm.id_dampak_residu,
 
             rtp.id_rtp,
             rtp.uraian_rtp,
@@ -1539,11 +1556,21 @@ class PelaporanRisikoController extends BaseController
             rtp.target_waktu,
 
             er.id_evaluasi,
+            er.id_penilaian,
 
             ir.id_identifikasi,
             ir.pernyataan_risiko,
+            ir.keterjadian_risiko,
+            ir.jumlah_keterjadian,
 
             pr.nilai_risiko,
+            pr.tindakan AS respon_risiko,
+
+            km_res.level AS kemungkinan_residu,
+            kd_res.level AS dampak_residu,
+            mr_res.nilai_risiko AS skor_risiko_residu,
+
+            bp.url_link AS link_bukti,
 
             k.id_konteks,
             k.tahun,
@@ -1579,6 +1606,28 @@ class PelaporanRisikoController extends BaseController
                     'left'
                 )
                 ->join(
+                    'kriteria_kemungkinan km_res',
+                    'km_res.id_kriteria = pm.id_kemungkinan_residu',
+                    'left'
+                )
+                ->join(
+                    'kriteria_dampak kd_res',
+                    'kd_res.id_kriteria = pm.id_dampak_residu',
+                    'left'
+                )
+                ->join(
+                    'matriks_risiko mr_res',
+                    'mr_res.level_kemungkinan = km_res.level
+     AND mr_res.level_dampak = kd_res.level',
+                    'left',
+                    false
+                )
+                ->join(
+                    'bukti_pemantauan bp',
+                    'bp.id_pemantauan = pm.id_pemantauan',
+                    'left'
+                )
+                ->join(
                     'tim_kerja tk',
                     'tk.id_tim = k.id_tim',
                     'left'
@@ -1592,10 +1641,7 @@ class PelaporanRisikoController extends BaseController
 
             // FILTER OPERATOR
             if (session('user_role') === 'operator') {
-                $form4Builder->where(
-                    'k.id_tim',
-                    $idTimAktif
-                );
+                $form4Builder->where('k.id_tim', $idTimAktif);
             }
 
             // FILTER KETUA
@@ -1617,9 +1663,9 @@ class PelaporanRisikoController extends BaseController
                 }
             }
 
-
-
+            // FILTER PERIODE
             if ($type === 'range' && $start && $end) {
+
                 $startDate = date('Y-m-01', strtotime($start));
                 $endExclusive = date(
                     'Y-m-01',
@@ -1630,6 +1676,7 @@ class PelaporanRisikoController extends BaseController
                     ->where('pm.realisasi_waktu >=', $startDate)
                     ->where('pm.realisasi_waktu <', $endExclusive);
             } elseif ($type !== 'semua') {
+
                 $endExclusive = date(
                     'Y-m-d',
                     strtotime($endDate . ' +1 day')
@@ -1639,8 +1686,6 @@ class PelaporanRisikoController extends BaseController
                     ->where('pm.realisasi_waktu >=', $startDate)
                     ->where('pm.realisasi_waktu <', $endExclusive);
             }
-
-
 
             // FILTER KEGIATAN
             if (!empty($idKegiatan)) {
@@ -1664,33 +1709,34 @@ class PelaporanRisikoController extends BaseController
                 ->orderBy('rtp.id_rtp', 'ASC')
                 ->get()
                 ->getResultArray();
+        }
 
-            // =================================================
-            // NOMOR PRIORITAS RISIKO
-            // sama dengan Form 3
-            // =================================================
 
-            $prioritasMapForm4 = [];
-            $nomorPrioritasForm4 = 1;
+        // =================================================
+        // NOMOR PRIORITAS RISIKO
+        // sama dengan Form 3
+        // =================================================
 
-            foreach ($form4Data as &$row) {
+        $prioritasMapForm4 = [];
+        $nomorPrioritasForm4 = 1;
 
-                $idEvaluasi = $row['id_evaluasi'];
+        foreach ($form4Data as &$row) {
 
-                if (!isset($prioritasMapForm4[$idEvaluasi])) {
-                    $prioritasMapForm4[$idEvaluasi]
-                        = $nomorPrioritasForm4++;
-                }
+            $idEvaluasi = $row['id_evaluasi'];
 
-                $row['prioritas_risiko']
-                    = $prioritasMapForm4[$idEvaluasi];
+            if (!isset($prioritasMapForm4[$idEvaluasi])) {
+                $prioritasMapForm4[$idEvaluasi]
+                    = $nomorPrioritasForm4++;
             }
 
-            unset($row);
+            $row['prioritas_risiko']
+                = $prioritasMapForm4[$idEvaluasi];
         }
+
+        unset($row);
+
         // =====================================================
         // META PDF: TIM KERJA & KEGIATAN
-        // =====================================================
 
         $timkerja = '-';
         $kegiatan = '-';
