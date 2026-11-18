@@ -1022,6 +1022,8 @@ pr.efektivitas,
         $form1Proses = [];
         $form1Pemangku = [];
         $form1Peraturan = [];
+        $form1Pestle = [];
+        $form1Swot = [];
 
         if ($form === 'form1' || $form === 'all') {
 
@@ -1147,6 +1149,76 @@ pr.efektivitas,
                     ->where('kp.id_konteks', $idKonteksForm1)
                     ->get()
                     ->getResultArray();
+
+                // =============================
+                // ANALISIS SWOT & PESTLE
+                // =============================
+
+                $analisisModel = new \App\Models\AnalisisSwotPestleModel();
+
+                $analisisData = $analisisModel
+                    ->where('id_tim', $form1['id_tim'])
+                    ->where('tahun', $tahun)
+                    ->orderBy('triwulan', 'ASC')
+                    ->orderBy('id_analisis', 'ASC')
+                    ->findAll();
+
+                // Inisialisasi kategori
+                $form1Pestle = [
+                    'political'     => [],
+                    'economic'      => [],
+                    'social'        => [],
+                    'technological' => [],
+                    'legal'         => [],
+                    'environmental' => [],
+                ];
+
+                $form1Swot = [
+                    'strength'    => [],
+                    'weakness'    => [],
+                    'opportunity' => [],
+                    'threat'      => [],
+                ];
+
+                // Mapping kategori database ke kategori view
+                foreach ($analisisData as $row) {
+
+                    $jenis = strtoupper($row['jenis_analisis'] ?? '');
+                    $kategori = strtoupper($row['kategori'] ?? '');
+                    $uraian = trim($row['uraian'] ?? '');
+
+                    if ($uraian === '') {
+                        continue;
+                    }
+
+                    if ($jenis === 'PESTLE') {
+
+                        $mapPestle = [
+                            'P'   => 'political',
+                            'E'   => 'economic',
+                            'S'   => 'social',
+                            'T'   => 'technological',
+                            'L'   => 'legal',
+                            'ENV' => 'environmental',
+                        ];
+
+                        if (isset($mapPestle[$kategori])) {
+                            $form1Pestle[$mapPestle[$kategori]][] = $uraian;
+                        }
+                    } elseif ($jenis === 'SWOT') {
+
+                        $mapSwot = [
+                            'S' => 'strength',
+                            'W' => 'weakness',
+                            'O' => 'opportunity',
+                            'T' => 'threat',
+                        ];
+
+                        if (isset($mapSwot[$kategori])) {
+                            $form1Swot[$mapSwot[$kategori]][] = $uraian;
+                        }
+                    }
+                }
             }
         }
 
@@ -1788,6 +1860,8 @@ pr.efektivitas,
             'form1Proses' => $form1Proses,
             'form1Pemangku' => $form1Pemangku,
             'form1Peraturan' => $form1Peraturan,
+            'form1Pestle' => $form1Pestle,
+            'form1Swot'   => $form1Swot,
 
             //FORM2
             'form2Data' => $form2Data,
@@ -1933,7 +2007,8 @@ pr.efektivitas,
         $dompdf->loadHtml($html);
 
         // PAPER
-        $dompdf->setPaper('A4', 'landscape');
+        $orientation = ($form === 'form1') ? 'portrait' : 'landscape';
+        $dompdf->setPaper('A4', $orientation);
 
         // =====================================================
         // RENDER PDF
