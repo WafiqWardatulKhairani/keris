@@ -7,13 +7,14 @@
                         <th rowspan="2" class="rtp-th text-center">#</th>
                         <th rowspan="2" class="rtp-th text-center">Kode<br>Proses</th>
                         <th rowspan="2" class="rtp-th">Risiko</th>
+                        <th rowspan="2" class="rtp-th text-center">Keterjadian Risiko</th>
+                        <th rowspan="2" class="rtp-th text-center">Jumlah Keterjadian</th>
+                        <th rowspan="2" class="rtp-th text-center">Akumulasi</th>
                         <th rowspan="2" class="rtp-th">RTP</th>
                         <th colspan="2" class="rtp-th text-center">Target</th>
                         <th colspan="3" class="rtp-th text-center">Realisasi</th>
-                        <th rowspan="2" class="rtp-th text-center">Keterjadian Risiko</th>
-                        <th rowspan="2" class="rtp-th text-center">Jumlah Keterjadian</th>
-                    </tr>
 
+                    </tr>
                     <tr class="rtp-thead-sub">
                         <th class="rtp-th text-center">Output</th>
                         <th class="rtp-th text-center">Waktu</th>
@@ -97,57 +98,6 @@
                                             </div>
                                         </td>
                                     <?php endif; ?>
-
-                                    <!-- RTP -->
-<td>
-    <div title="<?= esc($rtp['uraian_rtp'], 'attr') ?>"
-         style="max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-        <?= esc($rtp['uraian_rtp']) ?>
-    </div>
-</td>
-
-                                    <td>
-    <div title="<?= esc($rtp['target_output'] ?? '—', 'attr') ?>"
-         style="max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-        <?= esc($rtp['target_output'] ?? '—') ?>
-    </div>
-</td>
-
-                                    <!-- TARGET WAKTU -->
-                                    <td class="text-center">
-                                        <?php if ($bulan && $tahun): ?>
-                                            <div><?= $bulan ?></div>
-                                            <div class="small text-muted"><?= $tahun ?></div>
-                                        <?php else: ?>
-                                            <span class="text-muted">—</span>
-                                        <?php endif; ?>
-                                    </td>
-
-                                    <td>
-    <div class="<?= !empty($rtp['realisasi_output']) ? 'fw-semibold' : '' ?>"
-         title="<?= esc($rtp['realisasi_output'] ?? '—', 'attr') ?>"
-         style="max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-        <?= esc($rtp['realisasi_output'] ?? '—') ?>
-    </div>
-</td>
-
-                                    <!-- REALISASI WAKTU -->
-                                    <td class="text-center <?= !empty($rtp['realisasi_waktu']) ? 'fw-semibold' : '' ?>">
-                                        <?php if ($rBulan && $rTahun): ?>
-                                            <div><?= $rBulan ?></div>
-                                            <div class="small text-muted"><?= $rTahun ?></div>
-                                        <?php else: ?>
-                                            <span class="text-muted">—</span>
-                                        <?php endif; ?>
-                                    </td>
-
-                                    <!-- STATUS -->
-                                    <td class="text-center">
-                                        <span class="badge bg-<?= $statusClass ?>-subtle text-<?= $statusClass ?> border border-<?= $statusClass ?>">
-                                            <?= esc($status) ?>
-                                        </span>
-                                    </td>
-
                                     <?php if ($isFirst): ?>
                                         <!-- KETERJADIAN RISIKO -->
                                         <td rowspan="<?= $rowspan ?>" class="text-center">
@@ -181,6 +131,69 @@
                                         </td>
                                     <?php endif; ?>
 
+                                    <!-- AKUMULASI TRIWULAN 4 -->
+                                    <td rowspan="<?= $rowspan ?>" class="text-center">
+                                        <input
+                                            type="number"
+                                            min="0"
+                                            class="form-control form-control-sm pr-jumlah-keterjadian"
+                                            data-id-identifikasi="<?= esc($item['id_identifikasi']) ?>"
+                                            value="<?= esc($item['jumlah_keterjadian'] ?? 0) ?>"
+                                            placeholder="0"
+                                            <?= ($item['keterjadian_risiko'] ?? 'TT') !== 'T' ? 'disabled' : '' ?>
+                                            <?= !in_array(session('user_role'), ['admin', 'operator'], true) ? 'disabled' : '' ?>>
+                                    </td>
+
+
+                                    <!-- RTP -->
+                                    <td>
+                                        <div title="<?= esc($rtp['uraian_rtp'], 'attr') ?>"
+                                            style="max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                            <?= esc($rtp['uraian_rtp']) ?>
+                                        </div>
+                                    </td>
+
+                                    <td>
+                                        <div title="<?= esc($rtp['target_output'] ?? '—', 'attr') ?>"
+                                            style="max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                            <?= esc($rtp['target_output'] ?? '—') ?>
+                                        </div>
+                                    </td>
+
+                                    <!-- TARGET WAKTU -->
+                                    <td class="text-center">
+                                        <?php if ($bulan && $tahun): ?>
+                                            <div><?= $bulan ?></div>
+                                            <div class="small text-muted"><?= $tahun ?></div>
+                                        <?php else: ?>
+                                            <span class="text-muted">—</span>
+                                        <?php endif; ?>
+                                    </td>
+
+                                    <td>
+                                        <div class="<?= !empty($rtp['realisasi_output']) ? 'fw-semibold' : '' ?>"
+                                            title="<?= esc($rtp['realisasi_output'] ?? '—', 'attr') ?>"
+                                            style="max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                            <?= esc($rtp['realisasi_output'] ?? '—') ?>
+                                        </div>
+                                    </td>
+
+                                    <!-- REALISASI WAKTU -->
+                                    <td class="text-center <?= !empty($rtp['realisasi_waktu']) ? 'fw-semibold' : '' ?>">
+                                        <?php if ($rBulan && $rTahun): ?>
+                                            <div><?= $rBulan ?></div>
+                                            <div class="small text-muted"><?= $rTahun ?></div>
+                                        <?php else: ?>
+                                            <span class="text-muted">—</span>
+                                        <?php endif; ?>
+                                    </td>
+
+                                    <!-- STATUS -->
+                                    <td class="text-center">
+                                        <span class="badge bg-<?= $statusClass ?>-subtle text-<?= $statusClass ?> border border-<?= $statusClass ?>">
+                                            <?= esc($status) ?>
+                                        </span>
+                                    </td>
                                 </tr>
 
                             <?php endforeach; ?>

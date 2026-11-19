@@ -7,15 +7,24 @@
         </div>
 
     <?php else: ?>
-
         <!-- ============================= -->
         <!-- I. LINGKUP -->
         <!-- ============================= -->
 
-        <table class="form1-context-table">
+        <table class="form1-context-table form1-context-scope">
+            <colgroup>
+                <col style="width: 25px">
+                <col style="width: 150px">
+                <col style="width: 18px">
+                <col style="width: auto">
+            </colgroup>
+
+            <!-- I. LINGKUP -->
             <tr>
                 <td class="form1-section-number">I</td>
-                <td colspan="3" class="form1-section-title">Lingkup</td>
+                <td colspan="4" class="form1-section-title">
+                    Lingkup
+                </td>
             </tr>
 
             <tr>
@@ -47,32 +56,42 @@
             </tr>
         </table>
 
-
         <!-- ============================= -->
         <!-- II. KONTEKS -->
         <!-- ============================= -->
 
-        <table class="form1-context-table">
+        <table class="form1-context-table form1-context-main">
+            <colgroup>
+                <colgroup>
+                    <col style="width: 28px">
+                    <col style="width: 28px">
+                    <col style="width: 85px">
+                    <col style="width: 18px">
+                    <col style="width: auto">
+                </colgroup>
+            </colgroup>
+
+            <!-- II. KONTEKS -->
             <tr>
                 <td class="form1-section-number">II</td>
-                <td colspan="3" class="form1-section-title">Konteks</td>
+                <td colspan="4" class="form1-section-title">
+                    Konteks
+                </td>
             </tr>
 
-            <!-- STRUKTUR ORGANISASI -->
-
+            <!-- 1. STRUKTUR ORGANISASI -->
             <tr>
                 <td></td>
-                <td colspan="3" class="form1-subsection-title">
+                <td colspan="4" class="form1-subsection-title">
                     1. Struktur Organisasi Penerapan Manajemen Risiko
                 </td>
             </tr>
 
-            <!-- PEMILIK RISIKO -->
-
+            <!-- a. PEMILIK RISIKO -->
             <tr>
                 <td></td>
                 <td class="form1-letter">a</td>
-                <td colspan="2" class="form1-role-title">
+                <td colspan="3" class="form1-role-title">
                     Pemilik Risiko
                 </td>
             </tr>
@@ -81,35 +100,31 @@
                 <td></td>
                 <td></td>
                 <td class="form1-label">Nama</td>
-                <td>
-                    : <?= esc($nama_pemilik ?? '-') ?>
-                </td>
+                <td class="form1-separator">:</td>
+                <td><?= esc($nama_pemilik ?? '-') ?></td>
             </tr>
 
             <tr>
                 <td></td>
                 <td></td>
                 <td class="form1-label">NIP</td>
-                <td>
-                    : <?= esc($nip_pemilik ?? '-') ?>
-                </td>
+                <td class="form1-separator">:</td>
+                <td><?= esc($nip_pemilik ?? '-') ?></td>
             </tr>
 
             <tr>
                 <td></td>
                 <td></td>
                 <td class="form1-label">Jabatan</td>
-                <td>
-                    : <?= esc($jabatan_pemilik ?? '-') ?>
-                </td>
+                <td class="form1-separator">:</td>
+                <td><?= esc($jabatan_pemilik ?? '-') ?></td>
             </tr>
 
-            <!-- PENGELOLA RISIKO -->
-
+            <!-- b. PENGELOLA RISIKO -->
             <tr>
                 <td></td>
                 <td class="form1-letter">b</td>
-                <td colspan="2" class="form1-role-title">
+                <td colspan="3" class="form1-role-title">
                     Pengelola Risiko
                 </td>
             </tr>
@@ -118,45 +133,38 @@
                 <td></td>
                 <td></td>
                 <td class="form1-label">Nama</td>
-                <td>
-                    : <?= esc($nama_ketua ?? '-') ?>
-                </td>
+                <td class="form1-separator">:</td>
+                <td><?= esc($nama_ketua ?? '-') ?></td>
             </tr>
 
             <tr>
                 <td></td>
                 <td></td>
                 <td class="form1-label">NIP</td>
-                <td>
-                    : <?= esc($nip_ketua ?? '-') ?>
-                </td>
+                <td class="form1-separator">:</td>
+                <td><?= esc($nip_ketua ?? '-') ?></td>
             </tr>
 
             <tr>
                 <td></td>
                 <td></td>
                 <td class="form1-label">Jabatan</td>
-                <td>
-                    : Ketua Tim <?= esc($timkerja ?? '-') ?>
-                </td>
+                <td class="form1-separator">:</td>
+                <td>Ketua Tim <?= esc($timkerja ?? '-') ?></td>
             </tr>
 
-
-            <!-- ============================= -->
-            <!-- PROSES BISNIS DAN SASARAN -->
-            <!-- ============================= -->
-
-            <tr>
+            <!-- 2. PROSES BISNIS -->
+            <tr class="form1-process-title-row">
                 <td></td>
-                <td colspan="3" class="form1-subsection-title">
+                <td colspan="4" class="form1-subsection-title">
                     2. Proses Bisnis dan Sasaran Kinerja
                 </td>
             </tr>
+
         </table>
 
-
+        <!-- PROSES BISNIS DAN SASARAN KINERJA-->
         <table class="report-table form1-table">
-
             <colgroup>
                 <col style="width: 6%">
                 <col style="width: 15%">
@@ -228,17 +236,11 @@
         <!-- ============================= -->
         <!-- 3. DAFTAR PEMANGKU KEPENTINGAN -->
         <!-- ============================= -->
-
-        <table class="form1-context-table">
-            <tr>
-                <td></td>
-                <td colspan="3" class="form1-subsection-title">
-                    3. Daftar pemangku kepentingan (internal maupun eksternal)
-                </td>
-            </tr>
-        </table>
-
         <table class="report-table form1-table form1-stakeholder-table">
+            <caption class="form1-stakeholder-caption">
+                3. Daftar pemangku kepentingan (internal maupun eksternal)
+            </caption>
+
             <colgroup>
                 <col style="width: 6%">
                 <col style="width: 60%">
@@ -277,17 +279,11 @@
         <!-- ============================= -->
         <!-- 4. DAFTAR PERATURAN -->
         <!-- ============================= -->
-
-        <table class="form1-context-table">
-            <tr>
-                <td></td>
-                <td colspan="3" class="form1-subsection-title">
-                    4. Daftar Peraturan Perundang-undangan yang Terkait
-                </td>
-            </tr>
-        </table>
-
         <table class="report-table form1-table form1-regulation-table">
+            <caption class="form1-stakeholder-caption">
+                4. Daftar Peraturan Perundang-undangan yang Terkait
+            </caption>
+
             <colgroup>
                 <col style="width: 6%">
                 <col style="width: 94%">
@@ -325,160 +321,128 @@
         <!-- 5. ANALISIS SWOT DAN PESTLE -->
         <!-- ============================= -->
 
-        <table class="form1-context-table">
-            <tr>
-                <td></td>
-                <td colspan="3" class="form1-subsection-title">
-                    5. Analisis SWOT dan PESTLE
-                </td>
-            </tr>
+        <div class="form1-analysis-section">
+
+            <div class="form1-analysis-heading">
+                5. Analisis SWOT dan PESTLE
+            </div>
 
             <!-- ANALISIS PESTLE -->
-            <tr>
-                <td></td>
-                <td class="form1-letter">a</td>
-                <td colspan="2" class="form1-role-title">
-                    Analisis PESTLE
-                </td>
-            </tr>
+            <div class="form1-analysis-subheading">
+                <span>a</span>
+                <span>Analisis PESTLE</span>
+            </div>
 
-            <tr>
-                <td></td>
-                <td></td>
-                <td colspan="2" class="form1-analysis-description">
-                    <i>
-                        Memetakan faktor lingkungan, terutama faktor eksternal
-                        ke dalam enam dimensi berikut:
-                    </i>
-                </td>
-            </tr>
+            <div class="form1-analysis-description">
+                Memetakan faktor lingkungan, terutama faktor eksternal
+                ke dalam enam dimensi berikut:
+            </div>
 
-            <tr>
-                <td></td>
-                <td></td>
-                <td colspan="2" class="form1-analysis-description">
-                    <b><i>Tahap pelaksanaan:</i></b>
-                    <br>
-                    <i>
-                        1. Mengumpulkan bahan acuan berupa RENSTRA, kebijakan internal,
-                        dan laporan evaluasi.
-                        <br>
-                        2. Mengelompokkan setiap isu yang teridentifikasi ke dalam
-                        salah satu dari enam dimensi.
-                        <br>
-                        3. Menilai tingkat relevansi dan dampak setiap faktor terhadap
-                        sasaran Unit Organisasi.
-                        <br>
-                        4. Memetakan hasil analisis sebagai dasar penetapan konteks.
-                    </i>
-                </td>
-            </tr>
-        </table>
+            <div class="form1-analysis-steps">
+                <strong><i>Tahap pelaksanaan:</i></strong>
+                <ol>
+                    <li><i>Mengumpulkan bahan acuan berupa RENSTRA, kebijakan internal, dan laporan evaluasi.</i></li>
+                    <li><i>Mengelompokkan setiap isu yang teridentifikasi ke dalam salah satu dari enam dimensi.</i></li>
+                    <li><i>Menilai tingkat relevansi dan dampak setiap faktor terhadap sasaran Unit Organisasi.</i></li>
+                    <li><i>Memetakan hasil analisis sebagai dasar penetapan konteks.</i></li>
+                </ol>
+            </div>
 
-        <!-- TABEL PESTLE -->
-        <table class="report-table form1-analysis-table">
-            <colgroup>
-                <col style="width: 16%">
-                <col style="width: 84%">
-            </colgroup>
+            <!-- TABEL PESTLE -->
+            <table class="report-table form1-analysis-table">
+                <colgroup>
+                    <col style="width: 18%">
+                    <col style="width: 82%">
+                </colgroup>
+                <tbody>
+                    <?php
+                    $pestleLabels = [
+                        'political'     => 'Politic',
+                        'economic'      => 'Economic',
+                        'social'        => 'Social',
+                        'technological' => 'Technology',
+                        'legal'         => 'Legal',
+                        'environmental' => 'Environment',
+                    ];
+                    ?>
 
-            <tbody>
-                <?php
-                $pestleLabels = [
-                    'political'     => 'Politic',
-                    'economic'      => 'Economic',
-                    'social'        => 'Social',
-                    'technological' => 'Technology',
-                    'legal'         => 'Legal',
-                    'environmental' => 'Environment',
-                ];
-                ?>
+                    <?php foreach ($pestleLabels as $key => $label): ?>
+                        <tr>
+                            <th class="form1-analysis-label">
+                                <?= esc($label) ?>
+                            </th>
+                            <td>
+                                <div class="form1-analysis-content">
+                                    <?php
+                                    $items = $form1Pestle[$key] ?? [];
+                                    ?>
 
-                <?php foreach ($pestleLabels as $key => $label): ?>
-                    <tr>
-                        <th class="form1-analysis-label">
-                            <?= esc($label) ?>
-                        </th>
-                        <td>
-                            <div class="form1-analysis-content">
-                                <?php
-                                $items = $form1Pestle[$key] ?? [];
-                                ?>
+                                    <?php if (is_array($items) && !empty($items)): ?>
+                                        <?php foreach ($items as $item): ?>
+                                            <?= esc(is_array($item) ? ($item['uraian'] ?? $item['isi'] ?? '') : $item) ?><br>
+                                        <?php endforeach; ?>
+                                    <?php else: ?>
+                                        -
+                                    <?php endif; ?>
+                                </div>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
 
-                                <?php if (is_array($items) && !empty($items)): ?>
-                                    <?php foreach ($items as $item): ?>
-                                        <?= esc(is_array($item) ? ($item['uraian'] ?? $item['isi'] ?? '') : $item) ?><br>
-                                    <?php endforeach; ?>
-                                <?php else: ?>
-                                    &nbsp;
-                                <?php endif; ?>
-                            </div>
-                        </td>
-                    </tr>
-                <?php endforeach; ?>
-            </tbody>
-        </table>
+            <!-- ANALISIS SWOT -->
+            <div class="form1-analysis-subheading form1-swot-heading">
+                <span>b</span>
+                <span>Analisis SWOT</span>
+            </div>
 
-        <!-- ANALISIS SWOT -->
-        <table class="form1-context-table">
-            <tr>
-                <td></td>
-                <td class="form1-letter">a</td>
-                <td colspan="2" class="form1-role-title">
-                    Analisis SWOT
-                </td>
-            </tr>
+            <div class="form1-analysis-description">
+                Memetakan kondisi internal organisasi.
+            </div>
 
-            <tr>
-                <td></td>
-                <td></td>
-                <td colspan="2" class="form1-analysis-description">
-                    <i>Memetakan kondisi internal organisasi</i>
-                </td>
-            </tr>
-        </table>
+            <!-- TABEL SWOT -->
+            <table class="report-table form1-analysis-table form1-swot-table">
+                <colgroup>
+                    <col style="width: 18%">
+                    <col style="width: 82%">
+                </colgroup>
+                <tbody>
+                    <?php
+                    $swotLabels = [
+                        'strength'    => 'Strength',
+                        'weakness'    => 'Weakness',
+                        'opportunity' => 'Opportunity',
+                        'threat'      => 'Threat',
+                    ];
+                    ?>
 
-        <!-- TABEL SWOT -->
-        <table class="report-table form1-analysis-table">
-            <colgroup>
-                <col style="width: 18%">
-                <col style="width: 82%">
-            </colgroup>
+                    <?php foreach ($swotLabels as $key => $label): ?>
+                        <tr>
+                            <th class="form1-analysis-label">
+                                <?= esc($label) ?>
+                            </th>
+                            <td>
+                                <div class="form1-analysis-content">
+                                    <?php
+                                    $items = $form1Swot[$key] ?? [];
+                                    ?>
 
-            <tbody>
-                <?php
-                $swotLabels = [
-                    'strength'     => 'Strength',
-                    'weakness'     => 'Weakness',
-                    'opportunity'  => 'Opportunity',
-                    'threat'       => 'Threat',
-                ];
-                ?>
+                                    <?php if (is_array($items) && !empty($items)): ?>
+                                        <?php foreach ($items as $item): ?>
+                                            <?= esc(is_array($item) ? ($item['uraian'] ?? $item['isi'] ?? '') : $item) ?><br>
+                                        <?php endforeach; ?>
+                                    <?php else: ?>
+                                        -
+                                    <?php endif; ?>
+                                </div>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
 
-                <?php foreach ($swotLabels as $key => $label): ?>
-                    <tr>
-                        <th class="form1-analysis-label">
-                            <?= esc($label) ?>
-                        </th>
-                        <td>
-                            <div class="form1-analysis-content">
-                                <?php
-                                $items = $form1Swot[$key] ?? [];
-                                ?>
-
-                                <?php if (is_array($items) && !empty($items)): ?>
-                                    <?php foreach ($items as $item): ?>
-                                        <?= esc(is_array($item) ? ($item['uraian'] ?? $item['isi'] ?? '') : $item) ?><br>
-                                    <?php endforeach; ?>
-                                <?php else: ?>
-                                    &nbsp;
-                                <?php endif; ?>
-                            </div>
-                        </td>
-                    </tr>
-                <?php endforeach; ?>
-            </tbody>
-        </table>
+        </div>
 
         <!-- ============================= -->
         <!-- III. KRITERIA -->
@@ -642,7 +606,7 @@
                 </tbody>
             </table>
         </div>
-        
+
         <!-- ============================= -->
         <!-- c. MATRIKS ANALISIS RISIKO -->
         <!-- ============================= -->
@@ -818,9 +782,6 @@
             </table>
 
         </div>
-        
-
-
     <?php endif; ?>
 
 </div>

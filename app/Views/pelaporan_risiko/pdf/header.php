@@ -1,10 +1,10 @@
+
 <?php
 $logoPath = ROOTPATH . 'tampilanSimiko/assets/img/BPS_Provinsi_Riau.png';
 
 $logoBase64 = null;
 
 if (is_file($logoPath)) {
-
     $logoType = pathinfo($logoPath, PATHINFO_EXTENSION);
     $logoData = file_get_contents($logoPath);
 
@@ -17,28 +17,16 @@ if (is_file($logoPath)) {
 ?>
 
 <div class="report-header">
+    <div class="brand-cell">
+        <?php if ($logoBase64): ?>
+            <img
+                src="<?= $logoBase64 ?>"
+                alt="BPS Provinsi Riau"
+                class="bps-brand-image">
+        <?php endif; ?>
+    </div>
 
-    <table class="header-table">
-        <tr>
-
-            <td class="brand-cell">
-
-                <?php if ($logoBase64): ?>
-                    <img
-                        src="<?= $logoBase64 ?>"
-                        alt="BPS Provinsi Riau"
-                        class="bps-brand-image">
-                <?php endif; ?>
-
-            </td>
-
-            <td class="title-cell">
-                <?= esc($formTitle ?? 'LAPORAN RISIKO') ?>
-            </td>
-
-        </tr>
-    </table>
-
+    <div class="report-title">
+        <?= esc($formTitle ?? 'LAPORAN RISIKO') ?>
+    </div>
 </div>
-
-<div class="header-line"></div>

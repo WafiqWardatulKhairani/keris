@@ -1,5 +1,5 @@
 @page {
-    margin: 10mm;
+  margin: 10mm;
 }
 
 body {
@@ -29,16 +29,6 @@ body {
   margin-bottom: 8px;
 }
 
-.header-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.header-table td {
-  border: none;
-  vertical-align: middle;
-}
-
 .brand-cell {
   width: 35%;
   text-align: left;
@@ -47,31 +37,6 @@ body {
 .bps-brand-image {
   width: 180px;
   height: auto;
-}
-
-.title-cell {
-  width: 65%;
-  text-align: right;
-  font-size: 16px;
-  font-weight: bold;
-  vertical-align: middle;
-}
-
-/* Garis dan informasi setelah header Form 2 */
-body:has(.form2-print) .header-line,
-body:has(.form3-print) .header-line {
-  margin-top: 3px;
-  margin-bottom: 7px;
-}
-
-body:has(.form2-print) .report-meta {
-  margin-top: 0;
-  margin-bottom: 10px;
-}
-
-body:has(.form2-print) .report-meta .meta-table td {
-  padding-top: 2px;
-  padding-bottom: 2px;
 }
 
 /* =========================
@@ -213,204 +178,194 @@ tr {
    ========================================= */
 
 .form1-print .report-header {
-    width: 100%;
-    margin: 0;
-    padding: 0;
+  width: 100%;
+  margin: 0;
+  padding: 0;
 }
 
 .form1-print .header-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin: 0;
-    padding: 0;
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0;
+  padding: 0;
 }
 
 .form1-print .header-table td {
-    border: none !important;
-    padding: 0 !important;
-    vertical-align: middle;
+  border: none !important;
+  padding: 0 !important;
+  vertical-align: middle;
 }
 
 .form1-print .brand-cell {
-    width: 50%;
-    text-align: left;
+  width: 50%;
+  text-align: left;
 }
 
 .form1-print .title-cell {
-    width: 50%;
-    text-align: right;
-    font-size: 14px !important;
-    font-weight: bold;
-    white-space: nowrap;
+  width: 50%;
+  text-align: right;
+  font-size: 14px !important;
+  font-weight: bold;
+  white-space: nowrap;
 }
 
 .form1-print .bps-brand-image {
-    width: 155px;
-    height: auto;
-}
-
-.form1-print .header-line {
-    display: block !important;
-    width: 100%;
-    height: 0;
-    border: none !important;
-    border-top: 1.5px solid #000 !important;
-    margin: 7px 0 10px !important;
-    padding: 0 !important;
+  width: 155px;
+  height: auto;
 }
 
 /* Identitas laporan */
 .form1-print .report-meta {
-    margin: 0 0 12px !important;
-    padding: 0;
+  margin: 0 0 12px !important;
+  padding: 0;
 }
 
 .form1-print .meta-table {
-    width: 100%;
-    border-collapse: collapse;
-    border-spacing: 0;
-    margin: 0;
+  width: 100%;
+  border-collapse: collapse;
+  border-spacing: 0;
+  margin: 0;
 }
 
 .form1-print .meta-table td {
-    border: none !important;
-    padding: 2px 0 !important;
-    font-size: 10.5px !important;
-    line-height: 1.25 !important;
-    vertical-align: middle;
+  border: none !important;
+  padding: 2px 0 !important;
+  font-size: 10.5px !important;
+  line-height: 1.25 !important;
+  vertical-align: middle;
 }
 
 .form1-print .meta-label {
-    width: 180px;
-    font-weight: bold;
+  width: 180px;
+  font-weight: bold;
 }
 
 .form1-print .meta-separator {
-    width: 20px;
-    text-align: center;
+  width: 20px;
+  text-align: center;
 }
 
 /* Judul bagian */
 .form1-print .subsection-title {
-    font-size: 10px;
-    font-weight: bold;
-    margin-top: 10px;
-    margin-bottom: 5px;
+  font-size: 10px;
+  font-weight: bold;
+  margin-top: 10px;
+  margin-bottom: 5px;
 }
 
 .form1-print .report-section {
-    width: 100% !important;
-    max-width: 100% !important;
-    margin-bottom: 15px;
-    padding: 0 !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  margin-bottom: 15px;
+  padding: 0 !important;
 }
 
 .form1-table th,
 .form1-table td {
-    border: 1px solid #000 !important;
-    padding: 4px 3px;
-    line-height: 1.3;
-    vertical-align: top;
-    overflow-wrap: break-word;
-    word-wrap: break-word;
+  border: 1px solid #000 !important;
+  padding: 4px 3px;
+  line-height: 1.3;
+  vertical-align: top;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
 }
 
 .form1-table thead th {
-    background-color: #80edb5 !important;
-    color: #000 !important;
-    font-size: 7px;
-    font-weight: bold;
-    text-align: center;
-    vertical-align: middle;
-    padding: 5px 3px;
+  background-color: #80edb5 !important;
+  color: #000 !important;
+  font-size: 7px;
+  font-weight: bold;
+  text-align: center;
+  vertical-align: middle;
+  padding: 5px 3px;
 }
 
 /* Isi tabel */
 .form1-table tbody td {
-    font-size: 7px;
-    line-height: 1.35;
-    vertical-align: top;
+  font-size: 7px;
+  line-height: 1.35;
+  vertical-align: top;
 }
 
 /* Kolom No dan Kode */
 .form1-table tbody td:nth-child(1),
 .form1-table tbody td:nth-child(2) {
-    text-align: center;
-    vertical-align: middle;
+  text-align: center;
+  vertical-align: middle;
 }
 
 /* Header berulang saat halaman berikutnya */
 .form1-table thead {
-    display: table-header-group;
+  display: table-header-group;
 }
 
 /* Hindari memotong baris */
 .form1-table tbody tr {
-    page-break-inside: avoid;
+  page-break-inside: avoid;
 }
 
 /* Hindari tabel terpotong secara horizontal */
 .form1-print .report-section {
-    width: 100%;
-    margin-bottom: 15px;
+  width: 100%;
+  margin-bottom: 15px;
 }
 
 /* Tabel Form 1 - alignment dengan judul subsection */
 .form1-print .form1-table {
-    margin-left: 27px !important;
-width: calc(100% - 27px) !important;
-max-width: calc(100% - 27px) !important;
-    margin-right: 0 !important;
-    table-layout: fixed !important;
-    border-collapse: collapse !important;
-    border-spacing: 0;
-    margin-top: 0 !important;
-    font-size: 7px;
+  margin-left: 27px !important;
+  width: calc(100% - 27px) !important;
+  max-width: calc(100% - 27px) !important;
+  margin-right: 0 !important;
+  table-layout: fixed !important;
+  border-collapse: collapse !important;
+  border-spacing: 0;
+  margin-top: 0 !important;
+  font-size: 7px;
 }
 
 /* Kecilkan kolom No Form 1 */
 .form1-print .form1-table th:first-child,
 .form1-print .form1-table td:first-child {
-    width: 5% !important;
-    min-width: 0 !important;
-    padding-left: 1px !important;
-    padding-right: 1px !important;
+  width: 5% !important;
+  min-width: 0 !important;
+  padding-left: 1px !important;
+  padding-right: 1px !important;
 }
 
 /* Form 1 - kolom Jenis dan Tahapan */
 .form1-print .form1-table td:nth-child(2),
 .form1-print .form1-table td:nth-child(3) {
-    text-align: center !important;
-    vertical-align: middle !important;
+  text-align: center !important;
+  vertical-align: middle !important;
 }
 
 /* Form 1 - Tabel Pemangku Kepentingan & Peraturan */
 .form1-print .form1-stakeholder-table,
 .form1-print .form1-regulation-table {
-    width: calc(100% - 25px) !important;
-    max-width: calc(100% - 25px) !important;
-    margin-left: 25px !important;
-    margin-right: 0 !important;
-    table-layout: fixed !important;
-    border-collapse: collapse !important;
+  width: calc(100% - 25px) !important;
+  max-width: calc(100% - 25px) !important;
+  margin-left: 25px !important;
+  margin-right: 0 !important;
+  table-layout: fixed !important;
+  border-collapse: collapse !important;
 }
 
 .form1-print .form1-stakeholder-table th,
 .form1-print .form1-regulation-table th {
-    text-align: center !important;
-    vertical-align: middle !important;
+  text-align: center !important;
+  vertical-align: middle !important;
 }
 
 .form1-print .form1-stakeholder-table td:first-child,
 .form1-print .form1-regulation-table td:first-child {
-    text-align: center !important;
-    vertical-align: middle !important;
+  text-align: center !important;
+  vertical-align: middle !important;
 }
 
 .form1-print .form1-stakeholder-table td,
 .form1-print .form1-regulation-table td {
-    vertical-align: middle !important;
-    padding: 4px 5px !important;
+  vertical-align: middle !important;
+  padding: 4px 5px !important;
 }
 
 /* ============================= */
@@ -418,54 +373,54 @@ max-width: calc(100% - 27px) !important;
 /* ============================= */
 
 .form1-print .form1-analysis-table {
-    width: calc(100% - 25px) !important;
-    max-width: calc(100% - 25px) !important;
-    margin-left: 25px !important;
-    margin-right: 0 !important;
-    table-layout: fixed !important;
-    border-collapse: collapse !important;
-    margin-top: 0 !important;
-    margin-bottom: 8px !important;
+  width: calc(100% - 25px) !important;
+  max-width: calc(100% - 25px) !important;
+  margin-left: 25px !important;
+  margin-right: 0 !important;
+  table-layout: fixed !important;
+  border-collapse: collapse !important;
+  margin-top: 0 !important;
+  margin-bottom: 8px !important;
 }
 
 .form1-print .form1-analysis-table th,
 .form1-print .form1-analysis-table td {
-    border: 1px solid #000 !important;
-    padding: 3px 4px !important;
-    vertical-align: top !important;
-    font-size: 8px !important;
-    line-height: 1.25 !important;
+  border: 1px solid #000 !important;
+  padding: 3px 4px !important;
+  vertical-align: top !important;
+  font-size: 8px !important;
+  line-height: 1.25 !important;
 }
 
 .form1-print .form1-analysis-label {
-    width: 16% !important;
-    background-color: #82edb9 !important;
-    text-align: left !important;
-    vertical-align: middle !important;
-    font-weight: bold !important;
-    padding: 4px !important;
+  width: 16% !important;
+  background-color: #82edb9 !important;
+  text-align: left !important;
+  vertical-align: middle !important;
+  font-weight: bold !important;
+  padding: 4px !important;
 }
 
 .form1-print .form1-analysis-content {
-    min-height: 0 !important;
-    height: auto !important;
-    line-height: 1.25 !important;
-    text-align: left !important;
-    vertical-align: top !important;
-    padding: 3px 4px !important;
+  min-height: 0 !important;
+  height: auto !important;
+  line-height: 1.25 !important;
+  text-align: left !important;
+  vertical-align: top !important;
+  padding: 3px 4px !important;
 }
 
 .form1-print .form1-analysis-description {
-    font-size: 8px !important;
-    line-height: 1.25 !important;
-    padding-top: 0 !important;
-    padding-bottom: 2px !important;
+  font-size: 8px !important;
+  line-height: 1.25 !important;
+  padding-top: 0 !important;
+  padding-bottom: 2px !important;
 }
 
 /* Judul subsection */
 .form1-print .form1-context-table .form1-subsection-title {
-    padding-top: 3px !important;
-    padding-bottom: 3px !important;
+  padding-top: 3px !important;
+  padding-bottom: 3px !important;
 }
 
 /* ============================= */
@@ -473,44 +428,44 @@ max-width: calc(100% - 27px) !important;
 /* ============================= */
 
 .form1-print .form1-criteria-table {
-    width: calc(100% - 25px) !important;
-    max-width: calc(100% - 25px) !important;
-    margin-left: 25px !important;
-    margin-right: 0 !important;
-    table-layout: fixed !important;
-    border-collapse: collapse !important;
-    margin-top: 0 !important;
-    margin-bottom: 5px !important;
+  width: calc(100% - 25px) !important;
+  max-width: calc(100% - 25px) !important;
+  margin-left: 25px !important;
+  margin-right: 0 !important;
+  table-layout: fixed !important;
+  border-collapse: collapse !important;
+  margin-top: 0 !important;
+  margin-bottom: 5px !important;
 }
 
 .form1-print .form1-criteria-table th,
 .form1-print .form1-criteria-table td {
-    border: 1px solid #000 !important;
-    padding: 3px 4px !important;
-    font-size: 8px !important;
-    line-height: 1.25 !important;
-    vertical-align: middle !important;
+  border: 1px solid #000 !important;
+  padding: 3px 4px !important;
+  font-size: 8px !important;
+  line-height: 1.25 !important;
+  vertical-align: middle !important;
 }
 
 .form1-print .form1-criteria-table th {
-    background-color: #82edb9 !important;
-    text-align: center !important;
-    font-weight: bold !important;
+  background-color: #82edb9 !important;
+  text-align: center !important;
+  font-weight: bold !important;
 }
 
 .form1-print .form1-criteria-table td {
-    text-align: center !important;
+  text-align: center !important;
 }
 
 .form1-print .form1-criteria-table tbody tr:nth-child(even) td:first-child {
-    background-color: #d9ead3 !important;
+  background-color: #d9ead3 !important;
 }
 
 .form1-print .form1-criteria-note {
-    font-size: 8px !important;
-    line-height: 1.3 !important;
-    margin-top: 3px !important;
-    margin-bottom: 8px !important;
+  font-size: 8px !important;
+  line-height: 1.3 !important;
+  margin-top: 3px !important;
+  margin-bottom: 8px !important;
 }
 
 /* ================================
@@ -518,51 +473,51 @@ max-width: calc(100% - 27px) !important;
 ================================ */
 
 .form1-criteria-table {
-    width: 100%;
-    border-collapse: collapse;
-    table-layout: fixed;
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
 }
 
 .form1-criteria-table thead {
-    display: table-header-group;
+  display: table-header-group;
 }
 
 .form1-criteria-table tr {
-    page-break-inside: avoid;
-    break-inside: avoid;
+  page-break-inside: avoid;
+  break-inside: avoid;
 }
 
 /* Judul subbagian jangan sendirian di ujung halaman */
 .form1-criteria-subtitle {
-    page-break-after: avoid;
-    break-after: avoid;
+  page-break-after: avoid;
+  break-after: avoid;
 }
 
 /* Jaga jarak tabel Kriteria */
 .form1-criteria-table {
-    margin-top: 4px;
-    margin-bottom: 8px;
+  margin-top: 4px;
+  margin-bottom: 8px;
 }
 
 /* FORM 1 - Kriteria Kemungkinan mulai halaman baru */
 .form1-criteria-new-page {
-    page-break-before: always;
-    break-before: page;
+  page-break-before: always;
+  break-before: page;
 }
 
 .form1-criteria-new-page .form1-criteria-subtitle {
-    page-break-after: avoid;
-    break-after: avoid;
+  page-break-after: avoid;
+  break-after: avoid;
 }
 
 .form1-criteria-new-page table {
-    page-break-before: avoid;
-    break-before: avoid;
+  page-break-before: avoid;
+  break-before: avoid;
 }
 
 .form1-criteria-new-page tr {
-    page-break-inside: avoid;
-    break-inside: avoid;
+  page-break-inside: avoid;
+  break-inside: avoid;
 }
 
 /* =========================================
@@ -570,132 +525,130 @@ max-width: calc(100% - 27px) !important;
 ========================================= */
 
 .form1-risk-matrix-section {
-    margin-top: 8px;
+  margin-top: 8px;
 }
 
 .form1-risk-matrix {
-    width: 100%;
-    table-layout: fixed;
-    border-collapse: collapse;
-    font-size: 8px;
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: collapse;
+  font-size: 8px;
 }
 
 .form1-risk-matrix th,
 .form1-risk-matrix td {
-    border: 1px solid #000;
-    padding: 4px 3px;
-    text-align: center;
-    vertical-align: middle;
+  border: 1px solid #000;
+  padding: 4px 3px;
+  text-align: center;
+  vertical-align: middle;
 }
 
 .form1-risk-matrix th {
-    background-color: #80e8b8;
-    font-weight: bold;
+  background-color: #80e8b8;
+  font-weight: bold;
 }
 
 .form1-risk-matrix .matrix-title {
-    font-size: 10px;
-    line-height: 1.4;
+  font-size: 10px;
+  line-height: 1.4;
 }
 
 .form1-risk-matrix .matrix-probability {
-    width: 8%;
-    text-align: center;
-    vertical-align: middle;
+  width: 8%;
+  text-align: center;
+  vertical-align: middle;
 }
 
 .form1-risk-matrix tbody th:nth-child(2) {
-    width: 6%;
+  width: 6%;
 }
 
 .form1-risk-matrix tbody th:nth-child(3) {
-    width: 15%;
-    text-align: left;
+  width: 15%;
+  text-align: left;
 }
 
 .form1-risk-matrix td {
-    font-size: 9px;
-    font-weight: bold;
+  font-size: 9px;
+  font-weight: bold;
 }
 
 /* WARNA LEVEL RISIKO */
 .risk-blue {
-    background-color: #00a2f5 !important;
+  background-color: #00a2f5 !important;
 }
 
 .risk-green {
-    background-color: #70ad47 !important;
+  background-color: #70ad47 !important;
 }
 
 .risk-yellow {
-    background-color: #ffff00 !important;
+  background-color: #ffff00 !important;
 }
 
 .risk-orange {
-    background-color: #ff9900 !important;
+  background-color: #ff9900 !important;
 }
 
 .risk-red {
-    background-color: #ff0000 !important;
+  background-color: #ff0000 !important;
 }
-
 
 /* =========================================
    FORM 1 - SELERA RISIKO
 ========================================= */
 
 .form1-risk-appetite {
-    margin-top: 8px;
-    font-size: 9px;
+  margin-top: 8px;
+  font-size: 9px;
 }
 
 .risk-appetite-text {
-    margin-left: 8px;
-    line-height: 1.5;
+  margin-left: 8px;
+  line-height: 1.5;
 }
-
 
 /* =========================================
    FORM 1 - TABEL LEVEL RISIKO
 ========================================= */
 
 .form1-risk-level-section {
-    margin-top: 10px;
+  margin-top: 10px;
 }
 
 .form1-risk-level-title {
-    font-weight: bold;
-    margin-bottom: 3px;
-    font-size: 10px;
+  font-weight: bold;
+  margin-bottom: 3px;
+  font-size: 10px;
 }
 
 .form1-risk-level-table {
-    width: 100%;
-    table-layout: fixed;
-    border-collapse: collapse;
-    font-size: 9px;
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: collapse;
+  font-size: 9px;
 }
 
 .form1-risk-level-table th,
 .form1-risk-level-table td {
-    border: 1px solid #000;
-    padding: 5px 4px;
-    text-align: center;
-    vertical-align: middle;
+  border: 1px solid #000;
+  padding: 5px 4px;
+  text-align: center;
+  vertical-align: middle;
 }
 
 .form1-risk-level-table th {
-    background-color: #80e8b8;
-    font-weight: bold;
+  background-color: #80e8b8;
+  font-weight: bold;
 }
 
 .form1-risk-level-table td:first-child {
-    font-weight: bold;
+  font-weight: bold;
 }
 
 .form1-risk-level-table tr {
-    page-break-inside: avoid;
-    break-inside: avoid;
+  page-break-inside: avoid;
+  break-inside: avoid;
 }
 /* =========================================
    FORM 2 - IDENTIFIKASI RISIKO
@@ -822,12 +775,6 @@ max-width: calc(100% - 27px) !important;
   font-size: 13px;
   font-weight: bold;
   transform: translateY(-5px);
-}
-
-/* Garis bawah header */
-.form2-print .header-line {
-  margin-top: 0;
-  margin-bottom: 5px;
 }
 
 /* Informasi identitas Form 2 */
@@ -1131,18 +1078,6 @@ max-width: calc(100% - 27px) !important;
   white-space: nowrap;
 }
 
-.form2-print .header-line,
-.form3-print .header-line,
-.form4-print .header-line {
-  display: block !important;
-  width: 100%;
-  height: 0;
-  border: none !important;
-  border-top: 1.5px solid #000 !important;
-  margin: 7px 0 10px !important;
-  padding: 0 !important;
-}
-
 /* Identitas laporan */
 .form2-print .report-meta,
 .form3-print .report-meta {
@@ -1222,80 +1157,818 @@ max-width: calc(100% - 27px) !important;
 ========================================= */
 
 .form4-print .report-header {
-    width: 100%;
-    margin: 0;
-    padding: 0;
+  width: 100%;
+  margin: 0;
+  padding: 0;
 }
 
 .form4-print .header-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin: 0;
-    padding: 0;
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0;
+  padding: 0;
 }
 
 .form4-print .header-table td {
-    border: none !important;
-    padding: 0 !important;
-    vertical-align: middle;
+  border: none !important;
+  padding: 0 !important;
+  vertical-align: middle;
 }
 
 .form4-print .brand-cell {
-    width: 50%;
-    text-align: left;
+  width: 50%;
+  text-align: left;
 }
 
 .form4-print .title-cell {
-    width: 50%;
-    text-align: right;
-    font-size: 14px !important;
-    font-weight: bold;
-    white-space: nowrap;
+  width: 50%;
+  text-align: right;
+  font-size: 14px !important;
+  font-weight: bold;
+  white-space: nowrap;
 }
 
 .form4-print .bps-brand-image {
-    width: 155px;
-    height: auto;
-}
-
-/* Garis header */
-.form4-print .header-line {
-    display: block !important;
-    width: 100%;
-    height: 0;
-    border: none !important;
-    border-top: 1.5px solid #000 !important;
-    margin: 7px 0 10px !important;
-    padding: 0 !important;
+  width: 155px;
+  height: auto;
 }
 
 /* Identitas laporan */
 .form4-print .report-meta {
-    margin: 0 0 12px !important;
-    padding: 0;
+  margin: 0 0 12px !important;
+  padding: 0;
 }
 
 .form4-print .meta-table {
-    width: 100%;
-    border-collapse: collapse;
-    border-spacing: 0;
-    margin: 0;
+  width: 100%;
+  border-collapse: collapse;
+  border-spacing: 0;
+  margin: 0;
 }
 
 .form4-print .meta-table td {
-    border: none !important;
-    padding: 2px 0 !important;
-    font-size: 10.5px !important;
-    line-height: 1.25 !important;
-    vertical-align: middle;
+  border: none !important;
+  padding: 2px 0 !important;
+  font-size: 10.5px !important;
+  line-height: 1.25 !important;
+  vertical-align: middle;
 }
 
 .form4-print .meta-label {
-    width: 180px;
-    font-weight: bold;
+  width: 180px;
+  font-weight: bold;
 }
 
 .form4-print .meta-separator {
-    width: 20px;
-    text-align: center;
+  width: 20px;
+  text-align: center;
+}
+
+/* =========================================
+   FORM 1 - FONT TIMES NEW ROMAN
+========================================= */
+
+.form1-print,
+.form1-print * {
+  font-family: "Times New Roman", Times, serif !important;
+  color: #000;
+}
+
+/* Ukuran dasar dokumen */
+.form1-print .report-section {
+  font-size: 11pt !important;
+  line-height: 1.15 !important;
+}
+
+/* Header laporan */
+.form1-print .title-cell {
+  font-family: "Times New Roman", Times, serif !important;
+  font-size: 11pt !important;
+  font-weight: bold !important;
+}
+
+/* Identitas laporan */
+.form1-print .meta-table td {
+  font-size: 11pt !important;
+}
+
+/* Judul bagian I, II, III */
+.form1-print .form1-section-number,
+.form1-print .form1-section-title {
+  font-size: 11pt !important;
+  font-weight: bold !important;
+}
+
+/* Judul subbagian */
+.form1-print .form1-subsection-title {
+  font-size: 11pt !important;
+  font-weight: bold !important;
+}
+
+/* Judul Pemilik dan Pengelola Risiko */
+.form1-print .form1-role-title,
+.form1-print .form1-letter {
+  font-size: 11pt !important;
+}
+
+/* Isi informasi struktur organisasi */
+.form1-print .form1-context-table td {
+  font-size: 11pt !important;
+  line-height: 1.15 !important;
+}
+
+/* Tabel proses bisnis dan tabel lainnya */
+.form1-print .form1-table th,
+.form1-print .form1-table td {
+  font-size: 10pt !important;
+  line-height: 1.2 !important;
+}
+
+/* Tabel analisis */
+.form1-print .form1-analysis-table th,
+.form1-print .form1-analysis-table td,
+.form1-print .form1-criteria-table th,
+.form1-print .form1-criteria-table td {
+  font-size: 9pt !important;
+}
+
+/* Matriks risiko */
+.form1-print .form1-risk-matrix th,
+.form1-print .form1-risk-matrix td {
+  font-size: 9pt !important;
+}
+
+/* Selera risiko dan tabel level risiko */
+.form1-print .form1-risk-appetite,
+.form1-print .risk-appetite-text,
+.form1-print .form1-risk-level-title,
+.form1-print .form1-risk-level-table th,
+.form1-print .form1-risk-level-table td {
+  font-size: 10pt !important;
+}
+
+/* =========================================
+   FORM 1 - SPASI STRUKTUR ORGANISASI
+========================================= */
+
+/* Jarak antarbagian */
+.form1-print .form1-context-table {
+  border-collapse: collapse !important;
+  border-spacing: 0 !important;
+}
+
+/* Rapatkan baris tabel konteks */
+.form1-print .form1-context-table td {
+  padding-top: 1px !important;
+  padding-bottom: 1px !important;
+}
+
+/* Judul Struktur Organisasi */
+.form1-print .form1-subsection-title {
+  padding-top: 4px !important;
+  padding-bottom: 3px !important;
+}
+
+/* Pemilik dan Pengelola Risiko */
+.form1-print .form1-role-title {
+  padding-top: 1px !important;
+  padding-bottom: 1px !important;
+}
+
+/* Hilangkan jarak berlebihan sebelum Proses Bisnis */
+.form1-print .form1-context-table .form1-subsection-title {
+  line-height: 1.2 !important;
+}
+
+/* =========================================
+   HEADER SEMUA FORM - TANPA GARIS
+   Logo di atas, judul di tengah bawah logo
+========================================= */
+
+.report-header {
+    width: 100% !important;
+    margin: 0 0 12px !important;
+    padding: 0 !important;
+}
+
+/* Logo tetap di kiri atas */
+.report-header .brand-cell {
+    width: 100% !important;
+    text-align: left !important;
+    padding: 0 !important;
+}
+
+.report-header .bps-brand-image {
+    width: 155px !important;
+    height: auto !important;
+    transform: none !important;
+}
+
+/* Judul laporan */
+.report-header .report-title {
+    width: 100% !important;
+    display: block !important;
+    text-align: center !important;
+    font-size: 14px !important;
+    font-weight: bold !important;
+    line-height: 1.3 !important;
+    margin-top: 8px !important;
+    margin-bottom: 12px !important;
+    padding: 0 !important;
+}
+
+/* =========================================
+   FORM 1 - FINAL TYPOGRAPHY & SPACING
+========================================= */
+
+/* Jarak judul subbagian */
+.form1-print .form1-subsection-title {
+  padding: 6px 0 5px !important;
+  font-size: 11pt !important;
+  font-weight: bold !important;
+  line-height: 1.3 !important;
+}
+
+/* Tabel konteks */
+.form1-print .form1-context-table {
+  border-collapse: collapse !important;
+  border-spacing: 0 !important;
+}
+
+/* Isi tabel konteks */
+.form1-print .form1-context-table td {
+  font-size: 11pt !important;
+  line-height: 1.15 !important;
+  padding-top: 1px !important;
+  padding-bottom: 1px !important;
+}
+
+/* Jarak khusus sebelum bagian II Konteks */
+.form1-print .form1-context-main {
+  margin-top: 7px !important;
+}
+
+/* Pemilik dan Pengelola Risiko */
+.form1-print .form1-role-title {
+  padding-top: 2px !important;
+  padding-bottom: 2px !important;
+}
+
+/* =========================================
+   FORM 1 - FIX HEADER TABEL SAAT PINDAH HALAMAN
+========================================= */
+
+/* Header tabel tetap utuh dan tidak terpisah dari isi */
+.form1-print table thead {
+  display: table-header-group;
+  page-break-inside: avoid;
+  break-inside: avoid;
+  page-break-after: avoid;
+  break-after: avoid;
+}
+
+/* Baris header tidak boleh terpotong */
+.form1-print table thead tr {
+  page-break-inside: avoid;
+  break-inside: avoid;
+}
+
+/* Baris data pertama harus mengikuti header */
+.form1-print table tbody tr:first-child {
+  page-break-before: avoid;
+  break-before: avoid;
+}
+
+/* Baris isi tabel jangan terpotong antarhalaman */
+.form1-print table tbody tr {
+  page-break-inside: avoid;
+  break-inside: avoid;
+}
+
+/* Judul pemangku kepentingan harus mengikuti tabel */
+.form1-print .form1-stakeholder-caption {
+  caption-side: top;
+  text-align: left;
+  font-family: "Times New Roman", serif;
+  font-size: 12pt;
+  font-weight: bold;
+  padding: 0 0 6px 25px;
+  page-break-after: avoid;
+  break-after: avoid;
+}
+
+/* =========================================
+   FORM 1 - JUDUL DAN TABEL TETAP BERSAMA
+========================================= */
+
+.form1-print .form1-stakeholder-caption {
+  caption-side: top;
+  text-align: left;
+  font-family: "Times New Roman", serif;
+  font-size: 12pt;
+  font-weight: bold;
+  text-align: left;
+  padding: 0 0 6px 25px;
+  page-break-after: avoid;
+}
+
+/* ==================================================
+   FORM 1 - FINAL LAYOUT
+   Konsistensi font, jarak, tabel, dan analisis
+================================================== */
+
+/* Font dokumen */
+.form1-print,
+.form1-print * {
+  font-family: "Times New Roman", Times, serif !important;
+  color: #000;
+}
+
+/* Teks isi dokumen */
+.form1-print .form1-context-table td {
+  font-size: 11pt !important;
+  line-height: 1.2 !important;
+}
+
+/* Judul bagian */
+.form1-print .form1-section-number,
+.form1-print .form1-section-title {
+  font-size: 12pt !important;
+  font-weight: bold !important;
+}
+
+/* Judul subbagian */
+.form1-print .form1-subsection-title {
+  font-size: 11pt !important;
+  font-weight: bold !important;
+  line-height: 1.2 !important;
+  padding: 6px 0 5px !important;
+}
+
+/* Judul pemilik/pengelola risiko */
+.form1-print .form1-role-title {
+  font-size: 11pt !important;
+  line-height: 1.2 !important;
+}
+
+/* Tabel Form 1: ukuran font diseragamkan */
+.form1-print .form1-table th,
+.form1-print .form1-table td,
+.form1-print .form1-stakeholder-table th,
+.form1-print .form1-stakeholder-table td,
+.form1-print .form1-regulation-table th,
+.form1-print .form1-regulation-table td,
+.form1-print .form1-analysis-table th,
+.form1-print .form1-analysis-table td {
+  font-size: 10pt !important;
+  line-height: 1.2 !important;
+}
+
+/* Jarak tabel pemangku kepentingan */
+.form1-print .form1-stakeholder-table {
+  margin-top: 0 !important;
+  margin-bottom: 7px !important;
+}
+
+/* Beri jarak antara tabel nomor 3 dan judul nomor 4 */
+.form1-print .form1-stakeholder-table + .form1-context-table {
+  margin-top: 5px !important;
+}
+
+/* Tabel peraturan */
+.form1-print .form1-regulation-table {
+  margin-top: 0 !important;
+  margin-bottom: 9px !important;
+}
+
+/* Jarak sebelum bagian analisis SWOT dan PESTLE */
+.form1-print .form1-regulation-table + .form1-context-table {
+  margin-top: 5px !important;
+}
+
+/* Judul dan pengantar analisis */
+.form1-print .form1-context-table .form1-analysis-description {
+  font-size: 10pt !important;
+  line-height: 1.3 !important;
+  padding-top: 2px !important;
+  padding-bottom: 3px !important;
+}
+
+/* Tabel PESTLE dan SWOT */
+.form1-print .form1-analysis-table {
+  width: calc(100% - 25px) !important;
+  margin-left: 25px !important;
+  margin-right: 0 !important;
+  margin-top: 3px !important;
+  margin-bottom: 9px !important;
+  table-layout: fixed !important;
+  border-collapse: collapse !important;
+}
+
+/* Sel tabel analisis */
+.form1-print .form1-analysis-table th,
+.form1-print .form1-analysis-table td {
+  padding: 5px 6px !important;
+  vertical-align: top !important;
+  line-height: 1.3 !important;
+}
+
+/* Kolom nama dimensi PESTLE dan SWOT */
+.form1-print .form1-analysis-table .form1-analysis-label {
+  width: 18% !important;
+  background-color: #80edb5 !important;
+  font-weight: bold !important;
+  text-align: left !important;
+  vertical-align: top !important;
+  padding: 6px !important;
+}
+
+/* Isi analisis */
+.form1-print .form1-analysis-content {
+  font-size: 10pt !important;
+  line-height: 1.35 !important;
+  padding: 0 !important;
+  text-align: left !important;
+}
+
+/* Jaga judul analisis tidak terlalu menempel */
+.form1-print .form1-context-table + .form1-analysis-table {
+  margin-top: 3px !important;
+}
+
+/* Jarak antarbaris tabel */
+.form1-print .form1-analysis-table tr {
+  page-break-inside: avoid;
+}
+
+/* Tabel tetap rapi saat berpindah halaman */
+.form1-print .form1-stakeholder-table,
+.form1-print .form1-regulation-table,
+.form1-print .form1-analysis-table {
+  border-collapse: collapse !important;
+}
+
+/* =========================================
+   FORM 1 - POSISI PEMILIK & PENGELOLA RISIKO
+========================================= */
+
+/* Judul Pemilik Risiko dan Pengelola Risiko */
+.form1-print .form1-context-main .form1-role-title {
+  text-align: left !important;
+  padding-left: 0 !important;
+  padding-top: 2px !important;
+  padding-bottom: 2px !important;
+}
+
+/* Posisi label Nama, NIP, Jabatan */
+.form1-print .form1-context-main .form1-label {
+  text-align: left !important;
+  padding-left: 0 !important;
+}
+
+/* Pastikan isi informasi sejajar */
+.form1-print .form1-context-main td {
+  vertical-align: top !important;
+}
+
+/* =========================================
+   FORM 1 - ANALISIS SWOT DAN PESTLE
+========================================= */
+
+.form1-print .form1-analysis-section {
+  width: calc(100% - 25px);
+  margin-left: 25px;
+  margin-right: 0;
+  font-family: "Times New Roman", Times, serif !important;
+  font-size: 11pt !important;
+  line-height: 1.3 !important;
+  color: #000;
+}
+
+/* Judul nomor 5 */
+.form1-print .form1-analysis-heading {
+  font-size: 11pt !important;
+  font-weight: bold !important;
+  line-height: 1.3 !important;
+  margin: 8px 0 7px !important;
+  padding: 0 !important;
+}
+
+/* Judul PESTLE dan SWOT */
+.form1-print .form1-analysis-subheading {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  font-size: 11pt !important;
+  font-weight: bold !important;
+  line-height: 1.3 !important;
+  margin: 5px 0 4px !important;
+}
+
+/* Deskripsi */
+.form1-print .form1-analysis-description {
+  font-size: 10pt !important;
+  font-weight: normal !important;
+  font-style: normal !important;
+  line-height: 1.3 !important;
+  margin: 0 0 4px 25px !important;
+  padding: 0 !important;
+}
+
+/* Tahap pelaksanaan */
+.form1-print .form1-analysis-steps {
+  font-size: 10pt !important;
+  line-height: 1.35 !important;
+  margin: 3px 0 7px 25px !important;
+  padding: 0 !important;
+}
+
+.form1-print .form1-analysis-steps strong {
+  font-weight: bold !important;
+}
+
+.form1-print .form1-analysis-steps ol {
+  margin: 2px 0 0 20px !important;
+  padding: 0 !important;
+}
+
+.form1-print .form1-analysis-steps li {
+  padding: 0 !important;
+  margin: 0 0 2px 0 !important;
+}
+
+/* Tabel PESTLE dan SWOT */
+.form1-print .form1-analysis-section .form1-analysis-table {
+  width: 100% !important;
+  margin: 4px 0 10px !important;
+  border-collapse: collapse !important;
+  table-layout: fixed !important;
+  font-family: "Times New Roman", Times, serif !important;
+}
+
+/* Sel tabel */
+.form1-print .form1-analysis-section .form1-analysis-table th,
+.form1-print .form1-analysis-section .form1-analysis-table td {
+  border: 1px solid #000 !important;
+  padding: 5px 7px !important;
+  font-family: "Times New Roman", Times, serif !important;
+  font-size: 10pt !important;
+  line-height: 1.3 !important;
+  vertical-align: top !important;
+}
+
+/* Kolom dimensi */
+.form1-print .form1-analysis-section .form1-analysis-label {
+  background-color: #80edb5 !important;
+  font-weight: bold !important;
+  font-style: normal !important;
+  text-align: left !important;
+  vertical-align: middle !important;
+}
+
+/* Isi analisis */
+.form1-print .form1-analysis-section .form1-analysis-content {
+  font-size: 10pt !important;
+  font-weight: normal !important;
+  font-style: normal !important;
+  line-height: 1.35 !important;
+  padding: 0 !important;
+  text-align: left !important;
+}
+
+/* Jarak sebelum SWOT */
+.form1-print .form1-analysis-section .form1-swot-heading {
+  margin-top: 10px !important;
+}
+
+/* Hindari baris terpotong */
+.form1-print .form1-analysis-section .form1-analysis-table tr {
+  page-break-inside: avoid;
+  break-inside: avoid;
+}
+
+/* =========================================
+   FORM 1 - PEMISAHAN JUDUL STRUKTUR & PROSES
+========================================= */
+
+/* Khusus judul nomor 1 */
+.form1-print .form1-context-main .form1-structure-title-row td {
+    padding-top: 6px !important;
+    padding-bottom: 5px !important;
+    line-height: 1.2 !important;
+}
+
+/* Nomor 2 tetap pada posisi semula */
+.form1-print .form1-context-main .form1-process-title-row td {
+    padding-top: 6px !important;
+    padding-bottom: 5px !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    line-height: 1.2 !important;
+}
+
+/* FIX KOLOM KONTEKS FORM 1 */
+.form1-print .form1-context-main {
+    width: 100% !important;
+    table-layout: fixed !important;
+    border-collapse: collapse !important;
+}
+
+/* Jarak antarbaris struktur */
+.form1-print .form1-context-main td {
+    vertical-align: top !important;
+}
+
+/* =========================================
+   FORM 1 - POSISI KONTEKS
+========================================= */
+
+.form1-print .form1-context-main {
+    width: 100% !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    border-collapse: collapse !important;
+    border-spacing: 0 !important;
+    table-layout: auto !important;
+}
+
+/* II dan Konteks */
+.form1-print .form1-context-main .form1-section-number {
+    width: 30px !important;
+    padding: 2px 0 !important;
+    white-space: nowrap !important;
+    text-align: left !important;
+}
+
+.form1-print .form1-context-main .form1-section-title {
+    padding: 2px 0 !important;
+    text-align: left !important;
+}
+
+/* Judul nomor 1 dan 2 */
+.form1-print .form1-context-main .form1-subsection-title {
+    padding: 4px 0 !important;
+    text-align: left !important;
+}
+
+/* Huruf a dan b */
+.form1-print .form1-context-main .form1-letter {
+    width: 30px !important;
+    padding: 1px 0 !important;
+    text-align: left !important;
+}
+
+/* Pemilik dan Pengelola Risiko */
+.form1-print .form1-context-main .form1-role-title {
+    padding: 1px 0 !important;
+    text-align: left !important;
+}
+
+/* Nama, NIP, Jabatan */
+.form1-print .form1-context-main .form1-label {
+    padding: 1px 0 !important;
+    white-space: nowrap !important;
+}
+
+/* Titik dua */
+.form1-print .form1-context-main .form1-separator {
+    text-align: center !important;
+    padding: 1px 0 !important;
+}
+
+
+/* =========================================
+   FORM 1 - LINGKUP
+   Disamakan dengan struktur Konteks
+========================================= */
+
+.form1-print .form1-context-scope {
+    width: 100% !important;
+    margin: 0 !important;
+    border-collapse: collapse !important;
+    border-spacing: 0 !important;
+    table-layout: auto !important;
+}
+
+.form1-print .form1-context-scope td {
+    font-family: "Times New Roman", Times, serif !important;
+    font-size: 11pt !important;
+    line-height: 1.2 !important;
+    padding-top: 1px !important;
+    padding-bottom: 1px !important;
+    vertical-align: top !important;
+}
+
+.form1-print .form1-context-scope .form1-section-number,
+.form1-print .form1-context-scope .form1-section-title {
+    font-weight: bold !important;
+}
+
+.form1-print .form1-context-scope .form1-label {
+    white-space: nowrap !important;
+    text-align: left !important;
+}
+
+.form1-print .form1-context-scope .form1-separator {
+    text-align: left !important;
+    padding-left: 0 !important;
+}
+
+/* =========================================
+   FORM 1 - SEJAJARKAN LINGKUP DAN KONTEKS
+========================================= */
+
+.form1-print .form1-context-scope .form1-section-number {
+    width: 30px !important;
+    padding: 2px 0 !important;
+    white-space: nowrap !important;
+    text-align: left !important;
+}
+
+.form1-print .form1-context-scope .form1-section-title {
+    padding: 2px 0 !important;
+    text-align: left !important;
+}
+
+
+/* =========================================
+   FORM 1 - FINAL FIX ANALISIS SWOT & PESTLE
+========================================= */
+
+/* Posisi keseluruhan bagian nomor 5 */
+.form1-print .form1-analysis-section {
+    width: calc(100% - 25px) !important;
+    margin-left: 25px !important;
+    margin-right: 0 !important;
+    box-sizing: border-box !important;
+}
+
+/* Judul nomor 5 */
+.form1-print .form1-analysis-section .form1-analysis-heading {
+    text-align: left !important;
+    margin-left: 0 !important;
+    padding-left: 0 !important;
+}
+
+/* Tabel PESTLE dan SWOT */
+.form1-print .form1-analysis-section .form1-analysis-table {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 4px 0 10px !important;
+    table-layout: fixed !important;
+    border-collapse: collapse !important;
+    box-sizing: border-box !important;
+}
+
+/* Seluruh isi tabel */
+.form1-print .form1-analysis-section .form1-analysis-table th,
+.form1-print .form1-analysis-section .form1-analysis-table td {
+    border: 1px solid #000 !important;
+    padding: 5px 7px !important;
+    font-size: 10pt !important;
+    line-height: 1.3 !important;
+    box-sizing: border-box !important;
+    overflow-wrap: anywhere !important;
+    word-wrap: break-word !important;
+}
+
+/* Kolom hijau: Political, Economic, Strength, dll. */
+.form1-print .form1-analysis-section .form1-analysis-label {
+    width: 18% !important;
+    background-color: #80edb5 !important;
+    text-align: center !important;
+    vertical-align: middle !important;
+    font-weight: bold !important;
+    padding: 6px 4px !important;
+}
+
+/* Kolom uraian */
+.form1-print .form1-analysis-section .form1-analysis-content {
+    width: 100% !important;
+    padding: 0 !important;
+    text-align: left !important;
+    vertical-align: top !important;
+    line-height: 1.35 !important;
+    overflow-wrap: anywhere !important;
+}
+
+/* Jarak sebelum analisis SWOT */
+.form1-print .form1-analysis-section .form1-swot-heading {
+    margin-top: 10px !important;
+}
+
+/* Baris tabel tidak terpotong */
+.form1-print .form1-analysis-section .form1-analysis-table tr {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+}
+
+/* Geser karakter titik dua pada Lingkup saja */
+.form1-print .form1-context-scope td.form1-separator {
+    text-align: left !important;
+    padding-left: 0 !important;
+    text-indent: -100px !important;
+    position: static !important;
+    left: auto !important;
+    transform: none !important;
 }

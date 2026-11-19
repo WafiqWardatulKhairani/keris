@@ -16,17 +16,20 @@
 <body>
     <?php
     $formTitle = match ($form) {
-        'form1' => 'FORM 1 - PENETAPAN KONTEKS',
-        'form2' => 'FORM 2 - IDENTIFIKASI RISIKO',
-        'form3' => 'FORM 3 - RENCANA PENANGANAN',
-        'form4' => 'FORM 4 - PELAPORAN RISIKO',
+        'form1' => 'FORMULIR LINGKUP, KONTEKS, KRITERIA MANAJEMEN RISIKO										',
+        'form2' => 'FORMULIR PENILAIAN RISIKO															',
+        'form3' => 'FORMULIR RENCANA TINDAK PENANGANAN RISIKO								',
+        'form4' => 'FORMULIR PEMANTAUAN RISIKO																	',
         default => 'LAPORAN RISIKO',
     };
     ?>
     <div class="report-wrapper <?= in_array($form, ['form1', 'form2', 'form3', 'form4']) ? $form . '-print' : '' ?>"> <?= view('pelaporan_risiko/pdf/header', [
                                                                                                                             'formTitle' => $formTitle
                                                                                                                         ]) ?>
-        <?= view('pelaporan_risiko/pdf/report_info') ?>
+        <?php if ($form !== 'form1'): ?>
+            <?= view('pelaporan_risiko/pdf/report_info') ?>
+        <?php endif; ?>
+
         <?php if ($form === 'form1'): ?>
             <?= view('pelaporan_risiko/pdf/sections/form1_konteks') ?>
         <?php elseif ($form === 'form2'): ?>
