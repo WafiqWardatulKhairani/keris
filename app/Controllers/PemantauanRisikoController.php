@@ -122,76 +122,88 @@ class PemantauanRisikoController extends BaseController
         return in_array((string) $row->id_tim, array_map('strval', $userTim), true);
     }
 
+
     public function updateKeterjadian()
     {
         $idIdentifikasi = $this->request->getPost('id_identifikasi');
         $keterjadian    = $this->request->getPost('keterjadian_risiko');
         $jumlah         = $this->request->getPost('jumlah_keterjadian');
+        $triwulan       = $this->request->getPost('triwulan');
 
-        // Validasi ID risiko
+        // Ambil tahun dari konteks global
+        $tahun = session()->get('global_tahun');
+
+        // Validasi input
         if (
-            !$idIdentifikasi ||
-            !ctype_digit((string) $idIdentifikasi)
+            !is_numeric($idIdentifikasi) ||
+            !in_array($keterjadian, ['T', 'TT', 'BT'], true) ||
+            !is_numeric($triwulan) ||
+            !in_array((int) $triwulan, [1, 2, 3, 4], true) ||
+            !is_numeric($jumlah) ||
+            (int) $jumlah < 0 ||
+            empty($tahun)
         ) {
-            return $this->response->setStatusCode(400)->setJSON([
+            return $this->response->setJSON([
                 'success' => false,
-                'message' => 'ID risiko tidak valid.'
+                'message' => 'Data keterjadian tidak valid.'
             ]);
         }
 
-        // Validasi status keterjadian
-        if (!in_array($keterjadian, ['T', 'TT', 'BT'], true)) {
-            return $this->response->setStatusCode(400)->setJSON([
-                'success' => false,
-                'message' => 'Status keterjadian tidak valid.'
-            ]);
-        }
+        $idIdentifikasi = (int) $idIdentifikasi;
+        $triwulan       = (int) $triwulan;
+        $tahun          = (int) $tahun;
+        $jumlah         = $keterjadian === 'T' ? (int) $jumlah : 0;
 
-        // Validasi jumlah
-        if (
-            $jumlah === null ||
-            filter_var($jumlah, FILTER_VALIDATE_INT) === false ||
-            (int) $jumlah < 0
-        ) {
-            return $this->response->setStatusCode(400)->setJSON([
-                'success' => false,
-                'message' => 'Jumlah keterjadian harus berupa bilangan bulat minimal 0.'
-            ]);
-        }
-
-        // Pastikan operator hanya mengubah risiko timnya
+        // Pastikan risiko termasuk tim yang boleh diakses
         if (!$this->validateTimAccessByRisiko($idIdentifikasi)) {
-            return $this->response->setStatusCode(403)->setJSON([
+            return $this->response->setJSON([
                 'success' => false,
-                'message' => 'Kamu tidak memiliki akses untuk mengubah risiko ini.'
+                'message' => 'Anda tidak memiliki akses ke risiko ini.'
             ]);
         }
 
-        // Jumlah hanya berlaku jika risiko berstatus Terjadi
-        $jumlah = $keterjadian === 'T' ? (int) $jumlah : 0;
+        $table = $this->db->table('pemantauan_keterjadian_risiko');
 
-        $updated = $this->db->table('identifikasi_risiko')
+        // Cek apakah data untuk risiko, tahun, dan triwulan ini sudah ada
+        $existing = $table
             ->where('id_identifikasi', $idIdentifikasi)
-            ->update([
-                'keterjadian_risiko' => $keterjadian,
-                'jumlah_keterjadian' => $jumlah,
-            ]);
+            ->where('tahun', $tahun)
+            ->where('triwulan', $triwulan)
+            ->get()
+            ->getRowArray();
 
-        if (!$updated) {
-            return $this->response->setStatusCode(500)->setJSON([
-                'success' => false,
-                'message' => 'Gagal menyimpan keterjadian risiko.'
-            ]);
+        $data = [
+            'keterjadian_risiko' => $keterjadian,
+            'jumlah_keterjadian' => $jumlah,
+            'updated_at'         => date('Y-m-d H:i:s'),
+        ];
+
+        if ($existing) {
+            $table
+                ->where('id_identifikasi', $idIdentifikasi)
+                ->where('tahun', $tahun)
+                ->where('triwulan', $triwulan)
+                ->update($data);
+        } else {
+            $data['id_identifikasi'] = $idIdentifikasi;
+            $data['tahun']           = $tahun;
+            $data['triwulan']        = $triwulan;
+            $data['created_at']      = date('Y-m-d H:i:s');
+
+            $table->insert($data);
         }
 
         return $this->response->setJSON([
             'success' => true,
-            'message' => 'Keterjadian risiko berhasil disimpan.',
+            'message' => 'Data keterjadian berhasil disimpan.',
             'data' => [
-                'keterjadian_risiko' => $keterjadian,
+                'id_identifikasi'    => $idIdentifikasi,
+                'keterjadian_risiko'  => $keterjadian,
                 'jumlah_keterjadian' => $jumlah,
+                'tahun'              => $tahun,
+                'triwulan'           => $triwulan
             ],
-            'csrfHash' => csrf_hash(),
+            'csrfHash' => csrf_hash()
         ]);
     }
 
@@ -200,6 +212,7 @@ class PemantauanRisikoController extends BaseController
         $globalTahun    = session('global_tahun');
         $globalTim      = session('global_id_tim');
         $globalKegiatan = session('global_id_kegiatan');
+        $triwulan       = max(1, min(4, (int) ($this->request->getGet('triwulan') ?? 1)));
 
         $perPage = max(1, (int) ($this->request->getGet('perPage') ?? 10));
         $page    = max(1, (int) ($this->request->getGet('page') ?? 1));
@@ -433,8 +446,29 @@ class PemantauanRisikoController extends BaseController
             $rows = $this->db->table('identifikasi_risiko ir')
                 ->select("
                 ir.id_identifikasi,
-                ir.keterjadian_risiko,
-                ir.jumlah_keterjadian,
+                COALESCE((
+                    SELECT pkr.keterjadian_risiko
+                    FROM pemantauan_keterjadian_risiko pkr
+                    WHERE pkr.id_identifikasi = ir.id_identifikasi
+                      AND pkr.tahun = " . (int) ($globalTahun ?? 0) . "
+                      AND pkr.triwulan = " . (int) $triwulan . "
+                    LIMIT 1
+                ), 'TT') AS keterjadian_risiko,
+                COALESCE((
+                    SELECT pkr.jumlah_keterjadian
+                    FROM pemantauan_keterjadian_risiko pkr
+                    WHERE pkr.id_identifikasi = ir.id_identifikasi
+                      AND pkr.tahun = " . (int) ($globalTahun ?? 0) . "
+                      AND pkr.triwulan = " . (int) $triwulan . "
+                    LIMIT 1
+                ), 0) AS jumlah_keterjadian,
+                COALESCE((
+                    SELECT SUM(pkr.jumlah_keterjadian)
+                    FROM pemantauan_keterjadian_risiko pkr
+                    WHERE pkr.id_identifikasi = ir.id_identifikasi
+                      AND pkr.tahun = " . (int) ($globalTahun ?? 0) . "
+                      AND pkr.keterjadian_risiko = 'T'
+                ), 0) AS akumulasi_tahunan,
                 ir.pernyataan_risiko,
                 ir.penyebab_risiko,
                 ir.dampak_risiko,
@@ -543,7 +577,8 @@ class PemantauanRisikoController extends BaseController
                         'id_identifikasi'   => $id,
                         'id_tim'            => $row['id_tim'],
                         'keterjadian_risiko' => $row['keterjadian_risiko'] ?? 'TT',
-                        'jumlah_keterjadian' => $row['jumlah_keterjadian'] ?? 0,
+                        'jumlah_keterjadian' => (int) ($row['jumlah_keterjadian'] ?? 0),
+                        'akumulasi_tahunan'  => (int) ($row['akumulasi_tahunan'] ?? 0),
                         'pernyataan_risiko' => $row['pernyataan_risiko'],
                         'penyebab_risiko'   => $row['penyebab_risiko'],
                         'dampak_risiko'     => $row['dampak_risiko'],
@@ -652,6 +687,7 @@ class PemantauanRisikoController extends BaseController
             'to'                 => $to,
             'perPage'             => $perPage,
             'filter'              => $filter,
+            'triwulan'            => $triwulan,
             'pager' => [
                 'currentPage' => $page,
                 'totalPages'  => $totalPages,
@@ -686,6 +722,7 @@ class PemantauanRisikoController extends BaseController
         $globalTahun    = session('global_tahun');
         $globalTim      = session('global_id_tim');
         $globalKegiatan = session('global_id_kegiatan');
+        $triwulan       = max(1, min(4, (int) ($this->request->getGet('triwulan') ?? 1)));
 
         // Pagination berdasarkan risiko
         $perPage = max(1, (int) ($this->request->getGet('perPage') ?? 10));
@@ -905,8 +942,29 @@ class PemantauanRisikoController extends BaseController
             $rows = $db->table('identifikasi_risiko ir')
                 ->select("
                 ir.id_identifikasi,
-                ir.keterjadian_risiko,
-                ir.jumlah_keterjadian,
+                COALESCE((
+                    SELECT pkr.keterjadian_risiko
+                    FROM pemantauan_keterjadian_risiko pkr
+                    WHERE pkr.id_identifikasi = ir.id_identifikasi
+                      AND pkr.tahun = " . (int) ($globalTahun ?? 0) . "
+                      AND pkr.triwulan = " . (int) $triwulan . "
+                    LIMIT 1
+                ), 'TT') AS keterjadian_risiko,
+                COALESCE((
+                    SELECT pkr.jumlah_keterjadian
+                    FROM pemantauan_keterjadian_risiko pkr
+                    WHERE pkr.id_identifikasi = ir.id_identifikasi
+                      AND pkr.tahun = " . (int) ($globalTahun ?? 0) . "
+                      AND pkr.triwulan = " . (int) $triwulan . "
+                    LIMIT 1
+                ), 0) AS jumlah_keterjadian,
+                COALESCE((
+                    SELECT SUM(pkr.jumlah_keterjadian)
+                    FROM pemantauan_keterjadian_risiko pkr
+                    WHERE pkr.id_identifikasi = ir.id_identifikasi
+                      AND pkr.tahun = " . (int) ($globalTahun ?? 0) . "
+                      AND pkr.keterjadian_risiko = 'T'
+                ), 0) AS akumulasi_tahunan,
                 ir.pernyataan_risiko,
                 ir.penyebab_risiko,
                 ir.dampak_risiko,
@@ -1010,7 +1068,8 @@ class PemantauanRisikoController extends BaseController
                         'id_identifikasi'    => $id,
                         'id_tim'             => $row['id_tim'],
                         'keterjadian_risiko' => $row['keterjadian_risiko'] ?? 'TT',
-                        'jumlah_keterjadian' => $row['jumlah_keterjadian'] ?? 0,
+                        'jumlah_keterjadian' => (int) ($row['jumlah_keterjadian'] ?? 0),
+                        'akumulasi_tahunan'  => (int) ($row['akumulasi_tahunan'] ?? 0),
                         'pernyataan_risiko'  => $row['pernyataan_risiko'],
                         'penyebab_risiko'    => $row['penyebab_risiko'],
                         'dampak_risiko'      => $row['dampak_risiko'],
@@ -1104,6 +1163,7 @@ class PemantauanRisikoController extends BaseController
                 'total'       => $total,
             ],
             'filter' => $filter,
+            'triwulan' => $triwulan,
         ]);
     }
 

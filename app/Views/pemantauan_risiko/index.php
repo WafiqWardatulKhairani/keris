@@ -70,6 +70,23 @@
         </div>
     <?php endif; ?>
 
+    <input type="hidden" id="filterTriwulan" value="1">
+
+    <div class="triwulan-tabs">
+        <button type="button" class="active" data-triwulan="1">
+            Triwulan I
+        </button>
+        <button type="button" data-triwulan="2">
+            Triwulan II
+        </button>
+        <button type="button" data-triwulan="3">
+            Triwulan III
+        </button>
+        <button type="button" data-triwulan="4">
+            Triwulan IV
+        </button>
+    </div>
+
     <!-- TABLE -->
     <?= view('pemantauan_risiko/_table_section', [
         'grouped' => $grouped,

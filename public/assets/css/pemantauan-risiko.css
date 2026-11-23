@@ -610,3 +610,42 @@
     word-break: normal;
     overflow-wrap: break-word;
 }
+
+.triwulan-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.triwulan-tabs button {
+    flex: 1;
+    padding: 10px 14px;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    background: #fff;
+    color: #495057;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.triwulan-tabs button:hover {
+    background: #f0f5ff;
+    border-color: #2563eb;
+}
+
+.triwulan-tabs button.active {
+    background: #2563eb;
+    border-color: #2563eb;
+    color: #fff;
+}
+
+@media (max-width: 576px) {
+    .triwulan-tabs {
+        gap: 5px;
+    }
+
+    .triwulan-tabs button {
+        padding: 9px 4px;
+        font-size: 12px;
+    }
+}

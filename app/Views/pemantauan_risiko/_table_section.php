@@ -9,7 +9,7 @@
                         <th rowspan="2" class="rtp-th">Risiko</th>
                         <th rowspan="2" class="rtp-th text-center">Keterjadian Risiko</th>
                         <th rowspan="2" class="rtp-th text-center">Jumlah Keterjadian</th>
-                        <th rowspan="2" class="rtp-th text-center">Akumulasi</th>
+                        <th rowspan="2" class="rtp-th text-center">Akumulasi Tahunan</th>
                         <th rowspan="2" class="rtp-th">RTP</th>
                         <th colspan="2" class="rtp-th text-center">Target</th>
                         <th colspan="3" class="rtp-th text-center">Realisasi</th>
@@ -131,19 +131,15 @@
                                         </td>
                                     <?php endif; ?>
 
-                                    <!-- AKUMULASI TRIWULAN 4 -->
-                                    <td rowspan="<?= $rowspan ?>" class="text-center">
-                                        <input
-                                            type="number"
-                                            min="0"
-                                            class="form-control form-control-sm pr-jumlah-keterjadian"
-                                            data-id-identifikasi="<?= esc($item['id_identifikasi']) ?>"
-                                            value="<?= esc($item['jumlah_keterjadian'] ?? 0) ?>"
-                                            placeholder="0"
-                                            <?= ($item['keterjadian_risiko'] ?? 'TT') !== 'T' ? 'disabled' : '' ?>
-                                            <?= !in_array(session('user_role'), ['admin', 'operator'], true) ? 'disabled' : '' ?>>
-                                    </td>
-
+                                    <!-- AKUMULASI TAHUNAN -->
+                                    <?php if ($isFirst): ?>
+                                        <!-- AKUMULASI TAHUNAN -->
+                                        <td rowspan="<?= $rowspan ?>" class="text-center">
+                                            <span class="fw-semibold">
+                                                <?= esc($item['akumulasi_tahunan'] ?? 0) ?>
+                                            </span>
+                                        </td>
+                                    <?php endif; ?>
 
                                     <!-- RTP -->
                                     <td>

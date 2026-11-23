@@ -451,22 +451,22 @@ function prResetResidu() {
    LOAD DETAIL
 ====================================================== */
 function prLoadDetail(idRtp) {
-    console.log("ID RTP YANG DIKLIK:", idRtp);
+  console.log("ID RTP YANG DIKLIK:", idRtp);
 
-    return fetch(PR_URL.detail(idRtp))
-        .then((r) => r.json())
-        .then((d) => {
-            console.log("HASIL DETAIL:", d);
-            console.log("ID PEMANTAUAN:", d.id_pemantauan);
+  return fetch(PR_URL.detail(idRtp))
+    .then((r) => r.json())
+    .then((d) => {
+      console.log("HASIL DETAIL:", d);
+      console.log("ID PEMANTAUAN:", d.id_pemantauan);
 
-            PR_CAN_EDIT = prCanEdit(d);
-            console.log("CAN EDIT:", PR_CAN_EDIT);
+      PR_CAN_EDIT = prCanEdit(d);
+      console.log("CAN EDIT:", PR_CAN_EDIT);
 
-            document.getElementById("prIdRtp").value = d.id_rtp;
-            prPopulateInfo(d);
+      document.getElementById("prIdRtp").value = d.id_rtp;
+      prPopulateInfo(d);
 
-            return d;
-        });
+      return d;
+    });
 }
 /* ======================================================
    OPEN ROW
@@ -502,7 +502,7 @@ document.addEventListener("click", function (e) {
 
     console.log(
       "CLASS TOMBOL SETELAH MODE:",
-      document.getElementById("prBtnEdit").className
+      document.getElementById("prBtnEdit").className,
     );
   });
 });
@@ -715,11 +715,15 @@ function prGoToPage(page) {
   const filter =
     tableContainer.querySelector('[name="filter"]')?.value || "semua";
 
+    const triwulan =
+  document.getElementById("filterTriwulan")?.value || 1;
+
   const url = new URL(PR_URL.table, window.location.origin);
 
   url.searchParams.set("page", page);
   url.searchParams.set("perPage", perPage);
   url.searchParams.set("filter", filter);
+  url.searchParams.set("triwulan", triwulan);
 
   tableContainer.style.opacity = "0.5";
 
@@ -778,6 +782,8 @@ function prSimpanKeterjadian(select, jumlahInput) {
   data.append("id_identifikasi", idIdentifikasi);
   data.append("keterjadian_risiko", select.value);
   data.append("jumlah_keterjadian", jumlahInput.value || 0);
+  const triwulan = document.getElementById("filterTriwulan")?.value || 1;
+  data.append("triwulan", triwulan);
   data.append(prCsrfName, prCsrfToken);
 
   select.disabled = true;
@@ -873,4 +879,27 @@ document.addEventListener("change", function (e) {
   }
 
   prSimpanKeterjadian(select, jumlahInput);
+});
+
+// Klik tab periode triwulan
+document.addEventListener("click", function (e) {
+    const tab = e.target.closest(".triwulan-tabs button");
+
+    if (!tab) return;
+
+    const triwulan = tab.dataset.triwulan;
+    const filter = document.getElementById("filterTriwulan");
+
+    if (!filter) return;
+
+    filter.value = triwulan;
+
+    // Atur tampilan tab aktif
+    document.querySelectorAll(".triwulan-tabs button")
+        .forEach(button => {
+            button.classList.toggle("active", button === tab);
+        });
+
+    // Muat ulang tabel sesuai triwulan
+    prGoToPage(1);
 });

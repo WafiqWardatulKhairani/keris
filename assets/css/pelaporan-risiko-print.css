@@ -543,9 +543,14 @@ tr {
   vertical-align: middle;
 }
 
-.form1-risk-matrix th {
-  background-color: #80e8b8;
-  font-weight: bold;
+.form1-risk-matrix thead th {
+    background-color: #80e8b8;
+    font-weight: bold;
+}
+
+.form1-risk-matrix tbody th {
+    background-color: #fff;
+    font-weight: bold;
 }
 
 .form1-risk-matrix .matrix-title {
@@ -554,9 +559,10 @@ tr {
 }
 
 .form1-risk-matrix .matrix-probability {
-  width: 8%;
-  text-align: center;
-  vertical-align: middle;
+    width: 8%;
+    text-align: center;
+    vertical-align: middle;
+    padding: 0 !important;
 }
 
 .form1-risk-matrix tbody th:nth-child(2) {
@@ -1445,33 +1451,18 @@ tr {
   break-inside: avoid;
 }
 
-/* Judul pemangku kepentingan harus mengikuti tabel */
+/* Jarak judul nomor 3 ke tabel pemangku kepentingan */
 .form1-print .form1-stakeholder-caption {
-  caption-side: top;
-  text-align: left;
-  font-family: "Times New Roman", serif;
-  font-size: 12pt;
-  font-weight: bold;
-  padding: 0 0 6px 25px;
-  page-break-after: avoid;
-  break-after: avoid;
+    display: block !important;
+    font-family: "Times New Roman", serif !important;
+    font-size: 12pt !important;
+    font-weight: bold !important;
+    text-align: left !important;
+    margin: 8px 0 0 25px !important;
+    padding: 0 0 8px 0 !important;
+    page-break-after: avoid;
+    break-after: avoid;
 }
-
-/* =========================================
-   FORM 1 - JUDUL DAN TABEL TETAP BERSAMA
-========================================= */
-
-.form1-print .form1-stakeholder-caption {
-  caption-side: top;
-  text-align: left;
-  font-family: "Times New Roman", serif;
-  font-size: 12pt;
-  font-weight: bold;
-  text-align: left;
-  padding: 0 0 6px 25px;
-  page-break-after: avoid;
-}
-
 /* ==================================================
    FORM 1 - FINAL LAYOUT
    Konsistensi font, jarak, tabel, dan analisis
@@ -1971,4 +1962,358 @@ tr {
     position: static !important;
     left: auto !important;
     transform: none !important;
+}
+
+
+/* ==================================================
+   FORM 1 - FINAL LAYOUT NOMOR 5 SAMPAI AKHIR
+   ================================================== */
+
+/* Patokan posisi tabel dan isi:
+   semua tabel dimulai pada garis yang sama */
+.form1-print .form1-analysis-section,
+.form1-print .form1-criteria-new-page,
+.form1-print .form1-risk-matrix-section,
+.form1-print .form1-risk-appetite,
+.form1-print .form1-risk-level-section {
+    box-sizing: border-box !important;
+}
+
+/* --------------------------------
+   5. ANALISIS SWOT DAN PESTLE
+-------------------------------- */
+
+.form1-print .form1-analysis-section {
+    width: calc(100% - 25px) !important;
+    margin: 8px 0 0 25px !important;
+    padding: 0 !important;
+}
+
+.form1-print .form1-analysis-heading {
+    font-size: 11pt !important;
+    font-weight: bold !important;
+    line-height: 1.3 !important;
+    margin: 0 0 8px !important;
+    padding: 0 !important;
+    page-break-after: avoid;
+    break-after: avoid;
+}
+
+.form1-print .form1-analysis-subheading {
+    display: block !important;
+    font-size: 11pt !important;
+    font-weight: bold !important;
+    line-height: 1.3 !important;
+    margin: 8px 0 5px !important;
+    page-break-after: avoid;
+    break-after: avoid;
+}
+
+.form1-print .form1-analysis-subheading span:first-child {
+    display: inline-block;
+    width: 22px;
+}
+
+.form1-print .form1-analysis-description {
+    font-size: 10pt !important;
+    line-height: 1.3 !important;
+    margin: 0 0 5px 22px !important;
+    padding: 0 !important;
+}
+
+.form1-print .form1-analysis-steps {
+    font-size: 10pt !important;
+    line-height: 1.35 !important;
+    margin: 4px 0 8px 22px !important;
+    padding: 0 !important;
+}
+
+.form1-print .form1-analysis-steps ol {
+    margin: 3px 0 0 20px !important;
+    padding: 0 !important;
+}
+
+.form1-print .form1-analysis-steps li {
+    margin: 0 0 3px !important;
+    padding: 0 !important;
+}
+
+/* Tabel PESTLE dan SWOT */
+.form1-print .form1-analysis-section .form1-analysis-table {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 5px 0 12px !important;
+    table-layout: fixed !important;
+    border-collapse: collapse !important;
+    border-spacing: 0 !important;
+    page-break-inside: auto;
+}
+
+.form1-print .form1-analysis-section .form1-analysis-table th,
+.form1-print .form1-analysis-section .form1-analysis-table td {
+    border: 1px solid #000 !important;
+    padding: 6px 8px !important;
+    font-size: 10pt !important;
+    line-height: 1.3 !important;
+    vertical-align: top !important;
+    overflow-wrap: break-word !important;
+    word-wrap: break-word !important;
+}
+
+.form1-print .form1-analysis-section .form1-analysis-table .form1-analysis-label {
+    width: 18% !important;
+    background-color: #80edb5 !important;
+    text-align: left !important;
+    vertical-align: middle !important;
+    font-weight: bold !important;
+    padding: 6px !important;
+}
+
+.form1-print .form1-analysis-content {
+    width: 100% !important;
+    padding: 0 !important;
+    font-size: 10pt !important;
+    line-height: 1.35 !important;
+    text-align: left !important;
+}
+
+.form1-print .form1-analysis-section .form1-swot-heading {
+    margin-top: 12px !important;
+}
+
+/* --------------------------------
+   III. KRITERIA
+-------------------------------- */
+
+.form1-print .form1-criteria-new-page {
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    page-break-before: always;
+    break-before: page;
+}
+
+.form1-print .form1-criteria-new-page > table.form1-context-table {
+    width: 100% !important;
+    margin: 0 !important;
+    border-collapse: collapse !important;
+}
+
+.form1-print .form1-criteria-new-page .form1-section-title,
+.form1-print .form1-criteria-new-page .form1-role-title {
+    font-size: 11pt !important;
+    font-weight: bold !important;
+    padding: 4px 0 !important;
+}
+
+.form1-print .form1-criteria-table {
+    width: calc(100% - 25px) !important;
+    max-width: calc(100% - 25px) !important;
+    margin: 4px 0 8px 25px !important;
+    table-layout: fixed !important;
+    border-collapse: collapse !important;
+    border-spacing: 0 !important;
+}
+
+.form1-print .form1-criteria-table th,
+.form1-print .form1-criteria-table td {
+    border: 1px solid #000 !important;
+    padding: 6px 7px !important;
+    font-size: 9pt !important;
+    line-height: 1.3 !important;
+    vertical-align: middle !important;
+    overflow-wrap: break-word !important;
+}
+
+.form1-print .form1-criteria-table th {
+    background-color: #80edb5 !important;
+    text-align: center !important;
+    font-weight: bold !important;
+}
+
+.form1-print .form1-criteria-table td {
+    text-align: left !important;
+}
+
+.form1-print .form1-criteria-table td.text-center {
+    text-align: center !important;
+}
+
+.form1-print .form1-criteria-note {
+    width: calc(100% - 25px) !important;
+    margin: 4px 0 10px 25px !important;
+    border-collapse: collapse !important;
+}
+
+.form1-print .form1-criteria-note td {
+    border: none !important;
+    padding: 3px 0 !important;
+    font-size: 9pt !important;
+    line-height: 1.4 !important;
+    vertical-align: top !important;
+}
+
+/* --------------------------------
+   C. MATRIKS ANALISIS RISIKO
+-------------------------------- */
+
+.form1-print .form1-risk-matrix-section {
+    width: calc(100% - 25px) !important;
+    margin: 10px 0 0 25px !important;
+}
+
+.form1-print .form1-risk-matrix-section .form1-subsection-title {
+    font-size: 11pt !important;
+    font-weight: bold !important;
+    margin: 0 0 6px !important;
+    padding: 0 !important;
+    page-break-after: avoid;
+    break-after: avoid;
+}
+
+.form1-print .form1-risk-matrix {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    table-layout: fixed !important;
+    border-collapse: collapse !important;
+}
+
+.form1-print .form1-risk-matrix th,
+.form1-print .form1-risk-matrix td {
+    border: 1px solid #000 !important;
+    padding: 5px 3px !important;
+    font-size: 8pt !important;
+    line-height: 1.25 !important;
+    text-align: center !important;
+    vertical-align: middle !important;
+    overflow-wrap: break-word !important;
+}
+
+.form1-risk-matrix thead th,
+.form1-risk-matrix tbody th:not(:nth-child(3)) {
+    background-color: #80e8b8;
+    font-weight: bold;
+}
+
+.form1-risk-matrix tbody th:nth-child(3) {
+    background-color: #fff;
+    font-weight: bold;
+}   
+
+.form1-print .form1-risk-matrix .matrix-title {
+    font-size: 9pt !important;
+    line-height: 1.4 !important;
+}
+
+.form1-print .form1-risk-matrix .matrix-probability {
+    font-weight: bold !important;
+    text-align: center !important;
+    vertical-align: middle !important;
+}
+
+/* Warna sel matriks */
+.form1-print .form1-risk-matrix .risk-blue,
+.form1-print .form1-risk-matrix .risk-green,
+.form1-print .form1-risk-matrix .risk-yellow,
+.form1-print .form1-risk-matrix .risk-orange,
+.form1-print .form1-risk-matrix .risk-red {
+    font-weight: bold !important;
+}
+
+/* --------------------------------
+   D. SELERA RISIKO
+-------------------------------- */
+
+.form1-print .form1-risk-appetite {
+    width: calc(100% - 25px) !important;
+    margin: 10px 0 0 25px !important;
+    font-size: 10pt !important;
+    line-height: 1.4 !important;
+}
+
+.form1-print .form1-risk-appetite .form1-subsection-title {
+    font-size: 11pt !important;
+    font-weight: bold !important;
+    margin: 0 0 5px !important;
+    padding: 0 !important;
+}
+
+.form1-print .risk-appetite-text {
+    margin: 3px 0 3px 22px !important;
+    font-size: 10pt !important;
+    line-height: 1.4 !important;
+}
+
+/* --------------------------------
+   TABEL LEVEL RISIKO
+-------------------------------- */
+
+.form1-print .form1-risk-level-section {
+    width: calc(100% - 25px) !important;
+    margin: 10px 0 0 25px !important;
+}
+
+.form1-print .form1-risk-level-title {
+    font-size: 11pt !important;
+    font-weight: bold !important;
+    margin: 0 0 6px !important;
+    padding: 0 !important;
+    page-break-after: avoid;
+    break-after: avoid;
+}
+
+.form1-print .form1-risk-level-table {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    table-layout: fixed !important;
+    border-collapse: collapse !important;
+}
+
+.form1-print .form1-risk-level-table th,
+.form1-print .form1-risk-level-table td {
+    border: 1px solid #000 !important;
+    padding: 6px 5px !important;
+    font-size: 9pt !important;
+    line-height: 1.3 !important;
+    text-align: center !important;
+    vertical-align: middle !important;
+    overflow-wrap: break-word !important;
+}
+
+.form1-print .form1-risk-level-table th {
+    background-color: #80edb5 !important;
+    font-weight: bold !important;
+}
+
+.form1-print .form1-risk-level-table td:first-child {
+    font-weight: bold !important;
+}
+
+/* --------------------------------
+   ATURAN CETAK / PINDAH HALAMAN
+-------------------------------- */
+
+.form1-print .form1-analysis-table thead,
+.form1-print .form1-criteria-table thead,
+.form1-print .form1-risk-matrix thead,
+.form1-print .form1-risk-level-table thead {
+    display: table-header-group;
+}
+
+.form1-print .form1-analysis-table tr,
+.form1-print .form1-criteria-table tr,
+.form1-print .form1-risk-matrix tr,
+.form1-print .form1-risk-level-table tr {
+    page-break-inside: avoid;
+    break-inside: avoid;
+}
+
+.form1-print .form1-analysis-heading,
+.form1-print .form1-analysis-subheading,
+.form1-print .form1-risk-matrix-section .form1-subsection-title,
+.form1-print .form1-risk-level-title {
+    page-break-after: avoid;
+    break-after: avoid;
 }

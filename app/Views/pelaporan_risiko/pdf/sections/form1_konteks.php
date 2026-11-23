@@ -61,15 +61,15 @@
         <!-- ============================= -->
 
         <table class="form1-context-table form1-context-main">
+
             <colgroup>
-                <colgroup>
-                    <col style="width: 28px">
-                    <col style="width: 28px">
-                    <col style="width: 85px">
-                    <col style="width: 18px">
-                    <col style="width: auto">
-                </colgroup>
+                <col style="width: 28px">
+                <col style="width: 28px">
+                <col style="width: 85px">
+                <col style="width: 18px">
+                <col style="width: auto">
             </colgroup>
+
 
             <!-- II. KONTEKS -->
             <tr>
@@ -236,10 +236,11 @@
         <!-- ============================= -->
         <!-- 3. DAFTAR PEMANGKU KEPENTINGAN -->
         <!-- ============================= -->
+        <div class="form1-stakeholder-caption">
+            3. Daftar pemangku kepentingan (internal maupun eksternal)
+        </div>
+
         <table class="report-table form1-table form1-stakeholder-table">
-            <caption class="form1-stakeholder-caption">
-                3. Daftar pemangku kepentingan (internal maupun eksternal)
-            </caption>
 
             <colgroup>
                 <col style="width: 6%">
@@ -279,10 +280,11 @@
         <!-- ============================= -->
         <!-- 4. DAFTAR PERATURAN -->
         <!-- ============================= -->
+        <div class="form1-stakeholder-caption">
+            4. Daftar Peraturan Perundang-undangan yang Terkait
+        </div>
+
         <table class="report-table form1-table form1-regulation-table">
-            <caption class="form1-stakeholder-caption">
-                4. Daftar Peraturan Perundang-undangan yang Terkait
-            </caption>
 
             <colgroup>
                 <col style="width: 6%">
@@ -618,6 +620,17 @@
             </div>
 
             <table class="report-table form1-risk-matrix">
+                <colgroup>
+                    <col style="width: 8%">
+                    <col style="width: 6%">
+                    <col style="width: 20%">
+                    <col style="width: 13.2%">
+                    <col style="width: 13.2%">
+                    <col style="width: 13.2%">
+                    <col style="width: 13.2%">
+                    <col style="width: 13.2%">
+                </colgroup>
+
                 <thead>
                     <tr>
                         <th rowspan="3" colspan="3" class="matrix-title">
@@ -644,7 +657,18 @@
                 <tbody>
                     <tr>
                         <th rowspan="5" class="matrix-probability">
-                            KEMUNGKINAN
+                            <svg width="100%" height="220" viewBox="0 0 80 220"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <text x="40" y="110"
+                                    transform="rotate(-90 40 110)"
+                                    text-anchor="middle"
+                                    dominant-baseline="middle"
+                                    font-size="14"
+                                    font-weight="bold"
+                                    fill="#000">
+                                    KEMUNGKINAN
+                                </text>
+                            </svg>
                         </th>
                         <th>5</th>
                         <th>Hampir Pasti Terjadi</th>
@@ -734,6 +758,13 @@
             </div>
 
             <table class="report-table form1-risk-level-table">
+                <colgroup>
+                    <col style="width: 13%">
+                    <col style="width: 25%">
+                    <col style="width: 18%">
+                    <col style="width: 44%">
+                </colgroup>
+
                 <thead>
                     <tr>
                         <th>Warna</th>
