@@ -129,24 +129,42 @@
                     </div>
                 </div>
 
-                <!-- ===== EFEKTIVITAS PENGENDALIAN ===== -->
+                <!-- ===== EFEKTIVITAS RTP ===== -->
                 <div class="mb-3">
                     <div class="rtp-section-title">
                         <i class="ti ti-shield-check me-1"></i>
-                        Efektivitas Pengendalian
+                        Efektivitas RTP
                     </div>
 
-                    <div id="prEfektivitasView"
-                        class="rtp-info-value small d-none">
-                        -
+                    <!-- DROPDOWN EFEKTIVITAS -->
+                    <div class="mb-2">
+                        <label class="rtp-form-label">Status Efektivitas</label>
+                        <select
+                            name="status_efektivitas"
+                            id="prStatusEfektivitas"
+                            class="form-select">
+                            <option value="">Pilih Efektivitas</option>
+                            <option value="Efektif">Efektif</option>
+                            <option value="Kurang Efektif">Kurang Efektif</option>
+                        </select>
                     </div>
 
-                    <textarea
-                        name="efektivitas_pengendalian"
-                        id="prEfektivitasPengendalian"
-                        class="form-control"
-                        rows="3"
-                        placeholder="Tuliskan efektivitas pengendalian..."></textarea>
+                    <!-- PENJELASAN EFEKTIVITAS -->
+                    <div>
+                        <label class="rtp-form-label">Penjelasan Efektivitas</label>
+
+                        <div id="prEfektivitasView"
+                            class="rtp-info-value small d-none">
+                            -
+                        </div>
+
+                        <textarea
+                            name="efektivitas_pengendalian"
+                            id="prEfektivitasPengendalian"
+                            class="form-control"
+                            rows="3"
+                            placeholder="Tuliskan penjelasan efektivitas pengendalian..."></textarea>
+                    </div>
                 </div>
 
                 <!-- ===== BUKTI ===== -->

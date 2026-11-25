@@ -36,7 +36,7 @@
                                     onclick="plPrintReport('form1')">
 
                                     <i class="ti ti-file-text me-2"></i>
-                                    Export Form 1
+                                    Form Penetapan Konteks
                                 </button>
                             </li>
 
@@ -47,7 +47,7 @@
                                     onclick="plPrintReport('form2')">
 
                                     <i class="ti ti-file-text me-2"></i>
-                                    Export Form 2
+                                    Form Penilaian Risiko
                                 </button>
                             </li>
 
@@ -58,7 +58,7 @@
                                     onclick="plPrintReport('form3')">
 
                                     <i class="ti ti-file-text me-2"></i>
-                                    Export Form 3
+                                    Form Rencana Penanganan Risiko
                                 </button>
                             </li>
 
@@ -66,10 +66,18 @@
                                 <button
                                     type="button"
                                     class="dropdown-item"
-                                    onclick="plPrintReport('form4')">
+                                    onclick="plPrintReport('form4')"
+                                    <?= empty($idKegiatan) ? 'disabled' : '' ?>
+                                    title="<?= empty($idKegiatan) ? 'Pilih satu kegiatan terlebih dahulu' : 'Export Form Pemantauan Risiko' ?>">
 
                                     <i class="ti ti-file-text me-2"></i>
-                                    Export Form 4
+                                    Form Pemantauan Risiko
+
+                                    <?php if (empty($idKegiatan)): ?>
+                                        <small class="text-muted d-block ms-4">
+                                            Pilih satu kegiatan terlebih dahulu
+                                        </small>
+                                    <?php endif; ?>
                                 </button>
                             </li>
 
@@ -156,6 +164,7 @@
             approveKegiatan: (id) => `<?= site_url('pelaporan-risiko/approve-kegiatan') ?>/${id}`,
             rejectKegiatan: (id) => `<?= site_url('pelaporan-risiko/reject-kegiatan') ?>/${id}`,
             print: '<?= site_url('pelaporan-risiko/print') ?>',
+            checkForm4: "<?= site_url('pelaporan-risiko/check-form4') ?>",
             export: '<?= site_url('pelaporan-risiko/export') ?>',
             batalAjukan: '<?= site_url('pelaporan-risiko/batal-ajukan') ?>',
         }

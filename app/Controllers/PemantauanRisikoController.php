@@ -69,14 +69,31 @@ class PemantauanRisikoController extends BaseController
             ->get()
             ->getRow();
 
-        if (!$row) return false;
+        if (!$row) {
+            return false;
+        }
 
-        $role = session('role');
+        $role = session('user_role');
 
-        if ($role === 'admin') return true;
-        if ($role === 'ketua') return true;
+        if ($role === 'admin' || $role === 'ketua') {
+            return true;
+        }
 
-        return (string)session('id_tim') === (string)$row->id_tim;
+        if ($role !== 'operator') {
+            return false;
+        }
+
+        $userTim = session('user_tim') ?? [];
+
+        if (empty($userTim) && session('id_tim')) {
+            $userTim = [session('id_tim')];
+        }
+
+        return in_array(
+            (string) $row->id_tim,
+            array_map('strval', $userTim),
+            true
+        );
     }
 
     private function validateTimAccessByRisiko($idIdentifikasi): bool
@@ -1195,11 +1212,11 @@ class PemantauanRisikoController extends BaseController
                     sk_kinerja.uraian_sasaran as uraian_sasaran_kinerja,
                     g.nama as nama_pengelola
                 ')
-                    ->join('evaluasi_risiko er',        'er.id_evaluasi = rtp.id_penilaian_awal')
-                    ->join('identifikasi_risiko ir',    'ir.id_identifikasi = er.id_identifikasi')
-                    ->join('konteks_proses_bisnis kpb', 'kpb.id_konteks_proses = ir.id_konteks_proses')
-                    ->join('proses_bisnis pb',          'pb.id_proses = kpb.id_proses')
-                    ->join('konteks k',                 'k.id_konteks = kpb.id_konteks')
+                    ->join('evaluasi_risiko er', 'er.id_evaluasi = rtp.id_penilaian_awal', 'left')
+                    ->join('identifikasi_risiko ir', 'ir.id_identifikasi = er.id_identifikasi', 'left')
+                    ->join('konteks_proses_bisnis kpb', 'kpb.id_konteks_proses = ir.id_konteks_proses', 'left')
+                    ->join('proses_bisnis pb', 'pb.id_proses = kpb.id_proses', 'left')
+                    ->join('konteks k', 'k.id_konteks = kpb.id_konteks', 'left')
                     ->join('tim_kerja sk',           'sk.id_tim = k.id_tim',           'left')
                     ->join('sasaran_strategis ss',      'ss.id_sasaran_strategis = k.id_sasaran_strategis', 'left')
                     // [FIX] Sama dengan EvaluasiRisikoController: join via id_konteks_proses
@@ -1224,6 +1241,17 @@ class PemantauanRisikoController extends BaseController
                 $data['efektivitas_pengendalian'] = null;
                 $data['id_kemungkinan_residu'] = null;
                 $data['id_dampak_residu'] = null;
+
+                // Ambil data pemantauan langsung berdasarkan ID RTP
+                $pemantauan = $this->db->table('pemantauan_risiko')
+                    ->where('id_rtp', (int) $idRtp)
+                    ->get()
+                    ->getRowArray();
+
+                // Jika data pemantauan ditemukan, gabungkan dengan data RTP
+                if ($pemantauan) {
+                    $data = array_merge($data, $pemantauan);
+                }
             }
 
             // Hitung Risiko Residu berdasarkan kemungkinan dan dampak
@@ -1294,6 +1322,8 @@ class PemantauanRisikoController extends BaseController
                 $realisasiWaktu = $realisasiWaktuInput . '-01 00:00:00';
             }
             $catatan = $this->request->getPost('catatan') ?: null;
+
+            $statusEfektivitas = $this->request->getPost('status_efektivitas') ?: null;
             $efektivitasPengendalian = $this->request->getPost('efektivitas_pengendalian') ?: null;
             $idKemungkinanResidu = $this->request->getPost('id_kemungkinan_residu') ?: null;
             $idDampakResidu      = $this->request->getPost('id_dampak_residu') ?: null;
@@ -1327,6 +1357,7 @@ class PemantauanRisikoController extends BaseController
                 'realisasi_output' => $realisasiOutput,
                 'realisasi_waktu'  => $realisasiWaktu,
                 'catatan'          => $catatan,
+                'status_efektivitas' => $statusEfektivitas,
                 'efektivitas_pengendalian' => $efektivitasPengendalian,
                 'id_kemungkinan_residu' => $idKemungkinanResidu,
                 'id_dampak_residu'      => $idDampakResidu,

@@ -80,3 +80,84 @@
 .pk-context-filter .pk-right-side {
     margin-top: 38px;
 }
+
+.pl-periode-modern {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.pl-tahun-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.pl-tahun-row .pl-select {
+    max-width: 130px;
+}
+
+.pl-triwulan-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #94a3b8;
+    text-transform: uppercase;
+}
+
+.pl-triwulan-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 9px;
+}
+
+.pl-triwulan-card {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 42px;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    background: #fff;
+    color: #475569;
+    cursor: pointer;
+    font-weight: 600;
+    transition: .2s ease;
+}
+
+.pl-triwulan-card input,
+.pl-semua-periode input {
+    display: none;
+}
+
+.pl-triwulan-card:hover {
+    border-color: #2878e8;
+    background: #f5f9ff;
+}
+
+.pl-triwulan-card.active {
+    border: 2px solid #2878e8;
+    background: #eff6ff;
+    color: #2878e8;
+}
+
+.pl-semua-periode {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: #64748b;
+    cursor: pointer;
+}
+
+.pl-semua-periode::before {
+    content: "";
+    width: 15px;
+    height: 15px;
+    border: 1px solid #cbd5e1;
+    border-radius: 50%;
+}
+
+.pl-semua-periode:has(input:checked)::before {
+    border: 5px solid #2878e8;
+}

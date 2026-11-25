@@ -2317,3 +2317,49 @@ tr {
     page-break-after: avoid;
     break-after: avoid;
 }
+
+.form4-table {
+    width: 100%;
+    table-layout: fixed;
+}
+
+.form4-table th:first-child,
+.form4-table td.form4-no {
+    width: 5mm !important;
+    min-width: 5mm !important;
+    max-width: 5mm !important;
+    padding-left: 1px !important;
+    padding-right: 1px !important;
+    white-space: nowrap;
+    text-align: center;
+}
+
+/* Nomor urut Form 4 */
+.form4-table td.form4-no {
+    width: 5mm !important;
+    min-width: 5mm !important;
+    max-width: 5mm !important;
+    text-align: center !important;
+    vertical-align: top !important;
+    padding: 4px 0 !important;
+    white-space: nowrap !important;
+    overflow: hidden;
+}
+
+.form4-table {
+    width: 100% !important;
+    table-layout: fixed !important;
+}
+
+.form4-table col:first-child {
+    width: 2mm !important;
+}
+
+.form4-table td.form4-no {
+    width: 2mm !important;
+    min-width: 2mm !important;
+    max-width: 2mm !important;
+    padding: 2px 0 !important;
+    text-align: center !important;
+    white-space: nowrap !important;
+}

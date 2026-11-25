@@ -1,5 +1,6 @@
 console.log("Pemantauan.js loaded");
 let PR_CAN_EDIT = false;
+let PR_ID_PEMANTAUAN = null;
 const USER = window.APP_USER || {};
 const PR_URL = window.PR_CONFIG?.url || {};
 let prCsrfToken = window.PR_CONFIG?.csrf?.token || "";
@@ -66,9 +67,10 @@ function prSetMode(mode) {
     }
   }
 
-  // Efektivitas Pengendalian
+  // Efektivitas RTP
   const efektivitasView = document.getElementById("prEfektivitasView");
   const efektivitasEdit = document.getElementById("prEfektivitasPengendalian");
+  const statusEfektivitas = document.getElementById("prStatusEfektivitas");
 
   const canEditEfektivitas = USER.role === "operator";
 
@@ -83,6 +85,10 @@ function prSetMode(mode) {
       efektivitasEdit.classList.remove("d-none");
       efektivitasEdit.disabled = false;
     }
+  }
+
+  if (statusEfektivitas) {
+    statusEfektivitas.disabled = isView || !canEditEfektivitas;
   }
 
   // Risiko Residu — hanya operator yang berhak mengubah
@@ -114,19 +120,25 @@ function prSetMode(mode) {
     if (el) el.classList.toggle("d-none", !show);
   };
 
-  toggle("prBtnEdit", isView && PR_CAN_EDIT);
-  toggle("prBtnBatal", isEdit && PR_CAN_EDIT);
-  toggle("prBtnSimpan", !isView && PR_CAN_EDIT);
-  toggle("prBtnTutup", !isEdit);
-  toggle("prBtnDelete", isView && PR_CAN_EDIT);
+const hasPemantauan = Boolean(
+  document.getElementById("prIdPemantauan")?.value
+);
+
+toggle("prBtnEdit", isView && PR_CAN_EDIT);
+toggle("prBtnBatal", isEdit && PR_CAN_EDIT);
+toggle("prBtnSimpan", !isView && PR_CAN_EDIT);
+toggle("prBtnTutup", !isEdit);
+toggle("prBtnDelete", isView && PR_CAN_EDIT && !!PR_ID_PEMANTAUAN);
 
   const titleEl = document.getElementById("prOffcanvasTitle");
   if (titleEl) {
-    titleEl.textContent = isCreate
-      ? "Tambah Pemantauan"
-      : isEdit
-        ? "Edit Pemantauan"
-        : "Detail Pemantauan";
+   const titleEl = document.getElementById("prOffcanvasTitle");
+
+if (titleEl) {
+  titleEl.textContent = isEdit
+    ? "Edit Pemantauan"
+    : "Detail Pemantauan";
+}
   }
 
   // [FIX #2] Re-render bukti agar tombol ✕ muncul/hilang sesuai mode
@@ -226,7 +238,13 @@ document.addEventListener("DOMContentLoaded", function () {
    RESET FORM
 ====================================================== */
 function prResetForm() {
+  PR_ID_PEMANTAUAN = null;
   document.getElementById("prForm").reset();
+  const statusEfektivitas = document.getElementById("prStatusEfektivitas");
+  if (statusEfektivitas) {
+    statusEfektivitas.value = "";
+    statusEfektivitas.disabled = false;
+  }
   document.getElementById("prForm").classList.remove("was-validated");
   document.getElementById("prIdRtp").value = "";
 
@@ -309,6 +327,7 @@ function prPopulateInfo(d) {
   setVal("prRealisasiOutput", d.realisasi_output);
   prRenderStatusBadge(d.status);
   setVal("prCatatan", d.catatan);
+  setVal("prStatusEfektivitas", d.status_efektivitas);
   setVal("prEfektivitasPengendalian", d.efektivitas_pengendalian);
   setVal("prKemungkinanResidu", d.id_kemungkinan_residu);
   setVal("prDampakResidu", d.id_dampak_residu);
@@ -457,17 +476,27 @@ function prLoadDetail(idRtp) {
     .then((r) => r.json())
     .then((d) => {
       console.log("HASIL DETAIL:", d);
-      console.log("ID PEMANTAUAN:", d.id_pemantauan);
 
       PR_CAN_EDIT = prCanEdit(d);
+      PR_ID_PEMANTAUAN = d.id_pemantauan || null;
+
+      console.log("ID PEMANTAUAN:", PR_ID_PEMANTAUAN);
       console.log("CAN EDIT:", PR_CAN_EDIT);
 
       document.getElementById("prIdRtp").value = d.id_rtp;
+
       prPopulateInfo(d);
+
+      prSetMode(PR_ID_PEMANTAUAN ? "view" : "create");
+
+      console.log("MODE AKHIR:", prCurrentMode);
+      console.log("EDIT:", document.getElementById("prBtnEdit")?.className);
+      console.log("DELETE:", document.getElementById("prBtnDelete")?.className);
 
       return d;
     });
 }
+
 /* ======================================================
    OPEN ROW
 ====================================================== */
@@ -497,7 +526,7 @@ document.addEventListener("click", function (e) {
     if (d.id_pemantauan) {
       prSetMode("view");
     } else {
-      prSetMode("create");
+      prSetMode("view");
     }
 
     console.log(
@@ -715,8 +744,7 @@ function prGoToPage(page) {
   const filter =
     tableContainer.querySelector('[name="filter"]')?.value || "semua";
 
-    const triwulan =
-  document.getElementById("filterTriwulan")?.value || 1;
+  const triwulan = document.getElementById("filterTriwulan")?.value || 1;
 
   const url = new URL(PR_URL.table, window.location.origin);
 
@@ -883,23 +911,22 @@ document.addEventListener("change", function (e) {
 
 // Klik tab periode triwulan
 document.addEventListener("click", function (e) {
-    const tab = e.target.closest(".triwulan-tabs button");
+  const tab = e.target.closest(".triwulan-tabs button");
 
-    if (!tab) return;
+  if (!tab) return;
 
-    const triwulan = tab.dataset.triwulan;
-    const filter = document.getElementById("filterTriwulan");
+  const triwulan = tab.dataset.triwulan;
+  const filter = document.getElementById("filterTriwulan");
 
-    if (!filter) return;
+  if (!filter) return;
 
-    filter.value = triwulan;
+  filter.value = triwulan;
 
-    // Atur tampilan tab aktif
-    document.querySelectorAll(".triwulan-tabs button")
-        .forEach(button => {
-            button.classList.toggle("active", button === tab);
-        });
+  // Atur tampilan tab aktif
+  document.querySelectorAll(".triwulan-tabs button").forEach((button) => {
+    button.classList.toggle("active", button === tab);
+  });
 
-    // Muat ulang tabel sesuai triwulan
-    prGoToPage(1);
+  // Muat ulang tabel sesuai triwulan
+  prGoToPage(1);
 });

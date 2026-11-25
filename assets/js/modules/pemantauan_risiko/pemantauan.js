@@ -1,5 +1,6 @@
 console.log("Pemantauan.js loaded");
 let PR_CAN_EDIT = false;
+let PR_ID_PEMANTAUAN = null;
 const USER = window.APP_USER || {};
 const PR_URL = window.PR_CONFIG?.url || {};
 let prCsrfToken = window.PR_CONFIG?.csrf?.token || "";
@@ -66,12 +67,12 @@ function prSetMode(mode) {
     }
   }
 
-  // Efektivitas Pengendalian
+  // Efektivitas RTP
   const efektivitasView = document.getElementById("prEfektivitasView");
   const efektivitasEdit = document.getElementById("prEfektivitasPengendalian");
+  const statusEfektivitas = document.getElementById("prStatusEfektivitas");
 
-  // Hanya operator yang boleh mengubah efektivitas pengendalian
-  const canEditEfektivitas = PR_ROLE === "operator";
+  const canEditEfektivitas = USER.role === "operator";
 
   if (efektivitasView && efektivitasEdit) {
     if (isView || !canEditEfektivitas) {
@@ -86,16 +87,48 @@ function prSetMode(mode) {
     }
   }
 
+  if (statusEfektivitas) {
+    statusEfektivitas.disabled = isView || !canEditEfektivitas;
+  }
+
+  // Risiko Residu — hanya operator yang berhak mengubah
+  const residuView = document.getElementById("prRisikoResiduView");
+  const residuInput = document.getElementById("prRisikoResiduInput");
+  const kemungkinanResidu = document.getElementById("prKemungkinanResidu");
+  const dampakResidu = document.getElementById("prDampakResidu");
+
+  const canEditResidu = USER.role === "operator" && PR_CAN_EDIT;
+
+  if (residuView && residuInput) {
+    if (isView || !canEditResidu) {
+      residuView.classList.remove("d-none");
+      residuInput.classList.add("d-none");
+
+      if (kemungkinanResidu) kemungkinanResidu.disabled = true;
+      if (dampakResidu) dampakResidu.disabled = true;
+    } else {
+      residuView.classList.add("d-none");
+      residuInput.classList.remove("d-none");
+
+      if (kemungkinanResidu) kemungkinanResidu.disabled = false;
+      if (dampakResidu) dampakResidu.disabled = false;
+    }
+  }
+
   const toggle = (id, show) => {
     const el = document.getElementById(id);
     if (el) el.classList.toggle("d-none", !show);
   };
 
-  toggle("prBtnEdit", isView && PR_CAN_EDIT);
-  toggle("prBtnBatal", isEdit && PR_CAN_EDIT);
-  toggle("prBtnSimpan", !isView && PR_CAN_EDIT);
-  toggle("prBtnTutup", !isEdit);
-  toggle("prBtnDelete", isView && PR_CAN_EDIT);
+const hasPemantauan = Boolean(
+  document.getElementById("prIdPemantauan")?.value
+);
+
+toggle("prBtnEdit", isView && PR_CAN_EDIT && !!PR_ID_PEMANTAUAN);
+toggle("prBtnBatal", isEdit && PR_CAN_EDIT);
+toggle("prBtnSimpan", !isView && PR_CAN_EDIT);
+toggle("prBtnTutup", !isEdit);
+toggle("prBtnDelete", isView && PR_CAN_EDIT && !!PR_ID_PEMANTAUAN);
 
   const titleEl = document.getElementById("prOffcanvasTitle");
   if (titleEl) {
@@ -157,7 +190,6 @@ function prReRenderBuktiMode(isView) {
     // Abaikan jika data tidak valid
   }
 }
-
 document.addEventListener("DOMContentLoaded", function () {
   const outputEl = document.getElementById("prRealisasiOutput");
 
@@ -165,6 +197,16 @@ document.addEventListener("DOMContentLoaded", function () {
     //outputEl.addEventListener("input", prAutoSetStatus);
   }
 
+  // ===== RISIKO RESIDU =====
+  document
+    .getElementById("prKemungkinanResidu")
+    ?.addEventListener("change", prHitungResidu);
+
+  document
+    .getElementById("prDampakResidu")
+    ?.addEventListener("change", prHitungResidu);
+
+  // ===== BUKTI DUKUNG =====
   const input = document.getElementById("prBuktiLinkInput");
   const preview = document.getElementById("prBuktiPreview");
 
@@ -194,9 +236,21 @@ document.addEventListener("DOMContentLoaded", function () {
    RESET FORM
 ====================================================== */
 function prResetForm() {
+  PR_ID_PEMANTAUAN = null;
   document.getElementById("prForm").reset();
+  const statusEfektivitas = document.getElementById("prStatusEfektivitas");
+  if (statusEfektivitas) {
+    statusEfektivitas.value = "";
+    statusEfektivitas.disabled = false;
+  }
   document.getElementById("prForm").classList.remove("was-validated");
   document.getElementById("prIdRtp").value = "";
+
+  const efektivitasView = document.getElementById("prEfektivitasView");
+  if (efektivitasView) {
+    efektivitasView.textContent = "-";
+    efektivitasView.classList.add("d-none");
+  }
 
   [
     "prInfoTahun",
@@ -212,6 +266,12 @@ function prResetForm() {
     "prInfoRtp",
     "prInfoTargetOutput",
     "prInfoTargetWaktu",
+    "prResiduKemungkinanView",
+    "prResiduDampakView",
+    "prNilaiRisikoResiduView",
+    "prSeleraRisikoResiduView",
+    "prNilaiRisikoResidu",
+    "prSeleraRisikoResidu",
   ].forEach((id) => {
     const el = document.getElementById(id);
     if (el) el.textContent = "-";
@@ -265,6 +325,33 @@ function prPopulateInfo(d) {
   setVal("prRealisasiOutput", d.realisasi_output);
   prRenderStatusBadge(d.status);
   setVal("prCatatan", d.catatan);
+  setVal("prStatusEfektivitas", d.status_efektivitas);
+  setVal("prEfektivitasPengendalian", d.efektivitas_pengendalian);
+  setVal("prKemungkinanResidu", d.id_kemungkinan_residu);
+  setVal("prDampakResidu", d.id_dampak_residu);
+  setVal("prKemungkinanResidu", d.id_kemungkinan_residu);
+  setVal("prDampakResidu", d.id_dampak_residu);
+
+  prHitungResidu();
+
+  const kemungkinanSelect = document.getElementById("prKemungkinanResidu");
+  const dampakSelect = document.getElementById("prDampakResidu");
+
+  const kemungkinanText = kemungkinanSelect?.selectedOptions[0]?.text;
+  const dampakText = dampakSelect?.selectedOptions[0]?.text;
+
+  const residuSet = (id, value) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = value || "-";
+  };
+
+  residuSet("prResiduKemungkinanView", kemungkinanText);
+  residuSet("prResiduDampakView", dampakText);
+  residuSet("prNilaiRisikoResiduView", d.nilai_risiko_residu);
+  residuSet("prSeleraRisikoResiduView", d.nama_selera_residu);
+
+  residuSet("prNilaiRisikoResidu", d.nilai_risiko_residu);
+  residuSet("prSeleraRisikoResidu", d.nama_selera_residu);
 
   const rwEl = document.getElementById("prRealisasiWaktu");
   if (rwEl) {
@@ -284,19 +371,126 @@ function prPopulateInfo(d) {
   prAutoSetStatus();
 }
 
+function prHitungResidu() {
+  const kemungkinan = document.getElementById("prKemungkinanResidu")?.value;
+  const dampak = document.getElementById("prDampakResidu")?.value;
+
+  if (!kemungkinan || !dampak) {
+    return prResetResidu();
+  }
+
+  const body = new URLSearchParams({
+    id_kemungkinan: kemungkinan,
+    id_dampak: dampak,
+    [prCsrfName]: prCsrfToken,
+  });
+
+  fetch(PR_URL.preview, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+      "X-Requested-With": "XMLHttpRequest",
+    },
+    body,
+  })
+    .then((response) => response.json())
+    .then((res) => {
+      if (res.status !== "success") {
+        return prResetResidu();
+      }
+
+      const warnaMap = {
+        biru: "#0d6efd",
+        hijau: "#198754",
+        kuning: "#ffc107",
+        oranye: "#fd7e14",
+        merah: "#dc3545",
+      };
+
+      const warna =
+        warnaMap[(res.warna_selera || "").toLowerCase()] ||
+        res.warna_selera ||
+        "#6c757d";
+
+      const setText = (id, value) => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = value ?? "-";
+      };
+
+      setText("prNilaiRisikoResidu", res.nilai_risiko);
+      setText("prSeleraRisikoResidu", res.nama_selera);
+      setText("prNilaiRisikoResiduView", res.nilai_risiko);
+      setText("prSeleraRisikoResiduView", res.nama_selera);
+
+      const nilai = document.getElementById("prNilaiRisikoResidu");
+      const nilaiView = document.getElementById("prNilaiRisikoResiduView");
+
+      if (nilai) nilai.style.color = res.warna || "";
+      if (nilaiView) nilaiView.style.color = res.warna || "";
+
+      const level = document.getElementById("prSeleraRisikoResidu");
+      const levelView = document.getElementById("prSeleraRisikoResiduView");
+
+      [level, levelView].forEach((el) => {
+        if (el) {
+          el.style.backgroundColor = warna;
+          el.style.color = "#fff";
+          el.style.padding = "3px 8px";
+          el.style.borderRadius = "6px";
+        }
+      });
+    })
+    .catch((error) => {
+      console.error("Gagal menghitung Risiko Residu:", error);
+      prResetResidu();
+    });
+}
+
+function prResetResidu() {
+  const ids = [
+    "prNilaiRisikoResidu",
+    "prSeleraRisikoResidu",
+    "prNilaiRisikoResiduView",
+    "prSeleraRisikoResiduView",
+  ];
+
+  ids.forEach((id) => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.textContent = "-";
+      el.style.color = "";
+      el.style.backgroundColor = "";
+    }
+  });
+}
+
 /* ======================================================
    LOAD DETAIL
 ====================================================== */
 function prLoadDetail(idRtp) {
+  console.log("ID RTP YANG DIKLIK:", idRtp);
+
   return fetch(PR_URL.detail(idRtp))
     .then((r) => r.json())
     .then((d) => {
-      console.log("USER", USER);
-      console.log("DATA", d);
+      console.log("HASIL DETAIL:", d);
+
       PR_CAN_EDIT = prCanEdit(d);
-      console.log("CAN EDIT?", prCanEdit(d));
+      PR_ID_PEMANTAUAN = d.id_pemantauan || null;
+
+      console.log("ID PEMANTAUAN:", PR_ID_PEMANTAUAN);
+      console.log("CAN EDIT:", PR_CAN_EDIT);
+
       document.getElementById("prIdRtp").value = d.id_rtp;
+
       prPopulateInfo(d);
+
+      prSetMode(PR_ID_PEMANTAUAN ? "view" : "create");
+
+      console.log("MODE AKHIR:", prCurrentMode);
+      console.log("EDIT:", document.getElementById("prBtnEdit")?.className);
+      console.log("DELETE:", document.getElementById("prBtnDelete")?.className);
+
       return d;
     });
 }
@@ -323,7 +517,9 @@ document.addEventListener("click", function (e) {
   ).show();
 
   prLoadDetail(idRtp).then((d) => {
-    const canEdit = prCanEdit(d);
+    console.log("DATA SETELAH LOAD:", d);
+    console.log("PR_CAN_EDIT:", PR_CAN_EDIT);
+    console.log("ID PEMANTAUAN:", d.id_pemantauan);
 
     if (d.id_pemantauan) {
       prSetMode("view");
@@ -331,10 +527,10 @@ document.addEventListener("click", function (e) {
       prSetMode("create");
     }
 
-    // 🔥 kalau tidak boleh edit → paksa view
-    if (!canEdit) {
-      prSetMode("view");
-    }
+    console.log(
+      "CLASS TOMBOL SETELAH MODE:",
+      document.getElementById("prBtnEdit").className,
+    );
   });
 });
 
@@ -521,7 +717,9 @@ function prCanEdit(data) {
   if (USER.role === "ketua") return false;
 
   if (USER.role === "operator") {
-    return String(USER.id_tim) === String(data.id_tim);
+    const userTeams = (USER.tim || []).map(String);
+
+    return userTeams.includes(String(data.id_tim));
   }
 
   return false;
@@ -544,11 +742,14 @@ function prGoToPage(page) {
   const filter =
     tableContainer.querySelector('[name="filter"]')?.value || "semua";
 
+  const triwulan = document.getElementById("filterTriwulan")?.value || 1;
+
   const url = new URL(PR_URL.table, window.location.origin);
 
   url.searchParams.set("page", page);
   url.searchParams.set("perPage", perPage);
   url.searchParams.set("filter", filter);
+  url.searchParams.set("triwulan", triwulan);
 
   tableContainer.style.opacity = "0.5";
 
@@ -607,6 +808,8 @@ function prSimpanKeterjadian(select, jumlahInput) {
   data.append("id_identifikasi", idIdentifikasi);
   data.append("keterjadian_risiko", select.value);
   data.append("jumlah_keterjadian", jumlahInput.value || 0);
+  const triwulan = document.getElementById("filterTriwulan")?.value || 1;
+  data.append("triwulan", triwulan);
   data.append(prCsrfName, prCsrfToken);
 
   select.disabled = true;
@@ -702,4 +905,26 @@ document.addEventListener("change", function (e) {
   }
 
   prSimpanKeterjadian(select, jumlahInput);
+});
+
+// Klik tab periode triwulan
+document.addEventListener("click", function (e) {
+  const tab = e.target.closest(".triwulan-tabs button");
+
+  if (!tab) return;
+
+  const triwulan = tab.dataset.triwulan;
+  const filter = document.getElementById("filterTriwulan");
+
+  if (!filter) return;
+
+  filter.value = triwulan;
+
+  // Atur tampilan tab aktif
+  document.querySelectorAll(".triwulan-tabs button").forEach((button) => {
+    button.classList.toggle("active", button === tab);
+  });
+
+  // Muat ulang tabel sesuai triwulan
+  prGoToPage(1);
 });

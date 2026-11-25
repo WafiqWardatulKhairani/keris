@@ -1,201 +1,102 @@
 document.addEventListener("DOMContentLoaded", function () {
-  const typeEl = document.getElementById("plCsType");
-  const single = document.getElementById("plSingle");
-  const range = document.getElementById("plRange");
-  const startEl = document.getElementById("plStart");
-  const endEl = document.getElementById("plEnd");
-
-  if (!typeEl) return;
-
-  function setMonthPlaceholder(input, label) {
-    input.addEventListener("focus", function () {
-      input.type = "month";
-    });
-    input.addEventListener("blur", function () {
-      if (!input.value) input.type = "text";
-    });
-    if (!input.value) {
-      input.type = "text";
-      input.placeholder = label;
-    }
-  }
-
-  if (startEl) setMonthPlaceholder(startEl, "Pilih bulan awal");
-  if (endEl) setMonthPlaceholder(endEl, "Pilih bulan akhir");
-
-  
-function toggleMode() {
-  const isRange = typeEl.value === "range";
-  const isSemua = typeEl.value === "semua";
-
-  single.style.display = isRange ? "none" : "block";
-  range.style.display = isRange ? "block" : "none";
-
-  // Kosongkan bulan saat memilih Semua Periode
-  const periodeEl = document.getElementById("plCsPeriode");
-
-  if (periodeEl && isSemua) {
-    periodeEl.value = "";
-  }
-}
-
-  typeEl.addEventListener("change", toggleMode);
-
-  if (startEl && endEl) {
-    startEl.addEventListener("change", function () {
-      if (!startEl.value) return;
-      const s = new Date(startEl.value);
-      const exactEnd = new Date(s);
-      exactEnd.setMonth(s.getMonth() + 2);
-      const exactEndStr =
-        exactEnd.getFullYear() +
-        "-" +
-        String(exactEnd.getMonth() + 1).padStart(2, "0");
-      endEl.min = exactEndStr;
-      endEl.max = exactEndStr;
-      endEl.value = exactEndStr;
-      endEl.type = "month";
-    });
-
-    endEl.addEventListener("change", function () {
-      if (!startEl.value || !endEl.value) return;
-      const s = new Date(startEl.value);
-      const e = new Date(endEl.value);
-      const diff =
-        (e.getFullYear() - s.getFullYear()) * 12 +
-        (e.getMonth() - s.getMonth());
-      if (diff !== 2) {
-        alert("Harus memilih rentang tepat 3 bulan");
-        endEl.value = "";
-        endEl.type = "text";
-      }
-    });
-  }
+  const form = document.getElementById("plContextSelectorForm");
+  if (!form) return;
 
   const timSelect = document.getElementById("plCsTimKerja");
   const pengelolaSelect = document.getElementById("plCsPengelola");
   const kegiatanSelect = document.getElementById("plCsKegiatan");
+  document
+    .querySelectorAll('.pl-triwulan-card input[name="triwulan"]')
+    .forEach((input) => {
+      input.addEventListener("change", function () {
+        document
+          .querySelectorAll(".pl-triwulan-card")
+          .forEach((card) => card.classList.remove("active"));
 
-  
-if (window.PL_CS_DATA) {
-  const konteksMap = window.PL_CS_DATA.konteksMap || {};
-  const listKegiatan = window.PL_CS_DATA.listKegiatan || [];
+        this.closest(".pl-triwulan-card").classList.add("active");
+      });
+    });
 
-  // Ambil kegiatan yang sebelumnya dipilih
-  let selectedKegiatan =
-    window.PL_CS_DATA.selectedKegiatan || "";
+  if (window.PL_CS_DATA) {
+    const konteksMap = window.PL_CS_DATA.konteksMap || {};
+    const listKegiatan = window.PL_CS_DATA.listKegiatan || [];
 
-  function filterPengelola() {
-    const selectedTim = timSelect
-      ? timSelect.value
-      : window.PL_CS_DATA.activeTimId;
+    // Ambil kegiatan yang sebelumnya dipilih
+    let selectedKegiatan = window.PL_CS_DATA.selectedKegiatan || "";
 
-    const currentPengelola = pengelolaSelect
-      ? pengelolaSelect.value
-      : "";
+    function filterPengelola() {
+      const selectedTim = timSelect
+        ? timSelect.value
+        : window.PL_CS_DATA.activeTimId;
 
-    const currentKegiatan =
-      kegiatanSelect?.value || selectedKegiatan;
+      const currentPengelola = pengelolaSelect ? pengelolaSelect.value : "";
 
-    if (pengelolaSelect) {
-      pengelolaSelect.innerHTML =
-        '<option value="">– Pilih Pengelola –</option>';
-    }
+      const currentKegiatan = kegiatanSelect?.value || selectedKegiatan;
 
-    if (kegiatanSelect) {
-      kegiatanSelect.innerHTML =
-        '<option value="">Semua Kegiatan</option>';
-    }
+      if (pengelolaSelect) {
+        pengelolaSelect.innerHTML =
+          '<option value="">– Pilih Pengelola –</option>';
+      }
 
-    const addedPengelola = new Set();
-    const addedKegiatan = new Set();
+      if (kegiatanSelect) {
+        kegiatanSelect.innerHTML = '<option value="">Semua Kegiatan</option>';
+      }
 
-    Object.values(konteksMap).forEach((item) => {
-      if (item.id_tim != selectedTim) return;
+      const addedPengelola = new Set();
+      const addedKegiatan = new Set();
 
-      if (
-        item.pengelola_risiko_id &&
-        !addedPengelola.has(item.pengelola_risiko_id)
-      ) {
-        addedPengelola.add(item.pengelola_risiko_id);
+      Object.values(konteksMap).forEach((item) => {
+        if (item.id_tim != selectedTim) return;
 
-        if (pengelolaSelect) {
+        if (
+          item.pengelola_risiko_id &&
+          !addedPengelola.has(item.pengelola_risiko_id)
+        ) {
+          addedPengelola.add(item.pengelola_risiko_id);
+
+          if (pengelolaSelect) {
+            const opt = document.createElement("option");
+            opt.value = item.pengelola_risiko_id;
+            opt.textContent = item.nama_pengelola;
+
+            if (item.pengelola_risiko_id == currentPengelola) {
+              opt.selected = true;
+            }
+
+            pengelolaSelect.appendChild(opt);
+          }
+        }
+      });
+
+      if (kegiatanSelect) {
+        listKegiatan.forEach((item) => {
+          if (item.id_tim != selectedTim) return;
+          if (addedKegiatan.has(item.id_kegiatan)) return;
+
+          addedKegiatan.add(item.id_kegiatan);
+
           const opt = document.createElement("option");
-          opt.value = item.pengelola_risiko_id;
-          opt.textContent = item.nama_pengelola;
+          opt.value = item.id_kegiatan;
+          opt.textContent = item.nama_kegiatan;
 
-          if (item.pengelola_risiko_id == currentPengelola) {
+          if (item.id_kegiatan == currentKegiatan) {
             opt.selected = true;
           }
 
-          pengelolaSelect.appendChild(opt);
-        }
+          kegiatanSelect.appendChild(opt);
+        });
+
+        selectedKegiatan = kegiatanSelect.value;
       }
-    });
+    }
 
-    if (kegiatanSelect) {
-      listKegiatan.forEach((item) => {
-        if (item.id_tim != selectedTim) return;
-        if (addedKegiatan.has(item.id_kegiatan)) return;
-
-        addedKegiatan.add(item.id_kegiatan);
-
-        const opt = document.createElement("option");
-        opt.value = item.id_kegiatan;
-        opt.textContent = item.nama_kegiatan;
-
-        if (item.id_kegiatan == currentKegiatan) {
-          opt.selected = true;
-        }
-
-        kegiatanSelect.appendChild(opt);
+    if (timSelect) {
+      timSelect.addEventListener("change", () => {
+        selectedKegiatan = "";
+        filterPengelola();
       });
-
-      selectedKegiatan = kegiatanSelect.value;
-    }
-  }
-
-  if (timSelect) {
-    timSelect.addEventListener("change", () => {
-      selectedKegiatan = "";
-      filterPengelola();
-    });
-  }
-
-  filterPengelola();
-}
-
-
-  toggleMode();
-
-  // Pastikan input range tetap bertipe month setelah reload
-  if (typeEl.value === "range" && startEl && endEl) {
-    if (startEl.value) {
-      startEl.type = "month";
     }
 
-    if (endEl.value) {
-      endEl.type = "month";
-    }
+    filterPengelola();
   }
-
-  // SAVE SCROLL POSITION
-  const form = document.getElementById("plContextSelectorForm");
-  if (form) {
-    form.addEventListener("submit", function () {
-      sessionStorage.setItem("plScrollY", window.scrollY);
-    });
-  }
-
-  // RESTORE AFTER PAGE FULLY LOADED
-  window.addEventListener("load", function () {
-    const savedScroll = sessionStorage.getItem("plScrollY");
-
-    if (savedScroll !== null) {
-      setTimeout(() => {
-        window.scrollTo(0, parseInt(savedScroll, 10));
-        sessionStorage.removeItem("plScrollY");
-      }, 50);
-    }
-  });
 });

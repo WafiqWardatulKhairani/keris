@@ -52,17 +52,17 @@ class PelaporanRisikoController extends BaseController
     public function setActive()
     {
         $id = $this->request->getPost('id_konteks');
-        $periode = $this->request->getPost('periode');
+        $tahun = $this->request->getPost('tahun');
+        $triwulan = $this->request->getPost('triwulan');
 
         if ($id) {
             session()->set('id_konteks_pl', $id);
         }
 
-        if ($periode) {
-            [$tahun, $bulan] = explode('-', $periode);
+        if ($tahun) {
             session()->set('pl_periode', [
-                'bulan' => $bulan,
-                'tahun' => $tahun
+                'tahun' => $tahun,
+                'triwulan' => $triwulan
             ]);
         }
 
@@ -74,52 +74,34 @@ class PelaporanRisikoController extends BaseController
         $userRole  = session('user_role');
         $idKonteks = session('id_konteks_pl');
 
-        $periodeInput = $this->request->getGet('periode');
-        $type = $this->request->getGet('tipe_periode') ?? 'bulanan';
 
-        $start = $this->request->getGet('start_periode');
-        $end = $this->request->getGet('end_periode');
+        $tahun = (int) ($this->request->getGet('tahun') ?? date('Y'));
+        $triwulan = $this->request->getGet('triwulan') ?? '';
 
-        $filterPeriode = ($type !== 'semua');
+        $rentangTriwulan = [
+            1 => ['01-01', '03-31'],
+            2 => ['04-01', '06-30'],
+            3 => ['07-01', '09-30'],
+            4 => ['10-01', '12-31'],
+        ];
 
-        if ($type === 'range' && $start && $end) {
-            $tahun = substr($start, 0, 4);
-            $bulan = substr($start, 5, 2);
+        if ($triwulan !== '' && isset($rentangTriwulan[(int) $triwulan])) {
+            $triwulan = (int) $triwulan;
 
-            $startDate = date('Y-m-01', strtotime($start . '-01'));
-            $endDate = date('Y-m-t', strtotime($end . '-01'));
-
-            $periode = [
-                'bulan' => $bulan,
-                'tahun' => $tahun,
-            ];
-        } elseif ($type === 'bulanan' && $periodeInput) {
-            [$tahun, $bulan] = explode('-', $periodeInput);
-
-            $periode = [
-                'bulan' => $bulan,
-                'tahun' => $tahun,
-            ];
-
-            [$startDate, $endDate] = $this->getDateRange(
-                $bulan,
-                $tahun,
-                'bulanan'
-            );
+            $startDate = $tahun . '-' . $rentangTriwulan[$triwulan][0];
+            $endDate   = $tahun . '-' . $rentangTriwulan[$triwulan][1];
         } else {
-            $periode = $this->getPeriode();
-
-            $bulan = $periode['bulan'];
-            $tahun = $periode['tahun'];
-
-            if ($type !== 'semua') {
-                [$startDate, $endDate] = $this->getDateRange(
-                    $bulan,
-                    $tahun,
-                    'bulanan'
-                );
-            }
+            $triwulan = '';
+            $startDate = null;
+            $endDate = null;
         }
+
+        $periode = [
+            'tahun' => $tahun,
+            'triwulan' => $triwulan,
+        ];
+
+        $type = 'triwulan';
 
         $idKegiatan = $this->request->getGet('id_kegiatan');
         $statusValidasi = $this->request->getGet('status_validasi');
@@ -214,34 +196,14 @@ class PelaporanRisikoController extends BaseController
             $builder->where('pm.status_validasi', $statusValidasi);
         }
 
-        // Filter tahun dan tanggal realisasi hanya jika
-        // pengguna memilih periode tertentu.
-        if ($type !== 'semua') {
 
-            if ($type === 'range') {
-                if ($start && $end) {
-                    $startDate = date('Y-m-01', strtotime($start));
-                    $endDate = date('Y-m-t', strtotime($end));
-                } else {
-                    [$startDate, $endDate] = $this->getDateRange(
-                        $bulan,
-                        $tahun,
-                        'bulanan'
-                    );
-                }
-            } else {
-                [$startDate, $endDate] = $this->getDateRange(
-                    $bulan,
-                    $tahun,
-                    $type
-                );
-            }
+        $builder->where('k.tahun', $tahun);
 
+        if ($triwulan !== '') {
             $builder
-                ->where('pm.realisasi_waktu >=', $startDate)
-                ->where('pm.realisasi_waktu <=', $endDate);
+                ->where('rtp.target_waktu >=', $startDate)
+                ->where('rtp.target_waktu <', date('Y-m-d', strtotime($endDate . ' +1 day')));
         }
-
 
         $builder->orderBy('kegiatan.nama_kegiatan', 'ASC');
         $builder->orderBy('rtp.id_rtp', 'ASC');
@@ -250,22 +212,50 @@ class PelaporanRisikoController extends BaseController
 
         // =====================================================
         // STATUS VALIDASI PER KEGIATAN
+        // DIHITUNG BERDASARKAN SELURUH RTP DALAM 1 TAHUN
         // =====================================================
+
+        $statusBuilder = $this->db->table('rencana_penanganan_risiko rtp')
+            ->select('
+        k.id_kegiatan,
+        pm.status_validasi,
+        pm.catatan_validasi
+    ')
+            ->join('evaluasi_risiko er', 'er.id_evaluasi = rtp.id_penilaian_awal')
+            ->join('identifikasi_risiko ir', 'ir.id_identifikasi = er.id_identifikasi')
+            ->join('konteks_proses_bisnis kpb', 'kpb.id_konteks_proses = ir.id_konteks_proses')
+            ->join('konteks k', 'k.id_konteks = kpb.id_konteks')
+            ->join('pemantauan_risiko pm', 'pm.id_rtp = rtp.id_rtp', 'left')
+            ->where('k.tahun', $tahun);
+
+        if ($triwulan !== '') {
+            $statusBuilder
+                ->where('rtp.target_waktu >=', $startDate)
+                ->where('rtp.target_waktu <', date('Y-m-d', strtotime($endDate . ' +1 day')));
+        }
+
+        // Batasi tim sesuai tim aktif
+        if ($idTim) {
+            $statusBuilder->where('k.id_tim', $idTim);
+        }
+
+        // Jika kegiatan tertentu dipilih
+        if (!empty($idKegiatan)) {
+            $statusBuilder->where('k.id_kegiatan', $idKegiatan);
+        }
+
+        $statusRows = $statusBuilder->get()->getResultArray();
 
         $statusKegiatan = [];
 
-        foreach ($allData as $row) {
+        foreach ($statusRows as $row) {
 
-            $idKegiatanRow = $row['id_kegiatan'] ?? null;
-
-            if (!$idKegiatanRow) {
-                continue;
-            }
+            $idKegiatanRow = $row['id_kegiatan'];
 
             if (!isset($statusKegiatan[$idKegiatanRow])) {
                 $statusKegiatan[$idKegiatanRow] = [
                     'statuses' => [],
-                    'catatan'  => null,
+                    'catatan' => null,
                 ];
             }
 
@@ -277,21 +267,18 @@ class PelaporanRisikoController extends BaseController
                 $status === 'Ditolak'
                 && !empty($row['catatan_validasi'])
             ) {
-                $statusKegiatan[$idKegiatanRow]['catatan']
-                    = $row['catatan_validasi'];
+                $statusKegiatan[$idKegiatanRow]['catatan'] =
+                    $row['catatan_validasi'];
             }
         }
 
-        // Tentukan status final tiap kegiatan
-        foreach ($statusKegiatan as $id => &$item) {
+        foreach ($statusKegiatan as &$item) {
 
             $statuses = array_unique($item['statuses']);
 
             if (in_array('Ditolak', $statuses, true)) {
-
                 $item['status'] = 'Ditolak';
             } elseif (in_array('Diajukan', $statuses, true)) {
-
                 $item['status'] = 'Diajukan';
             } elseif (
                 !empty($statuses)
@@ -300,10 +287,8 @@ class PelaporanRisikoController extends BaseController
                     fn($s) => $s === 'Disetujui'
                 )) === count($statuses)
             ) {
-
                 $item['status'] = 'Disetujui';
             } else {
-
                 $item['status'] = 'Draft';
             }
         }
@@ -350,11 +335,26 @@ class PelaporanRisikoController extends BaseController
             }
         }
 
-        $listKegiatan = $this->db->table('kegiatan')
+        $kegiatanBuilder = $this->db->table('kegiatan')
             ->select('id_kegiatan, nama_kegiatan, id_tim')
+            ->whereIn(
+                'id_kegiatan',
+                function ($subquery) use ($tahun) {
+                    $subquery->select('id_kegiatan')
+                        ->from('konteks')
+                        ->where('tahun', $tahun);
+                }
+            );
+
+        if ($idTim) {
+            $kegiatanBuilder->where('id_tim', $idTim);
+        }
+
+        $listKegiatan = $kegiatanBuilder
             ->orderBy('nama_kegiatan', 'ASC')
             ->get()
             ->getResultArray();
+
 
         return view('pelaporan_risiko/index', [
             'data' => $data,
@@ -364,12 +364,15 @@ class PelaporanRisikoController extends BaseController
             'userRole' => $userRole,
             'pager' => $pager,
             'perPage' => $perPage,
+            'idKegiatan'  => $idKegiatan,
             'total' => $total,
             'from' => $from,
             'to' => $to,
             'ketuaInfo' => $ketuaInfo,
             'statusKegiatan' => $statusKegiatan,
             'tipe_periode' => $type,
+            'tahun' => $tahun,
+            'triwulan' => $triwulan,
             'activeKonteks' => [
                 'id_tim' => $idTim
                     ?? $this->request->getGet('id_tim')
@@ -839,60 +842,220 @@ class PelaporanRisikoController extends BaseController
         ]);
     }
 
+    public function checkForm4()
+    {
+        $idKegiatan = $this->request->getGet('id_kegiatan');
+        $tahun = (int) ($this->request->getGet('tahun') ?? date('Y'));
+
+        if (empty($idKegiatan) || !ctype_digit((string) $idKegiatan)) {
+            return $this->response->setJSON([
+                'success' => false
+            ]);
+        }
+
+        $builder = $this->db->table('rencana_penanganan_risiko rtp')
+            ->select('rtp.id_rtp, pm.id_pemantauan, pm.status_validasi')
+            ->join('evaluasi_risiko er', 'er.id_evaluasi = rtp.id_penilaian_awal')
+            ->join('identifikasi_risiko ir', 'ir.id_identifikasi = er.id_identifikasi')
+            ->join('konteks_proses_bisnis kpb', 'kpb.id_konteks_proses = ir.id_konteks_proses')
+            ->join('konteks k', 'k.id_konteks = kpb.id_konteks')
+            ->join('pemantauan_risiko pm', 'pm.id_rtp = rtp.id_rtp', 'left')
+            ->where('k.id_kegiatan', $idKegiatan)
+            ->where('k.tahun', $tahun);
+
+        // Batasi sesuai tim aktif untuk operator dan ketua
+        if (in_array(session('user_role'), ['operator', 'ketua'], true)) {
+            $userTim = array_map('intval', session('user_tim') ?? []);
+
+            if (empty($userTim) && session('id_tim')) {
+                $userTim = [(int) session('id_tim')];
+            }
+
+            $idTim = (int) (
+                session('global_id_tim')
+                ?? session('id_tim')
+                ?? 0
+            );
+
+            if (!$idTim || !in_array($idTim, $userTim, true)) {
+                return $this->response->setJSON([
+                    'success' => false
+                ]);
+            }
+
+            $builder->where('k.id_tim', $idTim);
+        }
+
+        $rows = $builder->get()->getResultArray();
+
+        $lolos = !empty($rows);
+
+        foreach ($rows as $row) {
+            if (
+                empty($row['id_pemantauan']) ||
+                ($row['status_validasi'] ?? '') !== 'Disetujui'
+            ) {
+                $lolos = false;
+                break;
+            }
+        }
+
+        return $this->response->setJSON([
+            'success' => $lolos
+        ]);
+    }
+
     public function print()
     {
 
-        $periodeInput = $this->request->getGet('periode');
-        $type = $this->request->getGet('tipe_periode') ?? 'bulanan';
-        $filterPeriode = ($type !== 'semua');
+        $tahun = (int) ($this->request->getGet('tahun') ?? date('Y'));
+        $triwulan = $this->request->getGet('triwulan');
 
-        $start = $this->request->getGet('start_periode');
-        $end = $this->request->getGet('end_periode');
+        $rentangTriwulan = [
+            1 => ['01-01', '03-31'],
+            2 => ['04-01', '06-30'],
+            3 => ['07-01', '09-30'],
+            4 => ['10-01', '12-31'],
+        ];
 
+        if (
+            $triwulan !== null &&
+            $triwulan !== '' &&
+            isset($rentangTriwulan[(int) $triwulan])
+        ) {
+            $triwulan = (int) $triwulan;
 
-        if ($type === 'range' && $start && $end) {
-            $tahun = substr($start, 0, 4);
-            $bulan = substr($start, 5, 2);
+            $startDate = $tahun . '-' . $rentangTriwulan[$triwulan][0];
+            $endDate   = $tahun . '-' . $rentangTriwulan[$triwulan][1];
 
-            $startDate = date('Y-m-01', strtotime($start));
-            $endDate = date('Y-m-t', strtotime($end));
-
-            $periode = [
-                'bulan' => $bulan,
-                'tahun' => $tahun,
-            ];
-        } elseif ($periodeInput) {
-            [$tahun, $bulan] = explode('-', $periodeInput);
-
-            $periode = [
-                'bulan' => $bulan,
-                'tahun' => $tahun,
-            ];
-
-            session()->set('pl_periode', $periode);
-
-            [$startDate, $endDate] = $this->getDateRange(
-                $bulan,
-                $tahun,
-                $type
-            );
+            $periodeLabel = 'Triwulan ' . $triwulan;
         } else {
-            $periode = $this->getPeriode();
+            $triwulan = '';
 
-            $bulan = $periode['bulan'];
-            $tahun = $periode['tahun'];
+            $startDate = $tahun . '-01-01';
+            $endDate   = $tahun . '-12-31';
 
-            [$startDate, $endDate] = $this->getDateRange(
-                $bulan,
-                $tahun,
-                $type
-            );
+            $periodeLabel = 'Semua Periode';
         }
+
+        $type = 'triwulan';
+        $endExclusive = date('Y-m-d', strtotime($endDate . ' +1 day'));
+
+        // Dipakai untuk kompatibilitas dengan view PDF yang masih
+        // menggunakan variabel bulan.
+        $bulan = $periodeLabel;
 
         $idKegiatan = $this->request->getGet('id_kegiatan');
         $statusValidasi = $this->request->getGet('status_validasi');
         $form = $this->request->getGet('form') ?? 'form4';
         $idTimAktif = session('global_id_tim') ?? session('id_tim');
+
+
+        // =====================================================
+        // VALIDASI EXPORT FORM 4: SELURUH RTP HARUS DISETUJUI
+        // =====================================================
+        if ($form === 'form4') {
+
+            $pesanBlokir = null;
+
+            // Form 4 wajib menggunakan satu kegiatan
+            if (empty($idKegiatan) || !ctype_digit((string) $idKegiatan)) {
+                $pesanBlokir = 'Pilih satu kegiatan terlebih dahulu untuk export Form Pemantauan Risiko.';
+            } else {
+
+                $validasiBuilder = $this->db->table('rencana_penanganan_risiko rtp')
+                    ->select('
+                rtp.id_rtp,
+                pm.id_pemantauan,
+                pm.status_validasi
+            ')
+                    ->join(
+                        'evaluasi_risiko er',
+                        'er.id_evaluasi = rtp.id_penilaian_awal'
+                    )
+                    ->join(
+                        'identifikasi_risiko ir',
+                        'ir.id_identifikasi = er.id_identifikasi'
+                    )
+                    ->join(
+                        'konteks_proses_bisnis kpb',
+                        'kpb.id_konteks_proses = ir.id_konteks_proses'
+                    )
+                    ->join(
+                        'konteks k',
+                        'k.id_konteks = kpb.id_konteks'
+                    )
+                    ->join(
+                        'pemantauan_risiko pm',
+                        'pm.id_rtp = rtp.id_rtp',
+                        'left'
+                    )
+                    ->where('k.id_kegiatan', $idKegiatan)
+                    ->where('k.tahun', $tahun);
+
+                // Batasi sesuai tim operator
+                if (session('user_role') === 'operator') {
+
+                    if (empty($idTimAktif)) {
+                        $pesanBlokir = 'Tim aktif tidak ditemukan. Silakan pilih tim terlebih dahulu.';
+                    } else {
+                        $validasiBuilder->where('k.id_tim', $idTimAktif);
+                    }
+                }
+
+                // Batasi sesuai tim ketua
+                if (session('user_role') === 'ketua') {
+
+                    $pengelolaId = session('pengelola_id');
+
+                    $penugasanValidasi = $this->db
+                        ->table('penugasan_pengelola')
+                        ->where('pengelola_id', $pengelolaId)
+                        ->where('is_ketua_tim', true)
+                        ->get()
+                        ->getRowArray();
+
+                    if (!$penugasanValidasi) {
+                        $pesanBlokir = 'Data penugasan Ketua Tim tidak ditemukan.';
+                    } else {
+                        $validasiBuilder->where(
+                            'k.id_tim',
+                            $penugasanValidasi['tim_kerja_id']
+                        );
+                    }
+                }
+
+                if ($pesanBlokir === null) {
+
+                    $daftarValidasi = $validasiBuilder
+                        ->get()
+                        ->getResultArray();
+
+                    if (empty($daftarValidasi)) {
+
+                        $pesanBlokir = 'Tidak ditemukan data RTP pada kegiatan dan tahun yang dipilih.';
+                    } else {
+
+                        foreach ($daftarValidasi as $item) {
+
+                            if (
+                                empty($item['id_pemantauan']) ||
+                                ($item['status_validasi'] ?? '') !== 'Disetujui'
+                            ) {
+                                $pesanBlokir = 'Export Form Pemantauan Risiko belum dapat dilakukan. Pastikan seluruh RTP pada kegiatan ini sudah diisi dan disetujui oleh Ketua Tim.';
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+
+            if ($pesanBlokir !== null) {
+                return redirect()
+                    ->to(site_url('pelaporan-risiko'))
+                    ->with('warning_export', $pesanBlokir);
+            }
+        }
 
         $bulanNama = [
             '01' => 'Januari',
@@ -1386,7 +1549,7 @@ pb.kode_proses,
 pr.uraian_pengendalian,
 pr.efektivitas,
         kk.level,
-        kd.level,
+        kd.level,   
         er.id_evaluasi,
         er.opsi_tindakan,
         er.prioritas,
@@ -1543,35 +1706,15 @@ pr.efektivitas,
             }
 
             // FILTER TAHUN KONTEKS
-            if ($type !== 'semua') {
-                $form3Builder->where('k.tahun', $tahun);
-            }
+            $form3Builder->where('k.tahun', $tahun);
 
-            // FILTER PERIODE RTP BERDASARKAN TARGET WAKTU
-            if ($type === 'range' && $start && $end) {
-                $form3StartDate = date('Y-m-01', strtotime($start));
-                $form3EndExclusive = date(
-                    'Y-m-01',
-                    strtotime($end . ' +1 month')
-                );
-
-                $form3Builder
-                    ->where('rtp.target_waktu >=', $form3StartDate)
-                    ->where('rtp.target_waktu <', $form3EndExclusive);
-            } elseif ($type !== 'semua') {
-                $form3EndExclusive = date(
-                    'Y-m-d',
-                    strtotime($endDate . ' +1 day')
-                );
-
-                $form3Builder
-                    ->where('rtp.target_waktu >=', $startDate)
-                    ->where('rtp.target_waktu <', $form3EndExclusive);
-            }
+            // FILTER TRIWULAN BERDASARKAN TARGET WAKTU RTP
+            $form3Builder
+                ->where('rtp.target_waktu >=', $startDate)
+                ->where('rtp.target_waktu <', $endExclusive);
 
             $form3Data = $form3Builder
-                ->orderBy('pr.nilai_risiko', 'DESC')
-                ->orderBy('er.id_evaluasi', 'ASC')
+                ->orderBy('pb.kode_proses', 'ASC')
                 ->orderBy('rtp.id_rtp', 'ASC')
                 ->get()
                 ->getResultArray();
@@ -1610,8 +1753,15 @@ pr.efektivitas,
 
         if ($form === 'form4' || $form === 'all') {
 
-            $form4Builder = $this->db->table('pemantauan_risiko pm')
+            $form4Builder = $this->db->table('identifikasi_risiko ir')
                 ->select('
+            ir.id_identifikasi,
+            ir.pernyataan_risiko,
+
+           pkr.id AS id_pemantauan_keterjadian,
+pkr.keterjadian_risiko,
+pkr.jumlah_keterjadian,
+
             pm.id_pemantauan,
             pm.realisasi_output,
             pm.realisasi_waktu,
@@ -1629,14 +1779,9 @@ pr.efektivitas,
 
             er.id_evaluasi,
             er.id_penilaian,
-
-            ir.id_identifikasi,
-            ir.pernyataan_risiko,
-            ir.keterjadian_risiko,
-            ir.jumlah_keterjadian,
+            er.opsi_tindakan AS respon_risiko,
 
             pr.nilai_risiko,
-            pr.tindakan AS respon_risiko,
 
             km_res.level AS kemungkinan_residu,
             kd_res.level AS dampak_residu,
@@ -1652,18 +1797,8 @@ pr.efektivitas,
             tk.nama_tim,
             keg.nama_kegiatan
         ')
-                ->join(
-                    'rencana_penanganan_risiko rtp',
-                    'rtp.id_rtp = pm.id_rtp'
-                )
-                ->join(
-                    'evaluasi_risiko er',
-                    'er.id_evaluasi = rtp.id_penilaian_awal'
-                )
-                ->join(
-                    'identifikasi_risiko ir',
-                    'ir.id_identifikasi = er.id_identifikasi'
-                )
+
+                // KONTEKS RISIKO
                 ->join(
                     'konteks_proses_bisnis kpb',
                     'kpb.id_konteks_proses = ir.id_konteks_proses'
@@ -1672,11 +1807,46 @@ pr.efektivitas,
                     'konteks k',
                     'k.id_konteks = kpb.id_konteks'
                 )
+
+                // PEMANTAUAN KETERJADIAN RISIKO PER TRIWULAN
+                ->join(
+                    'pemantauan_keterjadian_risiko pkr',
+                    'pkr.id_identifikasi = ir.id_identifikasi
+     AND pkr.tahun = ' . (int) $tahun . '
+     AND pkr.triwulan = ' . (int) $triwulan,
+                    'left',
+                    false
+                )
+
+                // EVALUASI RISIKO
+                ->join(
+                    'evaluasi_risiko er',
+                    'er.id_identifikasi = ir.id_identifikasi',
+                    'left'
+                )
+
+                // RENCANA PENANGANAN RISIKO
+                ->join(
+                    'rencana_penanganan_risiko rtp',
+                    'rtp.id_penilaian_awal = er.id_evaluasi',
+                    'left'
+                )
+
+                // PEMANTAUAN RTP
+                ->join(
+                    'pemantauan_risiko pm',
+                    'pm.id_rtp = rtp.id_rtp',
+                    'left'
+                )
+
+                // PENILAIAN RISIKO
                 ->join(
                     'penilaian_risiko pr',
                     'pr.id_penilaian = er.id_penilaian',
                     'left'
                 )
+
+                // RISIKO RESIDUAL
                 ->join(
                     'kriteria_kemungkinan km_res',
                     'km_res.id_kriteria = pm.id_kemungkinan_residu',
@@ -1690,15 +1860,19 @@ pr.efektivitas,
                 ->join(
                     'matriks_risiko mr_res',
                     'mr_res.level_kemungkinan = km_res.level
-     AND mr_res.level_dampak = kd_res.level',
+             AND mr_res.level_dampak = kd_res.level',
                     'left',
                     false
                 )
+
+                // BUKTI DUKUNG
                 ->join(
                     'bukti_pemantauan bp',
                     'bp.id_pemantauan = pm.id_pemantauan',
                     'left'
                 )
+
+                // TIM DAN KEGIATAN
                 ->join(
                     'tim_kerja tk',
                     'tk.id_tim = k.id_tim',
@@ -1709,7 +1883,10 @@ pr.efektivitas,
                     'keg.id_kegiatan = k.id_kegiatan',
                     'left'
                 )
-                ->where('pm.status_validasi', 'Disetujui');
+
+                // FILTER TAHUN DAN KEGIATAN
+                ->where('k.tahun', $tahun)
+                ->where('k.id_kegiatan', $idKegiatan);
 
             // FILTER OPERATOR
             if (session('user_role') === 'operator') {
@@ -1724,6 +1901,7 @@ pr.efektivitas,
                 $penugasanForm4 = $this->db
                     ->table('penugasan_pengelola')
                     ->where('pengelola_id', $pengelolaId)
+                    ->where('is_ketua_tim', true)
                     ->get()
                     ->getRowArray();
 
@@ -1735,77 +1913,36 @@ pr.efektivitas,
                 }
             }
 
-            // FILTER PERIODE
-            if ($type === 'range' && $start && $end) {
-
-                $startDate = date('Y-m-01', strtotime($start));
-                $endExclusive = date(
-                    'Y-m-01',
-                    strtotime($end . ' +1 month')
-                );
-
-                $form4Builder
-                    ->where('pm.realisasi_waktu >=', $startDate)
-                    ->where('pm.realisasi_waktu <', $endExclusive);
-            } elseif ($type !== 'semua') {
-
-                $endExclusive = date(
-                    'Y-m-d',
-                    strtotime($endDate . ' +1 day')
-                );
-
-                $form4Builder
-                    ->where('pm.realisasi_waktu >=', $startDate)
-                    ->where('pm.realisasi_waktu <', $endExclusive);
-            }
-
-            // FILTER KEGIATAN
-            if (!empty($idKegiatan)) {
-                $form4Builder->where(
-                    'k.id_kegiatan',
-                    $idKegiatan
-                );
-            }
-
-            // FILTER STATUS VALIDASI
-            if (!empty($statusValidasi)) {
-                $form4Builder->where(
-                    'pm.status_validasi',
-                    $statusValidasi
-                );
-            }
-
+            // AMBIL SEMUA RISIKO, TERMASUK YANG BELUM MEMILIKI RTP
             $form4Data = $form4Builder
-                ->orderBy('pr.nilai_risiko', 'DESC')
-                ->orderBy('er.id_evaluasi', 'ASC')
+                ->orderBy('ir.id_identifikasi', 'ASC')
                 ->orderBy('rtp.id_rtp', 'ASC')
                 ->get()
                 ->getResultArray();
-        }
 
 
-        // =================================================
-        // NOMOR PRIORITAS RISIKO
-        // sama dengan Form 3
-        // =================================================
+            // =================================================
+            // NOMOR PRIORITAS RISIKO
+            // BERDASARKAN IDENTIFIKASI RISIKO
+            // =================================================
 
-        $prioritasMapForm4 = [];
-        $nomorPrioritasForm4 = 1;
+            $prioritasMapForm4 = [];
+            $nomorPrioritasForm4 = 1;
 
-        foreach ($form4Data as &$row) {
+            foreach ($form4Data as &$row) {
 
-            $idEvaluasi = $row['id_evaluasi'];
+                $idIdentifikasi = $row['id_identifikasi'];
 
-            if (!isset($prioritasMapForm4[$idEvaluasi])) {
-                $prioritasMapForm4[$idEvaluasi]
-                    = $nomorPrioritasForm4++;
+                if (!isset($prioritasMapForm4[$idIdentifikasi])) {
+                    $prioritasMapForm4[$idIdentifikasi] = $nomorPrioritasForm4++;
+                }
+
+                $row['prioritas_risiko'] =
+                    $prioritasMapForm4[$idIdentifikasi];
             }
 
-            $row['prioritas_risiko']
-                = $prioritasMapForm4[$idEvaluasi];
+            unset($row);
         }
-
-        unset($row);
 
         // =====================================================
         // META PDF: TIM KERJA & KEGIATAN
@@ -2092,6 +2229,7 @@ pr.efektivitas,
             $namaKegiatan .
             '.pdf';
 
+        // STREAM PDF
         // STREAM PDF
         $dompdf->stream($filename, [
             'Attachment' => false

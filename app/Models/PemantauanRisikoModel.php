@@ -21,6 +21,7 @@ class PemantauanRisikoModel extends Model
         'catatan_validasi',
         'validated_by',
         'validated_at',
+        'status_efektivitas',
         'efektivitas_pengendalian',
         'id_kemungkinan_residu',
         'id_dampak_residu',
@@ -170,6 +171,7 @@ class PemantauanRisikoModel extends Model
 
         if ($role !== 'operator') {
             unset(
+                $data['status_efektivitas'],
                 $data['efektivitas_pengendalian'],
                 $data['id_kemungkinan_residu'],
                 $data['id_dampak_residu']

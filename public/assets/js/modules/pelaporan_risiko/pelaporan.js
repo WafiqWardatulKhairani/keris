@@ -1,215 +1,217 @@
-  const USER = window.APP_USER || {};
-  const PL_URL = window.PL_CONFIG?.url || {};
+const USER = window.APP_USER || {};
+const PL_URL = window.PL_CONFIG?.url || {};
 
-  let plCsrfToken = window.PL_CONFIG?.csrf?.token || "";
-  const plCsrfName = window.PL_CONFIG?.csrf?.name || "";
-  function setText(id, value) {
-    const el = document.getElementById(id);
-    if (el) el.textContent = value ?? "-";
+let plCsrfToken = window.PL_CONFIG?.csrf?.token || "";
+const plCsrfName = window.PL_CONFIG?.csrf?.name || "";
+function setText(id, value) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = value ?? "-";
+}
+
+function setFormattedText(id, value) {
+  const el = document.getElementById(id);
+
+  if (!el) return;
+
+  if (!value) {
+    el.innerHTML = "-";
+    return;
   }
 
-  function setFormattedText(id, value) {
-    const el = document.getElementById(id); 
+  let formatted = value;
 
-    if (!el) return;
- 
-    if (!value) {
-      el.innerHTML = "-";
-      return;
-    }
+  //formatted = formatted.replace(/(\d+\.)/g, "<br>$1");
+  //formatted = formatted.replace(/(?:^|\s)(\d+\.)/g, "<br>$1");
+  formatted = formatted.replace(/(\d+\.)/g, "<br>$1");
+  formatted = formatted.replace(/^<br>/, "");
 
-    let formatted = value;
+  el.innerHTML = formatted;
+}
 
-    //formatted = formatted.replace(/(\d+\.)/g, "<br>$1");
-    //formatted = formatted.replace(/(?:^|\s)(\d+\.)/g, "<br>$1");
-    formatted = formatted.replace(/(\d+\.)/g, "<br>$1");
-    formatted = formatted.replace(/^<br>/, "");
+let currentId = null;
 
-    el.innerHTML = formatted;
+// INIT
+document.addEventListener("DOMContentLoaded", function () {
+  const role = USER.role || "operator";
+
+  // hanya tampilkan footer untuk ketua
+  const footer = document.getElementById("plFooterKetua");
+  if (footer) {
   }
+});
 
-  let currentId = null;
+//CLICK ROW
+document.addEventListener("click", function (e) {
+  const row = e.target.closest(".pl-row");
+  if (!row) return;
 
-  // INIT
-  document.addEventListener("DOMContentLoaded", function () {
-    const role = USER.role || "operator";
+  const id = row.dataset.id;
+  if (!id) return;
 
-    // hanya tampilkan footer untuk ketua
-    const footer = document.getElementById("plFooterKetua");
-    if (footer) {
-    }
-  });
+  openPelaporanDetail(id);
+});
 
-  //CLICK ROW
-  document.addEventListener("click", function (e) {
-    const row = e.target.closest(".pl-row");
-    if (!row) return;
+function applyBadgeColor(el, warna) {
+  if (!el) return;
 
-    const id = row.dataset.id;
-    if (!id) return;
+  el.className = "ar-preview-badge";
 
-    openPelaporanDetail(id);
-  });
+  switch (warna) {
+    case "biru":
+      el.classList.add("bg-primary", "text-white");
+      break;
 
-  function applyBadgeColor(el, warna) {
-    if (!el) return;
+    case "hijau":
+      el.classList.add("bg-success", "text-white");
+      break;
 
-    el.className = "ar-preview-badge";
+    case "kuning":
+      el.classList.add("bg-warning", "text-dark");
+      break;
 
-    switch (warna) {
-      case "biru":
-        el.classList.add("bg-primary", "text-white");
-        break;
+    case "oranye":
+      el.classList.add("bg-orange", "text-white");
+      break;
 
-      case "hijau":
-        el.classList.add("bg-success", "text-white");
-        break;
+    case "merah":
+      el.classList.add("bg-danger", "text-white");
+      break;
 
-      case "kuning":
-        el.classList.add("bg-warning", "text-dark");
-        break;
-
-      case "oranye":
-        el.classList.add("bg-orange", "text-white");
-        break;
-
-      case "merah":
-        el.classList.add("bg-danger", "text-white");
-        break;
-
-      default:
-        el.classList.add("bg-secondary", "text-white");
-        break;
-    }
+    default:
+      el.classList.add("bg-secondary", "text-white");
+      break;
   }
+}
 
-  // OPEN DETAIL
-  function openPelaporanDetail(id) {
-    currentId = id;
+// OPEN DETAIL
+function openPelaporanDetail(id) {
+  currentId = id;
 
-    fetch(PL_URL.detail(id))
+  fetch(PL_URL.detail(id))
+    .then((res) => res.json())
+    .then((data) => {
+      setText("plInfoTahun", data.tahun);
+      setText("plInfoTimKerja", data.nama_tim);
+      setText("plInfoKegiatan", data.nama_kegiatan);
+      setText("plInfoPengelola", data.nama_pengelola);
+      setText("plInfoSasaran", data.sasaran_strategis);
+
+      setText(
+        "plInfoProses",
+        (data.kode_proses ? data.kode_proses + " — " : "") +
+          (data.uraian_proses ?? ""),
+      );
+
+      setText("plInfoSasaranKinerja", data.sasaran_kinerja);
+      setText("plInfoRisiko", data.pernyataan_risiko);
+      setFormattedText("plInfoPenyebab", data.penyebab_risiko);
+      setFormattedText("plInfoDampak", data.dampak_risiko);
+
+      setText("plInfoProb", data.level_kemungkinan);
+      setText("plInfoImpact", data.level_dampak);
+
+      document.getElementById("plPreviewNilai").textContent =
+        data.nilai_risiko || 0;
+      document.getElementById("plPreviewBadge").textContent =
+        data.nama_selera || "";
+
+      applyBadgeColor(
+        document.getElementById("plPreviewBadge"),
+        data.warna_risiko,
+      );
+
+      setFormattedText("plInfoPengendalian", data.uraian_pengendalian);
+      setText("plInfoEfektivitas", data.efektivitas);
+
+      setText("plInfoRtp", data.uraian_rtp);
+      setText("plTargetOutput", data.target_output);
+      setText("plTargetWaktu", data.target_waktu);
+
+      setText("plRealisasiOutput", data.realisasi_output);
+      setText("plRealisasiWaktu", data.realisasi_waktu);
+      setText("plStatus", data.status);
+
+      const buktiEl = document.getElementById("plLinkBukti");
+      const buktiRow = document.getElementById("plRowBukti");
+
+      if (buktiEl && buktiRow) {
+        if (data.link_bukti) {
+          buktiEl.href = data.link_bukti;
+          buktiRow.style.display = "flex";
+        } else {
+          buktiRow.style.display = "none";
+        }
+      }
+
+      setText("plInfoProbResidu", data.level_kemungkinan_residu);
+
+      setText("plInfoImpactResidu", data.level_dampak_residu);
+
+      document.getElementById("plPreviewNilaiResidu").textContent =
+        data.nilai_residu || 0;
+
+      document.getElementById("plPreviewBadgeResidu").textContent =
+        data.nama_selera_residu || "";
+
+      applyBadgeColor(
+        document.getElementById("plPreviewBadgeResidu"),
+        data.warna_residu,
+      );
+
+      bootstrap.Offcanvas.getOrCreateInstance(
+        document.getElementById("plOffcanvas"),
+      ).show();
+    })
+    .catch(() => {
+      Swal.fire("Error", "Gagal load detail", "error");
+    });
+}
+
+function plAjukanKegiatan(idKegiatan) {
+  Swal.fire({
+    title: "Ajukan laporan ke ketua?",
+    text: "Semua RTP pada kegiatan ini akan dikirim untuk validasi.",
+    icon: "question",
+    showCancelButton: true,
+    confirmButtonText: "Ya, Ajukan",
+    cancelButtonText: "Batal",
+  }).then((result) => {
+    if (!result.isConfirmed) return;
+
+    fetch(PL_URL.ajukan, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        id_kegiatan: idKegiatan,
+      }),
+    })
       .then((res) => res.json())
       .then((data) => {
-        setText("plInfoTahun", data.tahun);
-        setText("plInfoTimKerja", data.nama_tim);
-        setText("plInfoKegiatan", data.nama_kegiatan);
-        setText("plInfoPengelola", data.nama_pengelola);
-        setText("plInfoSasaran", data.sasaran_strategis);
-
-        setText(
-          "plInfoProses",
-          (data.kode_proses ? data.kode_proses + " — " : "") +
-            (data.uraian_proses ?? ""),
-        );
-
-        setText("plInfoSasaranKinerja", data.sasaran_kinerja);
-        setText("plInfoRisiko", data.pernyataan_risiko);
-        setFormattedText("plInfoPenyebab", data.penyebab_risiko);
-        setFormattedText("plInfoDampak", data.dampak_risiko);
-
-        setText("plInfoProb", data.level_kemungkinan);
-        setText("plInfoImpact", data.level_dampak);
-
-        document.getElementById("plPreviewNilai").textContent = data.nilai_risiko || 0;
-        document.getElementById("plPreviewBadge").textContent = data.nama_selera || "";
-        
-        applyBadgeColor(
-          document.getElementById("plPreviewBadge"),
-          data.warna_risiko,
-        );
-
-        setFormattedText("plInfoPengendalian", data.uraian_pengendalian);
-        setText("plInfoEfektivitas", data.efektivitas);
-
-        setText("plInfoRtp", data.uraian_rtp);
-        setText("plTargetOutput", data.target_output);
-        setText("plTargetWaktu", data.target_waktu);
-
-        setText("plRealisasiOutput", data.realisasi_output);
-        setText("plRealisasiWaktu", data.realisasi_waktu);
-        setText("plStatus", data.status);
-
-        const buktiEl = document.getElementById("plLinkBukti");
-        const buktiRow = document.getElementById("plRowBukti");
-
-        if (buktiEl && buktiRow) {
-          if (data.link_bukti) {
-            buktiEl.href = data.link_bukti;
-            buktiRow.style.display = "flex";
-          } else {
-            buktiRow.style.display = "none";
-          }
+        if (!data.success) {
+          Swal.fire("Error", data.error || "Gagal mengajukan laporan", "error");
+          return;
         }
 
-        setText("plInfoProbResidu", data.level_kemungkinan_residu);
-
-        setText("plInfoImpactResidu", data.level_dampak_residu);
-
-        document.getElementById("plPreviewNilaiResidu").textContent = data.nilai_residu || 0;
-
-        document.getElementById("plPreviewBadgeResidu").textContent = data.nama_selera_residu || "";
-        
-        applyBadgeColor(
-          document.getElementById("plPreviewBadgeResidu"),
-          data.warna_residu,
-        );
-
-        bootstrap.Offcanvas.getOrCreateInstance(
-          document.getElementById("plOffcanvas"),
-        ).show();
+        Swal.fire(
+          "Berhasil",
+          "Laporan berhasil diajukan ke ketua",
+          "success",
+        ).then(() => {
+          location.reload();
+        });
       })
       .catch(() => {
-        Swal.fire("Error", "Gagal load detail", "error");
+        Swal.fire("Error", "Terjadi kesalahan server", "error");
       });
-  }
+  });
+}
 
-  function plAjukanKegiatan(idKegiatan) {
-    Swal.fire({
-      title: "Ajukan laporan ke ketua?",
-      text: "Semua RTP pada kegiatan ini akan dikirim untuk validasi.",
-      icon: "question",
-      showCancelButton: true,
-      confirmButtonText: "Ya, Ajukan",
-      cancelButtonText: "Batal",
-    }).then((result) => {
-      if (!result.isConfirmed) return;
-
-      fetch(PL_URL.ajukan, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          id_kegiatan: idKegiatan,
-        }),
-      })
-        .then((res) => res.json())
-        .then((data) => {
-          if (!data.success) {
-            Swal.fire("Error", data.error || "Gagal mengajukan laporan", "error");
-            return;
-          }
-
-          Swal.fire(
-            "Berhasil",
-            "Laporan berhasil diajukan ke ketua",
-            "success",
-          ).then(() => {
-            location.reload();
-          });
-        })
-        .catch(() => {
-          Swal.fire("Error", "Terjadi kesalahan server", "error");
-        });
-    });
-  }
-
- function plApproveKegiatan(idKegiatan) {
+function plApproveKegiatan(idKegiatan) {
   const timSelect = document.getElementById("plCsTimKerja");
 
-  const idTim = timSelect
-    ? timSelect.value
-    : window.PL_CS_DATA?.activeTimId;
+  const idTim = timSelect ? timSelect.value : window.PL_CS_DATA?.activeTimId;
 
   if (!idTim) {
     Swal.fire("Error", "Tim kerja belum dipilih", "error");
@@ -239,38 +241,26 @@
       .then((res) => res.json())
       .then((data) => {
         if (!data.success) {
-          Swal.fire(
-            "Error",
-            data.error || "Gagal approve",
-            "error",
-          );
+          Swal.fire("Error", data.error || "Gagal approve", "error");
           return;
         }
 
-        Swal.fire(
-          "Berhasil",
-          "Laporan berhasil disetujui",
-          "success",
-        ).then(() => {
-          location.reload();
-        });
+        Swal.fire("Berhasil", "Laporan berhasil disetujui", "success").then(
+          () => {
+            location.reload();
+          },
+        );
       })
       .catch(() => {
-        Swal.fire(
-          "Error",
-          "Terjadi kesalahan server",
-          "error",
-        );
+        Swal.fire("Error", "Terjadi kesalahan server", "error");
       });
   });
 }
 
-  function plRejectKegiatan(idKegiatan) {
+function plRejectKegiatan(idKegiatan) {
   const timSelect = document.getElementById("plCsTimKerja");
 
-  const idTim = timSelect
-    ? timSelect.value
-    : window.PL_CS_DATA?.activeTimId;
+  const idTim = timSelect ? timSelect.value : window.PL_CS_DATA?.activeTimId;
 
   if (!idTim) {
     Swal.fire("Error", "Tim kerja belum dipilih", "error");
@@ -317,57 +307,102 @@
       .then((res) => res.json())
       .then((data) => {
         if (!data.success) {
-          Swal.fire(
-            "Error",
-            data.error || "Gagal reject",
-            "error",
-          );
+          Swal.fire("Error", data.error || "Gagal reject", "error");
           return;
         }
 
-        Swal.fire(
-          "Berhasil",
-          "Laporan berhasil ditolak",
-          "success",
-        ).then(() => {
-          location.reload();
-        });
+        Swal.fire("Berhasil", "Laporan berhasil ditolak", "success").then(
+          () => {
+            location.reload();
+          },
+        );
       })
       .catch(() => {
-        Swal.fire(
-          "Error",
-          "Terjadi kesalahan server",
-          "error",
-        );
+        Swal.fire("Error", "Terjadi kesalahan server", "error");
       });
   });
 }
 
-  function plShowCatatan(catatan) {
-    Swal.fire({
-      title: "Catatan Ketua",
-      text: catatan,
-      icon: "info",
-      confirmButtonText: "Tutup",
-    });
-  }
+function plShowCatatan(catatan) {
+  Swal.fire({
+    title: "Catatan Ketua",
+    text: catatan,
+    icon: "info",
+    confirmButtonText: "Tutup",
+  });
+}
 
-function plPrintReport(form = "form4") {
-  const url = new URL(PL_URL.print, window.location.origin);
+async function plPrintReport(form = "form4") {
+    const url = new URL(PL_URL.print, window.location.origin);
+    url.searchParams.set("form", form);
 
-  const filterForm = document.getElementById("plContextSelectorForm");
+    const kegiatanSelect = document.getElementById("plCsKegiatan");
+    const idKegiatan = kegiatanSelect?.value || "";
 
-  url.searchParams.set("form", form);
+    // Validasi khusus Form 4
+    if (form === "form4") {
+        if (!idKegiatan) {
+            Swal.fire({
+                icon: "warning",
+                title: "Pilih Kegiatan",
+                text: "Pilih satu kegiatan terlebih dahulu untuk export Form Pemantauan Risiko.",
+                confirmButtonText: "Mengerti"
+            });
+            return;
+        }
 
-  if (filterForm) {
-    const formData = new FormData(filterForm);
+        const tahun = document.getElementById("plCsTahun")?.value || "";
 
-    for (const [key, value] of formData.entries()) {
-      if (value !== "") {
-        url.searchParams.set(key, value);
-      }
+        const params = new URLSearchParams({
+            id_kegiatan: idKegiatan,
+            tahun: tahun
+        });
+
+        try {
+            const response = await fetch(
+                `${PL_URL.checkForm4}?${params.toString()}`
+            );
+
+            const result = await response.json();
+
+            if (!result.success) {
+                Swal.fire({
+                    icon: "warning",
+                    title: "Belum Disetujui",
+                    text: "Export Form Pemantauan Risiko belum dapat dilakukan karena menunggu persetujuan Ketua Tim.",
+                    confirmButtonText: "Tutup"
+                });
+
+                return;
+            }
+        } catch (error) {
+            Swal.fire({
+                icon: "error",
+                title: "Gagal Memeriksa",
+                text: "Gagal memeriksa status persetujuan RTP.",
+                confirmButtonText: "Tutup"
+            });
+
+            return;
+        }
     }
-  }
 
-  window.open(url.toString(), "_blank");
+    // Kirim seluruh filter yang sedang dipilih
+    const filterForm = document.getElementById("plFilterForm");
+
+    if (filterForm) {
+        new FormData(filterForm).forEach((value, key) => {
+            if (value !== "") {
+                url.searchParams.set(key, value);
+            }
+        });
+    }
+
+    // Pastikan kegiatan terpilih ikut dikirim
+    if (form === "form4") {
+        url.searchParams.set("id_kegiatan", idKegiatan);
+    }
+
+    // PDF dibuka hanya setelah lolos pemeriksaan
+    window.open(url.toString(), "_blank");
 }

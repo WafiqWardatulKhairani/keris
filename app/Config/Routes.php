@@ -348,6 +348,9 @@ $routes->group('pelaporan-risiko', ['filter' => ['auth']], function ($routes) {
     $routes->get('detail/(:num)', 'PelaporanRisikoController::detail/$1', ['filter' => 'role:admin,operator,ketua']);
     $routes->get('export', 'PelaporanRisikoController::export', ['filter' => 'role:admin,operator,ketua']);
     $routes->get('print', 'PelaporanRisikoController::print', ['filter' => 'role:admin,operator,ketua']);
+  $routes->get('check-form4', 'PelaporanRisikoController::checkForm4', [
+    'filter' => 'role:admin,operator,ketua'
+]);
 
     // OPERATOR
     $routes->group('', ['filter' => 'role:operator'], function ($routes) {
