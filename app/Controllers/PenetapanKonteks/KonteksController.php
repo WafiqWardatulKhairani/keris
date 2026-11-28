@@ -385,7 +385,7 @@ class KonteksController extends BaseContextController
             }
         }
 
-        $perPage = (int) ($this->request->getGet('perPage') ?? 10);
+       $perPage = (int) ($this->request->getGet('perPage') ?? 5);
 
         $data  = $builder->orderBy('tahun', 'DESC')->paginate($perPage);
         $pager = $this->model->pager;

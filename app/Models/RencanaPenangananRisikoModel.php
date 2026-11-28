@@ -16,6 +16,7 @@ class RencanaPenangananRisikoModel extends Model
     protected $allowedFields = [
         'id_penilaian_awal',
         'uraian_rtp',
+        'jenis_penanganan',
         'target_output',
         'target_waktu',
         'id_kemungkinan_residu',
@@ -29,6 +30,7 @@ class RencanaPenangananRisikoModel extends Model
     protected $validationRules = [
         'id_penilaian_awal'     => 'required|integer',
         'uraian_rtp'            => 'required',
+        'jenis_penanganan' => 'permit_empty|in_list[Preventif,Korektif,Direktif,Detektif]',
         'target_output'         => 'required',
         'target_waktu'          => 'required|valid_date',
         'id_kemungkinan_residu' => 'permit_empty|integer',

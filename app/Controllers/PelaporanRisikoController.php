@@ -844,8 +844,30 @@ class PelaporanRisikoController extends BaseController
 
     public function checkForm4()
     {
+
         $idKegiatan = $this->request->getGet('id_kegiatan');
         $tahun = (int) ($this->request->getGet('tahun') ?? date('Y'));
+
+        $triwulan = (int) ($this->request->getGet('triwulan') ?? 0);
+
+        $rentangTriwulan = [
+            1 => ['01-01', '03-31'],
+            2 => ['04-01', '06-30'],
+            3 => ['07-01', '09-30'],
+            4 => ['10-01', '12-31'],
+        ];
+
+        if (!isset($rentangTriwulan[$triwulan])) {
+            return $this->response->setJSON([
+                'success' => false
+            ]);
+        }
+
+        $startDate = $tahun . '-' . $rentangTriwulan[$triwulan][0];
+        $endDate = date(
+            'Y-m-d',
+            strtotime($tahun . '-' . $rentangTriwulan[$triwulan][1] . ' +1 day')
+        );
 
         if (empty($idKegiatan) || !ctype_digit((string) $idKegiatan)) {
             return $this->response->setJSON([
@@ -862,6 +884,10 @@ class PelaporanRisikoController extends BaseController
             ->join('pemantauan_risiko pm', 'pm.id_rtp = rtp.id_rtp', 'left')
             ->where('k.id_kegiatan', $idKegiatan)
             ->where('k.tahun', $tahun);
+
+        $builder
+            ->where('rtp.target_waktu >=', $startDate)
+            ->where('rtp.target_waktu <', $endDate);
 
         // Batasi sesuai tim aktif untuk operator dan ketua
         if (in_array(session('user_role'), ['operator', 'ketua'], true)) {
@@ -950,7 +976,6 @@ class PelaporanRisikoController extends BaseController
         $form = $this->request->getGet('form') ?? 'form4';
         $idTimAktif = session('global_id_tim') ?? session('id_tim');
 
-
         // =====================================================
         // VALIDASI EXPORT FORM 4: SELURUH RTP HARUS DISETUJUI
         // =====================================================
@@ -991,7 +1016,9 @@ class PelaporanRisikoController extends BaseController
                         'left'
                     )
                     ->where('k.id_kegiatan', $idKegiatan)
-                    ->where('k.tahun', $tahun);
+                    ->where('k.tahun', $tahun)
+                    ->where('rtp.target_waktu >=', $startDate)
+                    ->where('rtp.target_waktu <', $endExclusive);
 
                 // Batasi sesuai tim operator
                 if (session('user_role') === 'operator') {
@@ -1106,7 +1133,20 @@ pr.efektivitas,
 
         pm.realisasi_output,
         pm.realisasi_waktu,
-        COALESCE(pm.status, 'Belum Dilaksanakan') as status,
+      CASE
+    WHEN pm.realisasi_waktu IS NOT NULL
+         AND pm.realisasi_waktu > rtp.target_waktu
+        THEN 'Terlambat'
+
+    WHEN (
+        pm.realisasi_waktu IS NULL
+        OR COALESCE(pm.status, '') <> 'Selesai'
+    )
+    AND rtp.target_waktu < CURRENT_DATE
+        THEN 'Terlambat'
+
+    ELSE COALESCE(pm.status, 'Belum Dilaksanakan')
+END AS status,
 
         sk.nama_tim,
         kegiatan.id_kegiatan,
@@ -1745,6 +1785,19 @@ pr.efektivitas,
 
         //batas form 3
 
+        if (
+            ($form === 'form4' || $form === 'all') &&
+            (
+                empty($idKegiatan) ||
+                !in_array((int) $triwulan, [1, 2, 3, 4], true)
+            )
+        ) {
+            return redirect()->back()->with(
+                'error',
+                'Pilih satu kegiatan dan satu triwulan untuk mencetak Form 4.'
+            );
+        }
+
         // =====================================================
         // DATA KHUSUS FORM 4 - PELAPORAN RISIKO
         // =====================================================
@@ -1752,7 +1805,20 @@ pr.efektivitas,
         $form4Data = [];
 
         if ($form === 'form4' || $form === 'all') {
+            $rentangTriwulan = [
+                1 => ['01-01', '04-01'],
+                2 => ['04-01', '07-01'],
+                3 => ['07-01', '10-01'],
+                4 => ['10-01', null],
+            ];
 
+            $startDate = $tahun . '-' . $rentangTriwulan[(int) $triwulan][0];
+
+            $endExclusive = (int) $triwulan === 4
+                ? ($tahun + 1) . '-01-01'
+                : $tahun . '-' . $rentangTriwulan[(int) $triwulan][1];
+
+            // QUERY FORM 4
             $form4Builder = $this->db->table('identifikasi_risiko ir')
                 ->select('
             ir.id_identifikasi,
@@ -1828,8 +1894,11 @@ pkr.jumlah_keterjadian,
                 // RENCANA PENANGANAN RISIKO
                 ->join(
                     'rencana_penanganan_risiko rtp',
-                    'rtp.id_penilaian_awal = er.id_evaluasi',
-                    'left'
+                    'rtp.id_penilaian_awal = er.id_evaluasi
+     AND rtp.target_waktu >= ' . $this->db->escape($startDate) . '
+     AND rtp.target_waktu < ' . $this->db->escape($endExclusive),
+                    'left',
+                    false
                 )
 
                 // PEMANTAUAN RTP

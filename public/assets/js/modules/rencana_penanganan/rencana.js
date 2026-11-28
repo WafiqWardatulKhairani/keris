@@ -22,6 +22,81 @@ function rtpCanEdit(data) {
   return false;
 }
 
+/* ================= JENIS PENANGANAN ================= */
+
+document.addEventListener("change", function (e) {
+  const select = e.target.closest(".js-jenis-penanganan");
+
+  if (!select) return;
+
+  const idRtp = select.dataset.idRtp;
+  const jenis = select.value;
+  const status = select.parentElement.querySelector(".jenis-penanganan-status");
+
+  const previousValue = select.dataset.previousValue ?? "";
+
+  if (!idRtp) return;
+
+  if (!jenis) {
+    select.value = previousValue;
+    return;
+  }
+
+  select.disabled = true;
+
+  const body = new URLSearchParams();
+  body.append("jenis_penanganan", jenis);
+  body.append(rtpCsrfName, rtpCsrfToken);
+
+  fetch(RTP_URL.updateJenisPenanganan(idRtp), {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+      "X-Requested-With": "XMLHttpRequest",
+    },
+    body: body.toString(),
+  })
+    .then(async (response) => {
+      const result = await response.json();
+
+      if (!response.ok || result.status !== "success") {
+        throw new Error(result.message || "Gagal menyimpan perubahan.");
+      }
+
+      if (result.csrf_token) {
+        rtpCsrfToken = result.csrf_token;
+      }
+
+      select.dataset.previousValue = jenis;
+    })
+    .catch((error) => {
+      console.error("Update jenis penanganan:", error);
+
+      select.value = previousValue;
+
+      Swal.fire({
+        icon: "error",
+        title: "Gagal",
+        text: error.message,
+      });
+    })
+    .finally(() => {
+      select.disabled = !rtpCanEdit({
+        id_tim: select.dataset.idTim,
+      });
+    });
+});
+
+function rtpInitJenisPenanganan() {
+  document.querySelectorAll(".js-jenis-penanganan").forEach((select) => {
+    select.disabled = !rtpCanEdit({
+      id_tim: select.dataset.idTim,
+    });
+
+    select.dataset.previousValue = select.value;
+  });
+}
+
 /* ================= MODE ================= */
 function rtpSetMode(mode) {
   const isView = mode === "view";
@@ -70,6 +145,13 @@ function rtpSetMode(mode) {
   document
     .getElementById("rtpBtnSimpan")
     .classList.toggle("d-none", isView || !RTP_CAN_EDIT);
+
+  // Dropdown jenis penanganan pada tampilan detail
+  document
+    .querySelectorAll("#rtpTimelineContainer .rtp-view-jenis")
+    .forEach((select) => {
+      select.disabled = true;
+    });
 
   document.getElementById("rtpBtnTutup").classList.toggle("d-none", isEdit);
 
@@ -211,6 +293,12 @@ function rtpAddCard(data = {}) {
 
   const node = tpl.content.cloneNode(true);
 
+  const jenis = node.querySelector('select[name="jenis_penanganan[]"]');
+
+  if (jenis) {
+    jenis.value = data.jenis_penanganan || "";
+  }
+
   const idRtp = node.querySelector('input[name="id_rtp[]"]');
   if (idRtp) idRtp.value = data.id_rtp || "";
 
@@ -239,6 +327,7 @@ function rtpLoadDetail(idRtp) {
     .then((d) => {
       console.log("USER", USER);
       console.log("DATA", d);
+      console.table(d.rtp_list);
       console.log("CAN EDIT?", rtpCanEdit(d));
       document.getElementById("rtpId").value = d.id_rtp;
       document.getElementById("rtpIdEvaluasi").value = d.id_evaluasi;
@@ -354,15 +443,50 @@ function rtpRenderTimeline(list) {
   const wrapper = document.createElement("div");
   wrapper.className = "rtp-timeline";
 
-  list.forEach((r, i) => {
+  const opsiJenis = ["Preventif", "Korektif", "Direktif", "Detektif"];
+
+  list.forEach((r) => {
     const item = document.createElement("div");
     item.className = "rtp-timeline-item";
+
+    const options = opsiJenis
+      .map(
+        (jenis) => `
+      <option value="${jenis}"
+        ${r.jenis_penanganan === jenis ? "selected" : ""}>
+        ${jenis}
+      </option>
+    `,
+      )
+      .join("");
 
     item.innerHTML = `
       <div class="rtp-timeline-row">
         <div class="rtp-timeline-content">
-          <div><span class="rtp-timeline-label">Output :</span> ${r.target_output ?? "-"}</div>
-          <div><span class="rtp-timeline-label">Target :</span> ${r.target_waktu ?? "-"}</div>
+
+          <div class="mb-2">
+            <span class="rtp-timeline-label">
+              Jenis Penanganan :
+            </span>
+
+            <select
+              class="form-select form-select-sm rtp-view-jenis"
+              disabled>
+              <option value="">Pilih jenis penanganan</option>
+              ${options}
+            </select>
+          </div>
+
+          <div>
+            <span class="rtp-timeline-label">Output :</span>
+            ${r.target_output ?? "-"}
+          </div>
+
+          <div>
+            <span class="rtp-timeline-label">Target :</span>
+            ${r.target_waktu ?? "-"}
+          </div>
+
         </div>
       </div>
     `;
@@ -388,8 +512,7 @@ function rtpBatal() {
 
 /* ================= CLICK ROW ================= */
 document.addEventListener("click", function (e) {
-  if (e.target.closest("a, button")) return;
-
+  if (e.target.closest("a, button, select, input, textarea")) return;
   const row = e.target.closest("tr[data-rtp]");
 
   if (!row) return;
@@ -437,6 +560,9 @@ document.addEventListener("click", function (e) {
 });
 
 document.addEventListener("DOMContentLoaded", function () {
+  // Inisialisasi dropdown Jenis Penanganan
+  rtpInitJenisPenanganan();
+
   document
     .getElementById("rtpKemungkinanResidu")
     ?.addEventListener("change", rtpHitungResidu);
@@ -458,6 +584,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const id = document.getElementById("rtpId").value;
 
     let url = "";
+
     if (mode === "create") {
       url = RTP_URL.store;
     } else if (mode === "edit") {

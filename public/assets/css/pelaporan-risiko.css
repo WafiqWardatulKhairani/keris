@@ -23,13 +23,20 @@
   padding: 8px 20px 18px 20px;
 }
 
-/* ===== SUMMARY ===== */
+/* ===== SUMMARY CARDS ===== */
+
 .pl-stat-card {
-  border-radius: 12px;
-  padding: 16px;
+  height: 100%;
+  min-height: 76px;
+  padding: 12px 14px;
+  border-radius: 10px;
   background: #fff;
   border: 1px solid #e5e7eb;
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
 }
 
 .pl-stat-label {
@@ -38,8 +45,29 @@
 }
 
 .pl-stat-value {
-  font-size: 1.8rem;
+  font-size: 23px;
+  line-height: 1.2;
   font-weight: 700;
+}
+
+.pl-success {
+  color: #16a34a;
+}
+.pl-warning {
+  color: #2563eb;
+}
+.pl-danger {
+  color: #ef4444;
+}
+
+@media (max-width: 576px) {
+  .pl-stat-card {
+    min-height: 68px;
+  }
+
+  .pl-stat-value {
+    font-size: 20px;
+  }
 }
 
 /* ===== TABLE CARD ===== */
@@ -59,8 +87,8 @@
 
 /* ===== SHARED: TABLE SCROLL ===== */
 .ar-table-scroll {
-    width: 100%;
-    overflow-x: hidden;
+  width: 100%;
+  overflow-x: hidden;
 }
 
 /* ===== SHARED: RISIKO CELL ===== */
@@ -296,215 +324,6 @@
   }
 }
 
-/* ===== FILTER CARD ===== */
-.pl-filter-card {
-  border: 1px solid #e5e7eb;
-  border-radius: 14px;
-  background: #fff;
-  overflow: hidden;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
-}
-
-.pl-filter-inner {
-  display: flex;
-  align-items: stretch;
-}
-
-.pl-filter-section {
-  padding: 18px 24px;
-  flex: 1;
-}
-
-.pl-filter-context {
-  flex: 1.4;
-}
-
-.pl-filter-periode {
-  flex: 1;
-  background: #f8fafc;
-  display: flex;
-  flex-direction: column;
-}
-
-.pl-filter-divider {
-  width: 1px;
-  background: #e5e7eb;
-  flex-shrink: 0;
-}
-
-.pl-section-label {
-  font-size: 10px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: #9ca3af;
-  margin-bottom: 14px;
-  display: flex;
-  align-items: center;
-  gap: 5px;
-}
-
-.pl-field-group {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.pl-field {
-  display: flex;
-  align-items: center;
-  padding: 7px 0;
-  border-bottom: 1px solid #f3f4f6;
-  gap: 0;
-  min-height: 36px;
-}
-
-.pl-field:last-child {
-  border-bottom: none;
-}
-
-.pl-field-label {
-  font-size: 11.5px;
-  color: #9ca3af;
-  font-weight: 500;
-  width: 80px;
-  flex-shrink: 0;
-}
-
-.pl-field-value {
-  flex: 1;
-}
-
-.pl-select {
-  width: 100%;
-  border: none;
-  background: transparent;
-  padding: 2px 0;
-  font-size: 13px;
-  font-weight: 500;
-  color: #111827;
-  outline: none;
-  cursor: pointer;
-  appearance: auto;
-}
-
-.pl-select:focus {
-  color: #2f80ed;
-}
-
-.pl-field-static {
-  font-size: 13px;
-  font-weight: 500;
-  color: #111827;
-}
-
-/* Periode slot: tipe row selalu tampil, slot bawah fixed height */
-.pl-periode-tipe {
-  display: flex;
-  align-items: center;
-  padding: 7px 0;
-  border-bottom: 1px solid #f3f4f6;
-  min-height: 36px;
-}
-
-.pl-periode-slot {
-  min-height: 52px;
-  display: flex;
-  align-items: center;
-  padding: 10px 0 6px;
-}
-
-.pl-periode-slot-inner {
-  width: 100%;
-}
-
-.pl-slot-label {
-  font-size: 10.5px;
-  color: #9ca3af;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin-bottom: 4px;
-}
-
-.pl-slot-input {
-  width: 100%;
-  border: none;
-  background: transparent;
-  padding: 2px 0;
-  font-size: 13px;
-  font-weight: 500;
-  color: #111827;
-  outline: none;
-}
-
-.pl-slot-input:focus {
-  color: #2f80ed;
-}
-
-.pl-range-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  width: 100%;
-}
-
-.pl-range-col {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-}
-
-.pl-range-col .pl-slot-label {
-  margin-bottom: 4px;
-}
-
-.pl-range-col .pl-slot-input {
-  width: 100%;
-}
-
-.pl-range-sep {
-  color: #d1d5db;
-  font-size: 16px;
-  flex-shrink: 0;
-  padding-top: 16px;
-}
-
-.pl-btn-submit {
-  margin-top: 12px;
-  height: 36px;
-  padding: 0 20px;
-  background: #2f80ed;
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  align-self: flex-start;
-  transition: background 0.15s;
-}
-
-.pl-btn-submit:hover {
-  background: #1a6ed6;
-}
-
-@media (max-width: 768px) {
-  .pl-filter-inner {
-    flex-direction: column;
-  }
-  .pl-filter-divider {
-    width: 100%;
-    height: 1px;
-  }
-  .pl-filter-periode {
-    background: #fff;
-    border-top: 1px solid #e5e7eb;
-  }
-}
 /* ===== REPORT TABLE ===== */
 
 .pl-report-table {
@@ -512,6 +331,7 @@
     table-layout: fixed;
     font-size: 12px;
     margin: 0;
+    border-collapse: collapse;
 }
 
 .pl-report-table th,
@@ -520,14 +340,24 @@
     box-sizing: border-box;
 }
 
-/* ===== HEADER ===== */
-
+/* Header */
 .pl-report-table thead th {
     background: #f8fafc;
-    color: #374151;
+    color: #344054;
+    font-size: 12px;
     font-weight: 600;
-    padding: 11px 8px;
+    padding: 12px 7px;
+    text-align: left;
     border-color: #e5e7eb;
+}
+
+.pl-report-table thead th:first-child,
+.pl-report-table thead th:nth-child(4),
+.pl-report-table thead th:nth-child(5),
+.pl-report-table thead th:nth-child(6),
+.pl-report-table thead th:nth-child(7),
+.pl-report-table thead th:nth-child(8) {
+    text-align: center;
 }
 
 .pl-report-table thead tr:first-child th {
@@ -536,26 +366,27 @@
 
 .pl-report-table thead tr:nth-child(2) th {
     font-size: 11px;
+    white-space: nowrap;
 }
 
-/* ===== ROW ===== */
-
+/* Body */
 .pl-report-table tbody .pl-row td {
-    padding: 10px 8px;
+    padding: 12px 8px;
+    font-size: 12px;
+    line-height: 1.45;
     border-color: #edf0f3;
 }
 
 .pl-row {
     cursor: pointer;
-    transition: background-color .12s ease;
+    transition: background-color .15s ease;
 }
 
 .pl-row:hover td {
     background: #f8fafc;
 }
 
-/* ===== TEXT ===== */
-
+/* Risiko dan RTP */
 .pl-col-risiko,
 .pl-col-rtp {
     min-width: 0;
@@ -569,21 +400,24 @@
     white-space: nowrap;
 }
 
-.pl-col-risiko .text-muted {
-    margin-top: 3px;
-    font-size: 10px !important;
+.pl-col-risiko .fw-semibold {
+    font-size: 12px;
+    line-height: 1.4;
 }
 
-/* ===== WAKTU ===== */
+.pl-col-risiko .text-muted {
+    margin-top: 4px;
+    font-size: 10.5px !important;
+}
 
+/* Waktu */
 .pl-report-table td:nth-child(5),
 .pl-report-table td:nth-child(7) {
     text-align: center;
     white-space: nowrap;
 }
 
-/* ===== STATUS REALISASI ===== */
-
+/* Status */
 .pl-report-table td:nth-child(8) {
     text-align: center;
 }
@@ -591,67 +425,697 @@
 .pl-report-table td:nth-child(8) .badge {
     display: inline-block;
     max-width: 100%;
-    padding: 4px 6px;
-    font-size: 9.5px;
+    padding: 4px 7px;
+    font-size: 10px;
     font-weight: 500;
-    line-height: 1.2;
+    line-height: 1.35;
     white-space: normal;
     text-align: center;
-    border-radius: 4px;
+    border-radius: 5px;
 }
 
-/* ===== KEGIATAN ===== */
-
+/* Pemisah kegiatan */
 .pl-kegiatan-separator td {
     background: #f3f6fa !important;
     border-top: 1px solid #dce3ea;
     border-bottom: 1px solid #dce3ea;
-    padding: 8px 10px !important;
+    padding: 9px 10px !important;
 }
 
 .pl-kegiatan-title {
     min-width: 0;
     font-size: 12px;
-    font-weight: 700;
+    font-weight: 600;
     color: #344054;
     display: flex;
     align-items: center;
 }
 
-.pl-kegiatan-title i {
-    color: #667085;
-    font-size: 14px;
-}
-
-/* status kegiatan */
 .pl-kegiatan-separator .badge {
     flex-shrink: 0;
-    padding: 4px 6px;
+    padding: 4px 7px;
     font-size: 10px;
-    font-weight: 500;
-    border-radius: 4px;
 }
 
-/* action kegiatan */
 .pl-kegiatan-separator .btn {
-    height: 28px;
-    padding: 0 8px;
-    font-size: 10.5px;
-    font-weight: 500;
-    border-radius: 5px;
-
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-
+    min-height: 30px;
+    padding: 4px 9px;
+    font-size: 11px;
     white-space: nowrap;
 }
 
-/* ===== CATATAN ===== */
-
+/* Catatan */
 .pl-catatan-validasi {
     max-width: 420px;
     white-space: normal;
     word-break: break-word;
-    line-height: 1.35;
+    line-height: 1.4;
+}
+
+/* Tabel tetap menyesuaikan layar */
+.ar-table-scroll {
+    width: 100%;
+    overflow-x: auto;
+}
+
+#plTableCard .card-body {
+    padding: 14px;
+}
+
+#plTableCard {
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+@media (max-width: 768px) {
+    #plTableCard .card-body {
+        padding: 8px;
+    }
+
+    .pl-report-table {
+        min-width: 850px;
+    }
+}
+
+/* ==========================================
+   FILTER PELAPORAN RISIKO
+========================================== */
+
+.pl-filter-card {
+    width: 100%;
+    margin-bottom: 16px;
+    padding: 18px 20px;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    background: #fff;
+    box-shadow: none;
+    box-sizing: border-box;
+}
+
+.pl-filter-inner {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.pl-filter-section {
+    min-width: 0;
+    padding: 0;
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    box-sizing: border-box;
+}
+
+.pl-section-label {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin-bottom: 12px;
+    color: #344054;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.pl-filter-periode {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding-top: 14px;
+    border-top: 1px solid #eaecf0;
+}
+
+.pl-periode-modern {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.pl-tahun-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.pl-tahun-row .pl-select {
+    width: 115px;
+    flex-shrink: 0;
+}
+
+.pl-triwulan-label {
+    margin-top: 0;
+    color: #667085;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.pl-triwulan-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 8px;
+}
+
+.pl-triwulan-card {
+    min-height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    padding: 8px;
+    color: #475467;
+    font-size: 12px;
+    font-weight: 500;
+    border: 1px solid #d0d5dd;
+    border-radius: 8px;
+    background: #fff;
+    cursor: pointer;
+    transition: all .15s ease;
+}
+
+.pl-triwulan-card.active {
+    color: #2f80ed;
+    border-color: #2f80ed;
+    background: #eff6ff;
+    font-weight: 600;
+}
+
+.pl-filter-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px solid #eaecf0;
+}
+.pl-filter-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px solid #eaecf0;
+}
+
+.pl-filter-actions .pl-btn-submit {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    width: auto;
+    min-width: 145px;
+    min-height: 38px;
+    margin: 0;
+    padding: 8px 18px;
+}
+
+/* Judul card */
+.pl-section-label {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+   margin-bottom: 16px;
+    color: #344054;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.pl-filter-context .pl-field-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.pl-filter-context .pl-field {
+    display: grid;
+    grid-template-columns: 105px minmax(0, 1fr);
+    align-items: center;
+    gap: 10px;
+    margin: 0;
+    padding: 4px 0;
+    min-width: 0;
+}
+
+.pl-filter-context .pl-field-label {
+    color: #667085;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.pl-filter-context .pl-field-value {
+    min-width: 0;
+    margin: 0;
+}
+
+.pl-field-static {
+    display: block;
+    color: #344054;
+    font-size: 12px;
+    font-weight: 500;
+    overflow-wrap: break-word;
+}
+
+/* Dropdown konteks */
+.pl-filter-section .pl-select {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    height: 36px;
+    padding: 6px 32px 6px 10px;
+    color: #344054;
+    font-size: 12px;
+    border: 1px solid #d0d5dd;
+    border-radius: 7px;
+    background-color: #fff;
+    box-sizing: border-box;
+    cursor: pointer;
+}
+
+.pl-filter-section .pl-select:focus {
+    border-color: #80b4f8;
+    outline: 0;
+    box-shadow: 0 0 0 3px rgba(47, 128, 237, 0.10);
+}
+
+/* ==========================================
+   PERIODE
+========================================== */
+
+.pl-filter-periode {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+/* Tahun */
+.pl-tahun-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.pl-tahun-row .pl-field-label {
+    color: #667085;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.pl-tahun-row .pl-select {
+    width: 115px;
+    flex-shrink: 0;
+}
+
+/* Label triwulan */
+.pl-triwulan-label {
+    margin-top: 2px;
+    color: #8492a6;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+/* Grid triwulan */
+.pl-triwulan-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+}
+
+.pl-triwulan-card {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 0;
+    min-height: 38px;
+    margin: 0;
+    padding: 8px;
+    color: #475467;
+    font-size: 12px;
+    font-weight: 500;
+    border: 1px solid #dfe4ec;
+    border-radius: 8px;
+    background: #fff;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.pl-triwulan-card input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.pl-triwulan-card:hover {
+    border-color: #80b4f8;
+    background: #f8fbff;
+}
+
+.pl-triwulan-card.active {
+    color: #2f80ed;
+    border-color: #2f80ed;
+    background: #eff6ff;
+    font-weight: 600;
+}
+
+/* Semua periode */
+.pl-semua-periode {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: fit-content;
+    margin: 0;
+    padding: 2px 0;
+    color: #667085;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.pl-semua-periode input[type="radio"] {
+    appearance: none;
+    -webkit-appearance: none;
+    position: relative;
+    flex: 0 0 16px;
+    width: 16px;
+    height: 16px;
+    margin: 0;
+    padding: 0;
+    border: 1.5px solid #cbd5e1;
+    border-radius: 50%;
+    background: #fff;
+    cursor: pointer;
+}
+
+.pl-semua-periode input[type="radio"]:checked {
+    border: 5px solid #2f80ed;
+}
+
+/* Tombol tampilkan */
+.pl-btn-submit {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    width: 100%;
+    min-height: 36px;
+    margin-top: 2px;
+    padding: 8px 14px;
+    color: #fff;
+    background: #2f80ed;
+    border: 1px solid #2f80ed;
+    border-radius: 7px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+.pl-btn-submit:hover {
+    background: #1d6fd8;
+    border-color: #1d6fd8;
+}
+
+/* ==========================================
+   RESPONSIVE FILTER PELAPORAN RISIKO
+========================================== */
+
+/* Desktop dan tablet */
+.pl-filter-card .pl-filter-inner {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr) !important;
+    gap: 14px;
+    align-items: stretch;
+}
+
+/* Hanya layar HP kecil yang dibuat bertumpuk */
+@media (max-width: 400px) {
+    .pl-filter-card .pl-filter-inner {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+/* ========================================
+   FILTER PELAPORAN - FORMAL PROFESSIONAL
+======================================== */
+.pl-filter-card {
+    width: 100%;
+    margin-bottom: 16px;
+    padding: 18px 20px;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    background: #fff;
+    box-shadow: none;
+    box-sizing: border-box;
+}
+
+.pl-filter-inner {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.pl-filter-section {
+    min-width: 0;
+    padding: 0;
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    box-sizing: border-box;
+}
+
+.pl-section-label {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin-bottom: 12px;
+    color: #344054;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+/* Header */
+.pl-filter-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 17px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #eaecf0;
+}
+
+.pl-filter-header h6 {
+    margin: 0 0 5px;
+    font-size: 15px;
+    font-weight: 650;
+    color: #344054;
+}
+
+.pl-filter-header p {
+    margin: 0;
+    font-size: 12px;
+    color: #667085;
+}
+
+.pl-filter-header > i {
+    font-size: 21px;
+    color: #3978b9;
+}
+
+/* Dua kolom */
+.pl-filter-inner {
+    display: grid;
+    grid-template-columns: 1.05fr .95fr;
+    gap: 24px;
+    align-items: stretch;
+}
+
+/* Section */
+.pl-filter-section {
+    min-width: 0;
+    padding: 0;
+    background: transparent;
+    border: none;
+    border-radius: 0;
+}
+
+/* Pembatas vertikal */
+.pl-filter-periode {
+    padding-left: 24px;
+    border-left: 1px solid #eaecf0;
+}
+
+/* Judul section */
+.pl-section-label {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    margin-bottom: 18px;
+    color: #344054;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: .5px;
+}
+
+.pl-section-number {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 25px;
+    height: 25px;
+    border-radius: 5px;
+    background: #edf3fa;
+    color: #3978b9;
+    font-size: 11px;
+    letter-spacing: 0;
+}
+
+/* Konteks */
+.pl-filter-context .pl-field-group {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.pl-filter-context .pl-field {
+    display: grid;
+    grid-template-columns: 110px minmax(0, 1fr);
+    align-items: center;
+    gap: 12px;
+    margin: 0;
+    min-width: 0;
+}
+
+.pl-filter-context .pl-field-label {
+    font-size: 12px;
+    color: #667085;
+    font-weight: 500;
+}
+
+.pl-filter-context .pl-field-value {
+    min-width: 0;
+    margin: 0;
+}
+
+.pl-field-static {
+    color: #344054;
+    font-size: 13px;
+    font-weight: 500;
+    overflow-wrap: anywhere;
+}
+
+/* Input dan dropdown */
+.pl-filter-section .pl-select {
+    width: 100%;
+    height: 39px;
+    border: 1px solid #d0d5dd;
+    border-radius: 6px;
+    background-color: #fff;
+    color: #344054;
+    font-size: 12px;
+}
+
+/* Periode */
+.pl-periode-modern {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.pl-tahun-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.pl-tahun-row .pl-select {
+    max-width: 130px;
+}
+
+.pl-triwulan-label {
+    color: #667085;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.pl-triwulan-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 9px;
+}
+
+.pl-triwulan-card {
+    min-height: 39px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #d0d5dd;
+    border-radius: 6px;
+    color: #475467;
+    font-size: 12px;
+    cursor: pointer;
+    transition: .2s ease;
+}
+
+.pl-triwulan-card.active {
+    border-color: #3978b9;
+    background: #edf4fb;
+    color: #285f96;
+    font-weight: 600;
+}
+
+.pl-semua-periode {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #475467;
+    font-size: 12px;
+}
+
+/* Tombol */
+.pl-filter-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 22px;
+    padding-top: 16px;
+    border-top: 1px solid #eaecf0;
+}
+
+.pl-filter-actions .pl-btn-submit {
+    width: auto;
+    min-width: 145px;
+    height: 39px;
+    padding: 0 18px;
+    border-radius: 6px;
+    background: #2878b9;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .pl-filter-inner {
+        grid-template-columns: 1fr;
+        gap: 22px;
+    }
+
+    .pl-filter-periode {
+        padding-left: 0;
+        padding-top: 20px;
+        border-left: none;
+        border-top: 1px solid #eaecf0;
+    }
+}
+
+@media (max-width: 480px) {
+    .pl-filter-card {
+        padding: 16px;
+    }
+
+    .pl-filter-context .pl-field {
+        grid-template-columns: 95px minmax(0, 1fr);
+    }
 }

@@ -156,6 +156,17 @@
                                 <label class="rtp-form-label">Uraian RTP</label>
                                 <textarea name="uraian_rtp[]" class="form-control" rows="2"></textarea>
                             </div>
+                            <div class="mb-2">
+                                <label class="rtp-form-label">Jenis Penanganan</label>
+                                <select name="jenis_penanganan[]" class="form-select">
+                                    <option value="">Pilih jenis</option>
+                                    <?php foreach (['Preventif', 'Korektif', 'Direktif', 'Detektif'] as $opsi): ?>
+                                        <option value="<?= esc($opsi) ?>">
+                                            <?= esc($opsi) ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
                             <div class="rtp-target-grid">
                                 <div>
                                     <label class="rtp-form-label rtp-sub-label">Output</label>

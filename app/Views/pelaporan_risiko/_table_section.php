@@ -3,41 +3,40 @@
 
         <div class="ar-table-scroll">
             <table class="table table-hover align-middle mb-0 pl-report-table" id="plTable">
-
                 <colgroup>
                     <col style="width:4%">
-                    <col style="width:23%">
-                    <col style="width:22%">
-                    <col style="width:12%">
+                    <col style="width:25%">
+                    <col style="width:20%">
+                    <col style="width:13%">
+                    <col style="width:7%">
+                    <col style="width:13%">
                     <col style="width:7%">
                     <col style="width:11%">
-                    <col style="width:7%">
-                    <col style="width:14%">
                 </colgroup>
 
                 <thead class="table-light">
                     <tr>
-    <th rowspan="2" class="text-center">#</th>
-    <th rowspan="2">Risiko</th>
-    <th rowspan="2">RTP</th>
+                        <th rowspan="2" class="text-center">#</th>
+                        <th rowspan="2">Risiko</th>
+                        <th rowspan="2">RTP</th>
 
-    <th colspan="2" class="text-center">
-        Target
-    </th>
+                        <th colspan="2" class="text-center">
+                            Target
+                        </th>
 
-    <th colspan="3" class="text-center">
-        Realisasi
-    </th>
-</tr>
+                        <th colspan="3" class="text-center">
+                            Realisasi
+                        </th>
+                    </tr>
 
-<tr>
-    <th>Output</th>
-    <th class="text-center">Waktu</th>
+                    <tr>
+                        <th>Output</th>
+                        <th class="text-center">Waktu</th>
 
-    <th>Output</th>
-    <th class="text-center">Waktu</th>
-    <th class="text-center">Status</th>
-</tr>
+                        <th>Output</th>
+                        <th class="text-center">Waktu</th>
+                        <th class="text-center">Status</th>
+                    </tr>
                 </thead>
                 <tbody>
                     <?php if (empty($data)): ?>

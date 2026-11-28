@@ -46,7 +46,6 @@
     asort($pengelolaOpt);
 
     $sel = $activeKonteks ?? [];
-    $sel = $activeKonteks ?? [];
 
     $currentYear = (int) (
         service('request')->getGet('tahun')
@@ -71,7 +70,6 @@
         <form id="plContextSelectorForm" method="get" action="<?= site_url('pelaporan-risiko') ?>">
             <input type="hidden" name="id_konteks" id="plCsIdKonteks">
             <div class="pl-filter-inner">
-
                 <div class="pl-filter-section pl-filter-context">
                     <div class="pl-section-label"><i class="ti ti-building"></i> Konteks</div>
                     <div class="pl-field-group">
@@ -170,8 +168,6 @@
                     </div>
                 </div>
 
-                <div class="pl-filter-divider"></div>
-
                 <div class="pl-filter-section pl-filter-periode">
                     <div class="pl-section-label">
                         <i class="ti ti-calendar"></i> PERIODE
@@ -228,15 +224,15 @@
                             <span>Semua Periode</span>
                         </label>
 
-                        <button type="submit" class="pl-btn-submit">
+                    </div> <!-- pl-periode-modern -->
+                </div> <!-- pl-filter-periode -->
+
+            </div> <!-- pl-filter-inner -->
+                                    <button type="submit" class="pl-btn-submit">
                             <i class="ti ti-search"></i> Tampilkan
                         </button>
-
-                    </div>
-
-                </div>
         </form>
-    </div>
+    </div> <!-- pl-filter-card -->
 
     <script>
         window.PL_CS_DATA = {

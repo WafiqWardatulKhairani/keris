@@ -610,54 +610,59 @@ class EvaluasiRisikoController extends BaseController
         }
     }
 
-    public function update($id)
-    {
-        try {
-            $data = $this->evaluasiModel->find($id);
+public function update($id)
+{
+    try {
+        $data = $this->evaluasiModel->find($id);
 
-            if (!$data || !$this->validateTimAccessByIdentifikasi($data['id_identifikasi'])) {
-                return $this->response->setStatusCode(403)->setJSON([
-                    'status' => 'error',
-                    'message' => 'Tidak punya akses'
-                ]);
-            }
-
-            $pesanValidasi = $this->validateResponseRisk(
-                $this->request->getPost('id_penilaian'),
-                $this->request->getPost('id_identifikasi'),
-                $opsiTindakan
-            );
-
-            if ($pesanValidasi !== null) {
-                return $this->response->setStatusCode(422)->setJSON([
-                    'status'  => 'error',
-                    'message' => $pesanValidasi,
-                ]);
-            }
-
-            $this->evaluasiModel->update($id, [
-                'id_identifikasi' => $this->request->getPost('id_identifikasi'),
-                'id_penilaian'    => $this->request->getPost('id_penilaian'),
-                'opsi_tindakan'   => $opsiTindakan,
-                'prioritas'       => ($opsiTindakan === 'Mengurangi Risiko')
-                    ? $this->request->getPost('prioritas')
-                    : null,
-                'keterangan'      => $this->request->getPost('keterangan'),
-            ]);
-
-            return $this->response->setJSON([
-                'status'     => 'success',
-                'message'    => 'Evaluasi risiko berhasil diperbarui',
-                'csrf_token' => csrf_hash(),
-            ]);
-        } catch (\Throwable $e) {
-            log_message('error', 'ER Update Error: ' . $e->getMessage());
-            return $this->response->setStatusCode(500)->setJSON([
-                'status'  => 'error',
-                'message' => $e->getMessage(),
+        if (!$data || !$this->validateTimAccessByIdentifikasi($data['id_identifikasi'])) {
+            return $this->response->setStatusCode(403)->setJSON([
+                'status' => 'error',
+                'message' => 'Tidak punya akses'
             ]);
         }
+
+        // Ambil opsi tindakan dari form
+        $opsiTindakan = $this->request->getPost('opsi_tindakan');
+
+        $pesanValidasi = $this->validateResponseRisk(
+            $this->request->getPost('id_penilaian'),
+            $this->request->getPost('id_identifikasi'),
+            $opsiTindakan
+        );
+
+        if ($pesanValidasi !== null) {
+            return $this->response->setStatusCode(422)->setJSON([
+                'status'  => 'error',
+                'message' => $pesanValidasi,
+            ]);
+        }
+
+        $this->evaluasiModel->update($id, [
+            'id_identifikasi' => $this->request->getPost('id_identifikasi'),
+            'id_penilaian'    => $this->request->getPost('id_penilaian'),
+            'opsi_tindakan'   => $opsiTindakan,
+            'prioritas'       => ($opsiTindakan === 'Mengurangi Risiko')
+                ? $this->request->getPost('prioritas')
+                : null,
+            'keterangan'      => $this->request->getPost('keterangan'),
+        ]);
+
+        return $this->response->setJSON([
+            'status'     => 'success',
+            'message'    => 'Evaluasi risiko berhasil diperbarui',
+            'csrf_token' => csrf_hash(),
+        ]);
+
+    } catch (\Throwable $e) {
+        log_message('error', 'ER Update Error: ' . $e->getMessage());
+
+        return $this->response->setStatusCode(500)->setJSON([
+            'status'  => 'error',
+            'message' => $e->getMessage(),
+        ]);
     }
+}
 
     public function delete($id)
     {

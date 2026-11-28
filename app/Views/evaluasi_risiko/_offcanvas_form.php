@@ -219,7 +219,7 @@
 
             <!-- ===== BUTTONS ===== -->
             <div class="d-flex align-items-center pt-3 border-top">
-                <div>
+                <div> 
                     <button type="button" id="erBtnDelete"
                         class="btn btn-sm btn-danger d-none"
                         onclick="erHapus()">

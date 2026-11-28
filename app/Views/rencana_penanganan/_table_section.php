@@ -8,6 +8,7 @@
                     <th rowspan="2" class="rtp-th rtp-th-kode text-center">Kode<br>Proses</th>
                     <th rowspan="2" class="rtp-th rtp-th-risiko">Risiko</th>
                     <th rowspan="2" class="rtp-th rtp-th-rtp">Rencana Tindak Penanganan (RTP)</th>
+                    <th rowspan="2" class="rtp-th">Jenis Penanganan</th>
                     <th colspan="2" class="rtp-th text-center rtp-th-target-group">Target</th>
                     <th rowspan="2" class="rtp-th rtp-th-pj">Penanggung<br>Jawab</th>
                     <th colspan="3" class="rtp-th text-center rtp-th-residu-group">Risiko Residu</th>
@@ -24,7 +25,7 @@
             <tbody>
                 <?php if (empty($grouped)): ?>
                     <tr>
-                        <td colspan="8" class="text-center py-5 text-muted">
+                        <td colspan="10" class="text-center py-5 text-muted">
                             <i class="ti ti-inbox fs-3 d-block mb-2 opacity-25"></i>
                             Belum ada data.
                         </td>
@@ -71,7 +72,7 @@
 
                         <?php if ($jumlahRtp === 0): ?>
                             <!-- ===== BARIS KOSONG (belum ada RTP) ===== -->
-                            <tr class="rtp-row-empty rtp-row-group" 
+                            <tr class="rtp-row-empty rtp-row-group"
                                 data-group="<?= $groupId ?>"
                                 data-rtp=""
                                 data-id-evaluasi="<?= esc($item['id_evaluasi']) ?>"
@@ -108,7 +109,7 @@
                                     </div>
                                 </td>
 
-                                <td class="rtp-td text-center text-muted" colspan="3">
+                                <td class="rtp-td text-center text-muted" colspan="4">
                                     <span class="text-muted">—</span>
                                 </td>
 
@@ -140,6 +141,7 @@
                                     data-group="<?= $groupId ?>"
                                     data-rtp="<?= esc($rtp['id_rtp']) ?>"
                                     data-id-evaluasi="<?= esc($item['id_evaluasi']) ?>"
+                                    data-id-tim="<?= esc($item['id_tim']) ?>"
                                     title="Klik untuk lihat/edit RTP ini">
 
                                     <?php if ($isFirst): ?>
@@ -184,6 +186,26 @@
                                         </div>
                                     </td>
 
+                                    <!-- Jenis Penanganan -->
+                                    <td class="rtp-td text-center">
+                                        <select
+                                            class="form-select form-select-sm js-jenis-penanganan"
+                                            data-id-rtp="<?= esc($rtp['id_rtp']) ?>"
+                                            data-id-tim="<?= esc($item['id_tim']) ?>"
+                                            style="min-width: 130px; font-size: 0.8rem;">
+
+                                            <option value="">Pilih jenis</option>
+
+                                            <?php foreach (['Preventif', 'Korektif', 'Direktif', 'Detektif'] as $opsi): ?>
+                                                <option value="<?= esc($opsi) ?>"
+                                                    <?= ($rtp['jenis_penanganan'] ?? '') === $opsi ? 'selected' : '' ?>>
+                                                    <?= esc($opsi) ?>
+                                                </option>
+                                            <?php endforeach; ?>
+                                        </select>
+
+                                        <small class="jenis-penanganan-status d-block"></small>
+                                    </td>
                                     <!-- Target Output -->
                                     <td class="rtp-td rtp-td-output">
                                         <div class="rtp-truncate small text-dark">
@@ -277,7 +299,7 @@
                     endforeach;
                     ?>
                     <select name="perPage" class="rtp-perpage pk-perpage-select"
-                            onchange="document.getElementById('rtpPerPageForm').submit();">
+                        onchange="document.getElementById('rtpPerPageForm').submit();">
                         <?php foreach ([5, 10, 25, 50] as $size): ?>
                             <option value="<?= $size ?>" <?= ($perPage ?? 10) == $size ? 'selected' : '' ?>>
                                 <?= $size ?>
@@ -303,7 +325,7 @@
                         <li class="page-item disabled"><span class="page-link">&laquo;</span></li>
                     <?php else:
                         $queryString['page'] = $currentPage - 1;
-                        ?>
+                    ?>
                         <li class="page-item"><a class="page-link" href="?<?= http_build_query($queryString) ?>">&laquo;</a></li>
                     <?php endif; ?>
 
@@ -314,7 +336,7 @@
                                 <li class="page-item active"><span class="page-link"><?= $i ?></span></li>
                             <?php else:
                                 $queryString['page'] = $i;
-                                ?>
+                            ?>
                                 <li class="page-item"><a class="page-link" href="?<?= http_build_query($queryString) ?>"><?= $i ?></a></li>
                             <?php endif; ?>
                         <?php elseif ($i == 2 || $i == $totalPages - 1): ?>
@@ -327,7 +349,7 @@
                         <li class="page-item disabled"><span class="page-link">&raquo;</span></li>
                     <?php else:
                         $queryString['page'] = $currentPage + 1;
-                        ?>
+                    ?>
                         <li class="page-item"><a class="page-link" href="?<?= http_build_query($queryString) ?>">&raquo;</a></li>
                     <?php endif; ?>
                 </ul>
@@ -358,8 +380,13 @@
                 const newCard = doc.getElementById('rtpTableCard');
                 if (newCard && wrapper) {
                     wrapper.outerHTML = newCard.outerHTML;
+                    if (typeof rtpInitJenisPenanganan === "function") {
+    rtpInitJenisPenanganan();
+}
                     window.history.pushState({}, '', url.toString());
-                    window.scrollTo({ top: scrollY });
+                    window.scrollTo({
+                        top: scrollY
+                    });
                 }
             });
     }
@@ -387,4 +414,4 @@
             });
         });
     });
-</script>   
+</script>

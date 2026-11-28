@@ -798,6 +798,7 @@ function prGoToPage(page) {
 ====================================================== */
 
 // Simpan perubahan keterjadian ke database
+
 function prSimpanKeterjadian(select, jumlahInput) {
   const idIdentifikasi = select.dataset.idIdentifikasi;
 
@@ -806,10 +807,14 @@ function prSimpanKeterjadian(select, jumlahInput) {
     return;
   }
 
+  const previousStatus = select.dataset.previousValue ?? select.value;
+  const previousJumlah = jumlahInput.dataset.previousValue ?? jumlahInput.value;
+
   const data = new FormData();
   data.append("id_identifikasi", idIdentifikasi);
   data.append("keterjadian_risiko", select.value);
   data.append("jumlah_keterjadian", jumlahInput.value || 0);
+
   const triwulan = document.getElementById("filterTriwulan")?.value || 1;
   data.append("triwulan", triwulan);
   data.append(prCsrfName, prCsrfToken);
@@ -829,7 +834,7 @@ function prSimpanKeterjadian(select, jumlahInput) {
 
       if (!response.ok || !result.success) {
         throw new Error(
-          result.message || "Gagal menyimpan keterjadian risiko.",
+          result.message || "Gagal menyimpan keterjadian risiko."
         );
       }
 
@@ -837,14 +842,18 @@ function prSimpanKeterjadian(select, jumlahInput) {
         prCsrfToken = result.csrfHash;
       }
 
-      return result;
-    })
-    .then((result) => {
+      select.dataset.previousValue = select.value;
+      jumlahInput.dataset.previousValue = result.data.jumlah_keterjadian;
+
       jumlahInput.value = result.data.jumlah_keterjadian;
+
       console.log("Keterjadian berhasil disimpan:", result.data);
     })
     .catch((error) => {
       console.error("Update keterjadian gagal:", error);
+
+      select.value = previousStatus;
+      jumlahInput.value = previousJumlah;
 
       Swal.fire({
         icon: "error",
@@ -858,11 +867,13 @@ function prSimpanKeterjadian(select, jumlahInput) {
     });
 }
 
+
 // Ketika dropdown status berubah
 document.addEventListener("change", function (e) {
   if (!e.target.matches(".pr-keterjadian-select")) return;
 
   const select = e.target;
+  select.dataset.previousValue = select.value;
   const idIdentifikasi = select.dataset.idIdentifikasi;
   const table = select.closest("table");
 
@@ -888,6 +899,7 @@ document.addEventListener("change", function (e) {
   if (!e.target.matches(".pr-jumlah-keterjadian")) return;
 
   const jumlahInput = e.target;
+  jumlahInput.dataset.previousValue = jumlahInput.value;
   const idIdentifikasi = jumlahInput.dataset.idIdentifikasi;
   const table = jumlahInput.closest("table");
 

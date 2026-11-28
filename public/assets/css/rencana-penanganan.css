@@ -800,3 +800,39 @@ background:#e5e7eb;
     text-align:right;
     margin-top:4px;
 }
+
+/* Jenis Penanganan pada Detail RTP */
+#rtpTimelineContainer .rtp-view-jenis {
+    width: 100%;
+    max-width: 100%;
+    min-height: 38px;
+    background-color: #fff;
+    color: #495057;
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
+    font-size: 13px;
+    padding: 7px 12px;
+    opacity: 1;
+    cursor: default;
+}
+
+#rtpTimelineContainer .rtp-timeline-item {
+    padding-bottom: 14px;
+    margin-bottom: 14px;
+}
+
+#rtpTimelineContainer .rtp-timeline-content {
+    width: 100%;
+}
+
+#rtpTimelineContainer .rtp-timeline-label {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #6c757d;
+}
+
+#rtpTimelineContainer .rtp-timeline-content > div {
+    margin-bottom: 7px;
+}

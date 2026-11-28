@@ -6,7 +6,7 @@ function rlSetMode(mode) {
   const isView = mode === "view";
   const isEdit = mode === "edit";
   const isCreate = mode === "create";
-
+ 
   const show = (id) => document.getElementById(id)?.classList.remove("d-none");
 
   const hide = (id) => document.getElementById(id)?.classList.add("d-none");

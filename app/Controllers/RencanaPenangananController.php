@@ -258,11 +258,12 @@ class RencanaPenangananController extends BaseController
             sr_r.warna as warna_selera_residu,
             sl.nama_level as nama_selera,
             sl.warna      as warna_selera,
-            rtp.id_rtp,
-            rtp.uraian_rtp,
-            rtp.target_output,
-            rtp.target_waktu,
-            km_r.level      as level_kemungkinan_residu,
+          rtp.id_rtp,
+rtp.uraian_rtp,
+rtp.target_output,
+rtp.target_waktu,
+rtp.jenis_penanganan,
+km_r.level AS level_kemungkinan_residu,
             kd_r.level      as level_dampak_residu
         ')
             ->join('identifikasi_risiko ir', 'ir.id_identifikasi = er.id_identifikasi')
@@ -374,15 +375,17 @@ class RencanaPenangananController extends BaseController
                 $skorSR = $row['nilai_sr_residu'] ?? null;
 
                 $grouped[$idEval]['rtp_list'][] = [
-                    'id_rtp'        => $row['id_rtp'],
-                    'uraian_rtp'    => $row['uraian_rtp'],
-                    'target_output' => $row['target_output'],
-                    'target_waktu'  => $row['target_waktu'],
+                    'id_rtp'           => $row['id_rtp'],
+                    'uraian_rtp'       => $row['uraian_rtp'],
+                    'target_output'    => $row['target_output'],
+                    'target_waktu'     => $row['target_waktu'],
+                    'jenis_penanganan' => $row['jenis_penanganan'],
+
                     'level_kemungkinan_residu' => $levelP ?: null,
                     'level_dampak_residu'      => $levelD ?: null,
-                    'nilai_sr_residu' => $row['nilai_sr_residu'],
-                    'nama_selera_residu' => $row['nama_selera_residu'],
-                    'warna_selera_residu' => $row['warna_selera_residu'],
+                    'nilai_sr_residu'          => $row['nilai_sr_residu'],
+                    'nama_selera_residu'       => $row['nama_selera_residu'],
+                    'warna_selera_residu'      => $row['warna_selera_residu'],
                 ];
             }
         }
@@ -467,6 +470,7 @@ class RencanaPenangananController extends BaseController
             rtp.uraian_rtp,
             rtp.target_output,
             rtp.target_waktu,
+            rtp.jenis_penanganan,
             km_r.level as level_kemungkinan_residu,
             kd_r.level as level_dampak_residu,
             mr_r.nilai_risiko as nilai_sr_residu,
@@ -591,6 +595,7 @@ class RencanaPenangananController extends BaseController
                     'uraian_rtp'    => $row['uraian_rtp'],
                     'target_output' => $row['target_output'],
                     'target_waktu'  => $row['target_waktu'],
+                    'jenis_penanganan' => $row['jenis_penanganan'],
                     'level_kemungkinan_residu' => $row['level_kemungkinan_residu'],
                     'level_dampak_residu'      => $row['level_dampak_residu'],
                     'nilai_sr_residu'          => $row['nilai_sr_residu'],
@@ -618,6 +623,112 @@ class RencanaPenangananController extends BaseController
         ]);
     }
 
+    public function updateJenisPenanganan($id)
+    {
+        try {
+            $jenis = $this->request->getPost('jenis_penanganan');
+
+            $allowed = [
+                'Preventif',
+                'Korektif',
+                'Direktif',
+                'Detektif',
+            ];
+
+            if (!in_array($jenis, $allowed, true)) {
+                return $this->response->setStatusCode(422)->setJSON([
+                    'status'  => 'error',
+                    'message' => 'Jenis penanganan tidak valid.',
+                ]);
+            }
+
+            // Ambil data RTP beserta tim pemiliknya
+            $rtp = $this->db->table('rencana_penanganan_risiko rtp')
+                ->select('rtp.id_rtp, k.id_tim')
+                ->join(
+                    'evaluasi_risiko er',
+                    'er.id_evaluasi = rtp.id_penilaian_awal'
+                )
+                ->join(
+                    'identifikasi_risiko ir',
+                    'ir.id_identifikasi = er.id_identifikasi'
+                )
+                ->join(
+                    'konteks_proses_bisnis kpb',
+                    'kpb.id_konteks_proses = ir.id_konteks_proses'
+                )
+                ->join(
+                    'konteks k',
+                    'k.id_konteks = kpb.id_konteks'
+                )
+                ->where('rtp.id_rtp', $id)
+                ->get()
+                ->getRowArray();
+
+            if (!$rtp) {
+                return $this->response->setStatusCode(404)->setJSON([
+                    'status'  => 'error',
+                    'message' => 'Data RTP tidak ditemukan.',
+                ]);
+            }
+
+            // Validasi hak akses berdasarkan role
+            $role = session()->get('user_role');
+
+            if ($role === 'ketua') {
+                return $this->response->setStatusCode(403)->setJSON([
+                    'status'  => 'error',
+                    'message' => 'Anda tidak memiliki akses untuk mengubah data.',
+                ]);
+            }
+
+            if ($role === 'operator') {
+                $userTeams = session()->get('user_tim') ?? [];
+
+                $userTeams = array_map('strval', (array) $userTeams);
+
+                if (!in_array((string) $rtp['id_tim'], $userTeams, true)) {
+                    return $this->response->setStatusCode(403)->setJSON([
+                        'status'  => 'error',
+                        'message' => 'Anda tidak memiliki akses ke tim ini.',
+                    ]);
+                }
+            } elseif ($role !== 'admin') {
+                return $this->response->setStatusCode(403)->setJSON([
+                    'status'  => 'error',
+                    'message' => 'Role tidak memiliki akses.',
+                ]);
+            }
+
+            // Simpan jenis penanganan
+            $updated = $this->db->table('rencana_penanganan_risiko')
+                ->where('id_rtp', $id)
+                ->update([
+                    'jenis_penanganan' => $jenis,
+                ]);
+
+            if (!$updated) {
+                return $this->response->setStatusCode(500)->setJSON([
+                    'status'  => 'error',
+                    'message' => 'Gagal menyimpan jenis penanganan.',
+                ]);
+            }
+
+            return $this->response->setJSON([
+                'status'     => 'success',
+                'message'    => 'Jenis penanganan berhasil disimpan.',
+                'csrf_token' => csrf_hash(),
+            ]);
+        } catch (\Throwable $e) {
+            log_message('error', 'Update Jenis Penanganan: ' . $e->getMessage());
+
+            return $this->response->setStatusCode(500)->setJSON([
+                'status'  => 'error',
+                'message' => 'Terjadi kesalahan saat menyimpan.',
+            ]);
+        }
+    }
+
     /* DETAIL RTP (AJAX — view/edit mode) */
     public function detail($id)
     {
@@ -628,6 +739,7 @@ class RencanaPenangananController extends BaseController
             rtp.id_rtp,
             rtp.id_penilaian_awal as id_evaluasi,
             rtp.uraian_rtp,
+            rtp.jenis_penanganan,
             rtp.target_output,
             rtp.target_waktu,
             k.id_tim,
@@ -674,12 +786,13 @@ class RencanaPenangananController extends BaseController
         // ambil list RTP
         $rtpList = $db->table('rencana_penanganan_risiko rtp')
             ->select('
-        rtp.id_rtp,
-        rtp.uraian_rtp,
-        rtp.target_output,
-        rtp.target_waktu,
-        rtp.id_kemungkinan_residu,
-        rtp.id_dampak_residu
+      rtp.id_rtp,
+rtp.uraian_rtp,
+rtp.target_output,
+rtp.target_waktu,
+rtp.jenis_penanganan,
+rtp.id_kemungkinan_residu,
+rtp.id_dampak_residu
     ')
             ->where('rtp.id_penilaian_awal', $data['id_evaluasi'])
             ->orderBy('rtp.id_rtp', 'ASC')
@@ -749,6 +862,11 @@ class RencanaPenangananController extends BaseController
             $waktus      = $this->request->getPost('target_waktu');
             $kemungkinan = $this->request->getPost('id_kemungkinan_residu') ?: null;
             $dampak      = $this->request->getPost('id_dampak_residu') ?: null;
+            $jenisList = $this->request->getPost('jenis_penanganan') ?? [];
+
+            if (!is_array($jenisList)) {
+                $jenisList = [$jenisList];
+            }
 
             if (!is_array($uraianList)) $uraianList = [$uraianList];
             if (!is_array($outputs))    $outputs    = [$outputs];
@@ -771,11 +889,20 @@ class RencanaPenangananController extends BaseController
                     $targetWaktu = $targetWaktu . '-01';
                 }
 
-                $this->rtpModel->insert([
+                $jenis = $jenisList[$i] ?? null;
+
+                $allowed = ['Preventif', 'Korektif', 'Direktif', 'Detektif'];
+
+                if ($jenis !== null && $jenis !== '' && !in_array($jenis, $allowed, true)) {
+                    throw new \RuntimeException('Jenis penanganan tidak valid.');
+                }
+
+                $this->db->table('rencana_penanganan_risiko')->insert([
                     'id_penilaian_awal'     => $idPenilaian,
                     'uraian_rtp'            => $uraianList[$i] ?? null,
                     'target_output'         => $output,
                     'target_waktu'          => $targetWaktu,
+                    'jenis_penanganan'      => $jenis ?: null,
                     'id_kemungkinan_residu' => $kemungkinan,
                     'id_dampak_residu'      => $dampak,
                 ]);
@@ -841,11 +968,13 @@ class RencanaPenangananController extends BaseController
             $uraianList = $this->request->getPost('uraian_rtp') ?? [];
             $outputList = $this->request->getPost('target_output') ?? [];
             $waktuList  = $this->request->getPost('target_waktu') ?? [];
+            $jenisList = $this->request->getPost('jenis_penanganan') ?? [];
 
             $idRtpList  = is_array($idRtpList) ? $idRtpList : [$idRtpList];
             $uraianList = is_array($uraianList) ? $uraianList : [$uraianList];
             $outputList = is_array($outputList) ? $outputList : [$outputList];
             $waktuList  = is_array($waktuList) ? $waktuList : [$waktuList];
+            $jenisList = is_array($jenisList) ? $jenisList : [$jenisList];
 
             $kemungkinanResidu = $this->request->getPost('id_kemungkinan_residu') ?: null;
             $dampakResidu      = $this->request->getPost('id_dampak_residu') ?: null;
@@ -876,19 +1005,28 @@ class RencanaPenangananController extends BaseController
                     continue;
                 }
 
+                $jenis = $jenisList[$i] ?? null;
+
+                $allowed = ['Preventif', 'Korektif', 'Direktif', 'Detektif'];
+
+                if ($jenis !== null && $jenis !== '' && !in_array($jenis, $allowed, true)) {
+                    throw new \RuntimeException('Jenis penanganan tidak valid.');
+                }
+
                 $targetWaktu = $waktuList[$i] ?? null;
 
                 if ($targetWaktu && strlen($targetWaktu) === 7) {
                     $targetWaktu .= '-01';
                 }
 
-                $data = [
-                    'uraian_rtp'            => $uraianList[$i] ?? null,
-                    'target_output'         => $output,
-                    'target_waktu'          => $targetWaktu ?: null,
-                    'id_kemungkinan_residu' => $kemungkinanResidu,
-                    'id_dampak_residu'      => $dampakResidu,
-                ];
+               $data = [
+    'uraian_rtp'            => $uraianList[$i] ?? null,
+    'target_output'         => $output,
+    'target_waktu'          => $targetWaktu ?: null,
+    'jenis_penanganan'      => $jenis ?: null,
+    'id_kemungkinan_residu' => $kemungkinanResidu,
+    'id_dampak_residu'      => $dampakResidu,
+];
 
                 if ($idRtp !== '' && $idRtp !== null) {
                     // RTP lama: pertahankan ID, cukup update datanya

@@ -305,13 +305,18 @@ $routes->group('rencana-penanganan', ['namespace' => 'App\Controllers', 'filter'
 
     $routes->post('set-active', 'RencanaPenangananController::setActive', ['filter' => 'role:admin,operator,ketua']);
     $routes->post('reset-active', 'RencanaPenangananController::resetActive', ['filter' => 'role:admin,operator,ketua']);
-
     // WRITE ACCESS
     $routes->group('', ['filter' => 'role:admin,operator'], function ($routes) {
         $routes->post('store', 'RencanaPenangananController::store');
         $routes->post('update/(:num)', 'RencanaPenangananController::update/$1');
         $routes->post('delete/(:num)', 'RencanaPenangananController::delete/$1');
         $routes->post('preview', 'RencanaPenangananController::preview');
+
+        // Update Jenis Penanganan
+        $routes->post(
+            'update-jenis-penanganan/(:num)',
+            'RencanaPenangananController::updateJenisPenanganan/$1'
+        );
     });
 });
 
@@ -348,9 +353,9 @@ $routes->group('pelaporan-risiko', ['filter' => ['auth']], function ($routes) {
     $routes->get('detail/(:num)', 'PelaporanRisikoController::detail/$1', ['filter' => 'role:admin,operator,ketua']);
     $routes->get('export', 'PelaporanRisikoController::export', ['filter' => 'role:admin,operator,ketua']);
     $routes->get('print', 'PelaporanRisikoController::print', ['filter' => 'role:admin,operator,ketua']);
-  $routes->get('check-form4', 'PelaporanRisikoController::checkForm4', [
-    'filter' => 'role:admin,operator,ketua'
-]);
+    $routes->get('check-form4', 'PelaporanRisikoController::checkForm4', [
+        'filter' => 'role:admin,operator,ketua'
+    ]);
 
     // OPERATOR
     $routes->group('', ['filter' => 'role:operator'], function ($routes) {

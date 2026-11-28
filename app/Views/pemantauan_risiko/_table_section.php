@@ -2,6 +2,21 @@
     <div class="card-body">
         <div class="table-responsive">
             <table class="table rtp-table align-middle mb-0">
+                <colgroup>
+                    <col style="width: 3%">
+                    <col style="width: 7%">
+                    <col style="width: 13%">
+                    <col style="width: 13%">
+                    <col style="width: 9%">
+                    <col style="width: 8%">
+                    <col style="width: 5%">
+                    <col style="width: 10%">
+                    <col style="width: 6%">
+                    <col style="width: 10%">
+                    <col style="width: 6%">
+                    <col style="width: 10%">
+                </colgroup>
+
                 <thead>
                     <tr class="rtp-thead-main">
                         <th rowspan="2" class="rtp-th text-center">#</th>
@@ -27,7 +42,7 @@
                 <tbody>
                     <?php if (empty($grouped)): ?>
                         <tr>
-                            <td colspan="11" class="text-center py-5 text-muted">
+                            <td colspan="12" class="text-center py-5 text-muted">
                                 <i class="ti ti-inbox fs-3 d-block mb-2 opacity-25"></i>
                                 Belum ada data.
                             </td>
@@ -89,7 +104,7 @@
                                             </span>
                                         </td>
 
-                                        <td rowspan="<?= $rowspan ?>">
+                                        <td rowspan="<?= $rowspan ?>" class="pr-risk-cell">
                                             <div class="fw-semibold">
                                                 <?= esc($item['pernyataan_risiko']) ?>
                                             </div>
@@ -100,25 +115,32 @@
                                     <?php endif; ?>
                                     <?php if ($isFirst): ?>
                                         <!-- KETERJADIAN RISIKO -->
-                                        <td rowspan="<?= $rowspan ?>" class="text-center">
+                                        <td rowspan="<?= $rowspan ?>" class="text-center pr-edit-cell">
                                             <select
                                                 class="form-select form-select-sm pr-keterjadian-select"
                                                 data-id-identifikasi="<?= esc($item['id_identifikasi']) ?>"
                                                 <?= !in_array(session('user_role'), ['admin', 'operator'], true) ? 'disabled' : '' ?>>
+
                                                 <option value="T" <?= ($item['keterjadian_risiko'] ?? 'TT') === 'T' ? 'selected' : '' ?>>
                                                     Terjadi
                                                 </option>
+
                                                 <option value="TT" <?= ($item['keterjadian_risiko'] ?? 'TT') === 'TT' ? 'selected' : '' ?>>
                                                     Tidak Terjadi
                                                 </option>
+
                                                 <option value="BT" <?= ($item['keterjadian_risiko'] ?? 'TT') === 'BT' ? 'selected' : '' ?>>
                                                     Belum Terjadi
+                                                </option>
+
+                                                <option value="RB" <?= ($item['keterjadian_risiko'] ?? 'TT') === 'RB' ? 'selected' : '' ?>>
+                                                    Risiko Baru
                                                 </option>
                                             </select>
                                         </td>
 
                                         <!-- JUMLAH KETERJADIAN -->
-                                        <td rowspan="<?= $rowspan ?>" class="text-center">
+                                        <td rowspan="<?= $rowspan ?>" class="text-center pr-edit-cell">
                                             <input
                                                 type="number"
                                                 min="0"
@@ -143,8 +165,8 @@
 
                                     <!-- RTP -->
                                     <td>
-                                        <div title="<?= esc($rtp['uraian_rtp'], 'attr') ?>"
-                                            style="max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                        <div class="pr-table-text"
+                                            title="<?= esc($rtp['uraian_rtp'], 'attr') ?>">
                                             <?= esc($rtp['uraian_rtp']) ?>
                                         </div>
                                     </td>

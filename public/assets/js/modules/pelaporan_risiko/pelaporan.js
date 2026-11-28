@@ -333,76 +333,78 @@ function plShowCatatan(catatan) {
 }
 
 async function plPrintReport(form = "form4") {
-    const url = new URL(PL_URL.print, window.location.origin);
-    url.searchParams.set("form", form);
+  const url = new URL(PL_URL.print, window.location.origin);
+  url.searchParams.set("form", form);
 
-    const kegiatanSelect = document.getElementById("plCsKegiatan");
-    const idKegiatan = kegiatanSelect?.value || "";
+  const kegiatanSelect = document.getElementById("plCsKegiatan");
+  const idKegiatan = kegiatanSelect?.value || "";
 
-    // Validasi khusus Form 4
-    if (form === "form4") {
-        if (!idKegiatan) {
-            Swal.fire({
-                icon: "warning",
-                title: "Pilih Kegiatan",
-                text: "Pilih satu kegiatan terlebih dahulu untuk export Form Pemantauan Risiko.",
-                confirmButtonText: "Mengerti"
-            });
-            return;
-        }
+  // Validasi khusus Form 4
+  if (form === "form4") {
+    if (!idKegiatan) {
+      Swal.fire({
+        icon: "warning",
+        title: "Pilih Kegiatan",
+        text: "Pilih satu kegiatan terlebih dahulu untuk export Form Pemantauan Risiko.",
+        confirmButtonText: "Mengerti",
+      });
+      return;
+    }
 
-        const tahun = document.getElementById("plCsTahun")?.value || "";
+    const tahun = document.getElementById("plCsTahun")?.value || "";
 
-        const params = new URLSearchParams({
-            id_kegiatan: idKegiatan,
-            tahun: tahun
+    const triwulan =
+      document.querySelector('input[name="triwulan"]:checked')?.value || "";
+
+    const params = new URLSearchParams({
+      id_kegiatan: idKegiatan,
+      tahun: tahun,
+      triwulan: triwulan,
+    });
+
+    try {
+      const response = await fetch(`${PL_URL.checkForm4}?${params.toString()}`);
+
+      const result = await response.json();
+
+      if (!result.success) {
+        Swal.fire({
+          icon: "warning",
+          title: "Belum Disetujui",
+          text: "Export Form Pemantauan Risiko belum dapat dilakukan karena menunggu persetujuan Ketua Tim.",
+          confirmButtonText: "Tutup",
         });
 
-        try {
-            const response = await fetch(
-                `${PL_URL.checkForm4}?${params.toString()}`
-            );
+        return;
+      }
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "Gagal Memeriksa",
+        text: "Gagal memeriksa status persetujuan RTP.",
+        confirmButtonText: "Tutup",
+      });
 
-            const result = await response.json();
-
-            if (!result.success) {
-                Swal.fire({
-                    icon: "warning",
-                    title: "Belum Disetujui",
-                    text: "Export Form Pemantauan Risiko belum dapat dilakukan karena menunggu persetujuan Ketua Tim.",
-                    confirmButtonText: "Tutup"
-                });
-
-                return;
-            }
-        } catch (error) {
-            Swal.fire({
-                icon: "error",
-                title: "Gagal Memeriksa",
-                text: "Gagal memeriksa status persetujuan RTP.",
-                confirmButtonText: "Tutup"
-            });
-
-            return;
-        }
+      return;
     }
+  }
 
-    // Kirim seluruh filter yang sedang dipilih
-    const filterForm = document.getElementById("plFilterForm");
+  // Kirim seluruh filter yang sedang dipilih
+  const filterForm = document.getElementById("plContextSelectorForm");
 
-    if (filterForm) {
-        new FormData(filterForm).forEach((value, key) => {
-            if (value !== "") {
-                url.searchParams.set(key, value);
-            }
-        });
-    }
+  if (filterForm) {
+    new FormData(filterForm).forEach((value, key) => {
+      if (value !== "") {
+        url.searchParams.set(key, value);
+      }
+    });
+  }
 
-    // Pastikan kegiatan terpilih ikut dikirim
-    if (form === "form4") {
-        url.searchParams.set("id_kegiatan", idKegiatan);
-    }
+  // Pastikan kegiatan terpilih ikut dikirim
+  if (form === "form4") {
+    url.searchParams.set("id_kegiatan", idKegiatan);
+  }
 
-    // PDF dibuka hanya setelah lolos pemeriksaan
-    window.open(url.toString(), "_blank");
+  // PDF dibuka hanya setelah lolos pemeriksaan
+  window.open(url.toString(), "_blank");
 }

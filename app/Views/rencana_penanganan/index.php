@@ -14,6 +14,9 @@
             detail: (id) => `<?= site_url('rencana-penanganan/detail') ?>/${id}`,
             detailEvaluasi: (id) => `<?= site_url('rencana-penanganan/detail-evaluasi') ?>/${id}`,
             preview: '<?= site_url('rencana-penanganan/preview') ?>',
+
+            // Update jenis penanganan
+            updateJenisPenanganan: (id) => `<?= site_url('rencana-penanganan/update-jenis-penanganan') ?>/${id}`,
         }
     };
 </script>
@@ -41,7 +44,7 @@
                     <h2 class="page-title mb-0">Rencana Tindak Penanganan Risiko</h2>
                 </div>
             </div>
-        </div> 
+        </div>
     </div>
 
     <!-- Summary Cards -->

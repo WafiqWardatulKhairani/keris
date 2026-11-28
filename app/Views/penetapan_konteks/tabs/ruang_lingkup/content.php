@@ -56,7 +56,7 @@ $totalLengkap = count(array_filter($data, function ($row) {
 </div>
 
 <?= view('penetapan_konteks/tabs/ruang_lingkup/_table_section', [
-    'data'    => $data,
+    'data'    => $data, 
     'pager'   => $pager ?? null,
     'from'    => $from ?? 0,
     'to'      => $to ?? 0,

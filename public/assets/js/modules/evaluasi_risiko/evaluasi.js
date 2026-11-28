@@ -51,7 +51,7 @@ function erSetMode(mode) {
     .getElementById("erBtnSimpan")
     .classList.toggle("d-none", isView || !ER_CAN_EDIT);
 
-  // TUTUP
+  // TUTUP 
   document.getElementById("erBtnTutup").classList.toggle("d-none", isEdit);
 
   document
